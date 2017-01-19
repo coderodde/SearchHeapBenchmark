@@ -13,11 +13,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public final class DijkstraPathFinder implements PathFinder {
+public final class IndexedDijkstraPathFinder implements PathFinder {
 
     private final PriorityQueue<DirectedGraphNode, Double> searchFrontier;
     
-    public DijkstraPathFinder(PriorityQueue<DirectedGraphNode, Double> heap) {
+    public IndexedDijkstraPathFinder(
+            PriorityQueue<DirectedGraphNode, Double> heap) {
         heap.clear();
         this.searchFrontier = Objects.requireNonNull(heap, "The heap is null.");
     }
@@ -42,10 +43,6 @@ public final class DijkstraPathFinder implements PathFinder {
                 return tracebackPath(targetNode, parentMap);
             }
             
-            if (closedSet.contains(currentNode)) {
-                continue;
-            }
-            
             closedSet.add(currentNode);
             
             for (DirectedGraphNode childNode : currentNode.getChildren()) {
@@ -57,9 +54,13 @@ public final class DijkstraPathFinder implements PathFinder {
                         distanceMap.get(currentNode) +
                         weightFunction.getWeight(currentNode, childNode);
                 
-                if (!distanceMap.containsKey(childNode) 
-                        || distanceMap.get(childNode) > tentativeDistance) {
+                if (!distanceMap.containsKey(childNode)) {
                     searchFrontier.add(childNode, tentativeDistance);
+                    distanceMap.put(childNode, tentativeDistance);
+                    parentMap.put(childNode, currentNode);
+                } else if (distanceMap.get(childNode) > tentativeDistance) {
+                    searchFrontier.decreasePriority(childNode, 
+                                                    tentativeDistance);
                     distanceMap.put(childNode, tentativeDistance);
                     parentMap.put(childNode, currentNode);
                 }
