@@ -170,6 +170,11 @@ implements PriorityQueue<E, P> {
         this.size = 0;
     }
     
+    @Override
+    public String toString() {
+        return "BinomialHeap";
+    }
+    
     private BinomialTree<E, P> mergeRoots(BinomialTree<E, P> other) {
         BinomialTree<E, P> a = head;
         BinomialTree<E, P> b = other;

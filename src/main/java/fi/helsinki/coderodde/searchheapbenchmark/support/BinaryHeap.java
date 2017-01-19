@@ -95,6 +95,11 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
         size = 0;
     }
     
+    @Override
+    public String toString() {
+        return "BinaryHeap";
+    }
+    
     private void siftUp(int index) {
         if (index == 0) {
             return;

@@ -2,6 +2,7 @@ package tests;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.BinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class UnindexedHeapCorrectnessTest {
         PriorityQueue<Integer, Integer> d3aryHeap = new DaryHeap<>(3);
         PriorityQueue<Integer, Integer> d4aryHeap = new DaryHeap<>(4);
         PriorityQueue<Integer, Integer> d5aryHeap = new DaryHeap<>(5);
+        PriorityQueue<Integer, Integer> binomialHeap = new BinomialHeap<>();
         
         List<Integer> resultListOfBinaryHeap = test(binaryHeap, 
                                                     heapTaskList,
@@ -60,11 +62,16 @@ public class UnindexedHeapCorrectnessTest {
                                                   heapTaskList,
                                                   new Random(seed));
         
+        List<Integer> resultListOfBinomialHeap = test(binomialHeap,
+                                                      heapTaskList,
+                                                      new Random(seed));
+        
         return listsEqual(resultListOfBinaryHeap,
                           resultListOf2aryHeap,
                           resultListOf3aryHeap,
                           resultListOf4aryHeap,
-                          resultListOf5aryHeap);
+                          resultListOf5aryHeap,
+                          resultListOfBinomialHeap);
     }
     
     private static <T> boolean listsEqual(List<T>... lists) {
