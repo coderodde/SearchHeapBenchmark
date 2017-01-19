@@ -3,7 +3,16 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.Arrays;
 
-public class BinaryHeap<E, P extends Comparable<? super P>> 
+/**
+ * This class implements an un-indexed binary heap.
+ * 
+ * @author Rodion "(code)rodde" Efremov
+ * @version 1.6 (Jan 19, 2017)
+ * 
+ * @param <E> the element type.
+ * @param <P> the priority key type.
+ */
+public final class BinaryHeap<E, P extends Comparable<? super P>> 
         implements PriorityQueue<E, P> {
 
     /**
@@ -60,7 +69,7 @@ public class BinaryHeap<E, P extends Comparable<? super P>>
     }
 
     @Override
-    public void decreasePrioirty(E element, P newPriority) {
+    public void decreasePriority(E element, P newPriority) {
         throw new UnsupportedOperationException("This heap is not indexed.");
     }
 
@@ -69,6 +78,7 @@ public class BinaryHeap<E, P extends Comparable<? super P>>
         checkHeapIsNotEmpty();
         BinaryHeapNode<E, P> topNode = binaryHeapNodeArray[0];
         binaryHeapNodeArray[0] = binaryHeapNodeArray[--size];
+        binaryHeapNodeArray[size] = null;
         siftDownRoot();
         return topNode.element;
     }
@@ -80,8 +90,8 @@ public class BinaryHeap<E, P extends Comparable<? super P>>
     
     @Override 
     public void clear() {
+        Arrays.fill(binaryHeapNodeArray, 0, size, null);
         size = 0;
-        Arrays.fill(binaryHeapNodeArray, null);
     }
     
     private void siftUp(int index) {

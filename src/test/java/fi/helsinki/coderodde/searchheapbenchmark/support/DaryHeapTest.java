@@ -5,9 +5,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class BinaryHeapTest {
+public class DaryHeapTest {
 
-    private final PriorityQueue<Integer, Integer> heap = new BinaryHeap<>();
+    private final PriorityQueue<Integer, Integer> heap = new DaryHeap<>(3);
     
     @Before
     public void setUp() {
