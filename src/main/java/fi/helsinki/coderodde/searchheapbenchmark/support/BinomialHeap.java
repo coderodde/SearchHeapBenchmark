@@ -3,6 +3,15 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.NoSuchElementException;
 
+/**
+ * This class implements a binomial heap.
+ * 
+ * @author Rodion "(code)rodde" Efremov
+ * @version 1.6 (Jan 19, 2017)
+ * 
+ * @param <E> the element type.
+ * @param <P> the priority key type.
+ */
 public final class BinomialHeap<E, P extends Comparable<? super P>> 
 implements PriorityQueue<E, P> {
 
