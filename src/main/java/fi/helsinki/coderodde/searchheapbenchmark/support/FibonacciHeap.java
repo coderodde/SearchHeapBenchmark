@@ -166,6 +166,11 @@ implements PriorityQueue<E, P> {
         minimumNode = null;
         size = 0;
     }
+    
+    @Override
+    public String toString() {
+        return "FibonacciHeap";
+    }
 
     private void consolidate() {
         int arraySize = ((int) Math.floor(Math.log(size) / LOG_PHI)) + 1;
