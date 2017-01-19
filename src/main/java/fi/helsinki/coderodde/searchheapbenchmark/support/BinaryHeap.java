@@ -2,6 +2,7 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 /**
  * This class implements an un-indexed binary heap.
@@ -196,7 +197,7 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
     
     private void checkHeapIsNotEmpty() {
         if (size == 0) {
-            throw new IllegalStateException("This BinaryHeap is empty.");
+            throw new NoSuchElementException("This BinaryHeap is empty.");
         }
     }
 }

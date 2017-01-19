@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
  * @param <E> the element type.
  * @param <P> the priority key type.
  */
-public class DaryHeap<E, P extends Comparable<? super P>> 
+public final class DaryHeap<E, P extends Comparable<? super P>> 
         implements PriorityQueue<E, P> {
     
     /**
@@ -258,7 +258,7 @@ public class DaryHeap<E, P extends Comparable<? super P>>
      */
     private void checkHeapIsNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This BinaryHeap is empty.");
+            throw new NoSuchElementException("This DaryHeap is empty.");
         }
     }
     
