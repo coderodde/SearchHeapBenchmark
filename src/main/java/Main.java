@@ -147,9 +147,8 @@ public class Main {
         finder = new DijkstraPathFinder(heap);
         
         start = System.currentTimeMillis();
-        int i = 0;
+        
         for (SearchTask searchTask : searchTaskList) {
-            System.out.println(i++);
             DirectedGraphNode source = searchTask.source;
             DirectedGraphNode target = searchTask.target;
             paths.add(finder.search(source, target, weightFunction));

@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 public final class FibonacciHeap<E, P extends Comparable<? super P>>
 implements PriorityQueue<E, P> {
 
-    private static final int DEFAULT_CHILD_ARRAY_LENGTH = 10;
+    private static final int DEFAULT_CHILD_ARRAY_LENGTH = 100;
     
     /**
      * This class implements the Fibonacci heap nodes.
@@ -177,32 +177,42 @@ implements PriorityQueue<E, P> {
         int arraySize = ((int) Math.floor(Math.log(size) / LOG_PHI)) + 1;
         ensureArraySize(arraySize);
         Arrays.fill(array, null);
+    
+        FibonacciHeapNode<E, P> x = minimumNode;
+        int rootListSize = 0;
         
-        FibonacciHeapNode<E, P> w = minimumNode;
-        FibonacciHeapNode<E, P> wnext = w.right;
-        
-        do {
-            FibonacciHeapNode<E, P> x = w;
-            int d = x.degree;
+        if (x != null) {
+            rootListSize = 1;
+            x = x.right;
             
-            while (array[d] != null) {
-                FibonacciHeapNode<E, P> y = array[d];
+            while (x != minimumNode) {
+                rootListSize++;
+                x = x.right;
+            }
+        }
+        
+        while (rootListSize > 0) {
+            int degree = x.degree;
+            FibonacciHeapNode<E, P> next = x.right;
+            
+            while (array[degree] != null) {
+                FibonacciHeapNode<E, P> y = array[degree];
                 
                 if (x.priority.compareTo(y.priority) > 0) {
-                    FibonacciHeapNode<E, P> tmp = x;
-                    x = y;
-                    y = tmp;
+                    FibonacciHeapNode<E, P> tmp = y;
+                    y = x;
+                    x = tmp;
                 }
                 
                 link(y, x);
-                array[d] = null;
-                d++;
+                array[degree] = null;
+                degree++;
             }
             
-            array[d] = x;
-            w = wnext;
-            wnext = wnext.right;
-        } while (wnext != minimumNode);
+            array[degree] = x;
+            x = next;
+            rootListSize--;
+        }
         
         minimumNode = null;
         
@@ -212,22 +222,24 @@ implements PriorityQueue<E, P> {
             }
             
             if (minimumNode == null) {
-                y.degree = 0;
-                y.parent = null;
-                y.left = y;
-                y.right = y;
-                y.child = null;
                 minimumNode = y;
             } else {
-                y.left = minimumNode;
-                y.right = minimumNode.right;
-                minimumNode.right = y;
-                y.right.left = y;
-                
-                if (y.priority.compareTo(minimumNode.priority) < 0) {
-                    minimumNode = y;
-                }
+                moveToRootList(y);
             }
+        }
+    }
+    
+    private void moveToRootList(FibonacciHeapNode<E, P> node) {
+        node.left.right = node.right;
+        node.right.left = node.left;
+        
+        node.left = minimumNode;
+        node.right = minimumNode.right;
+        minimumNode.right = node;
+        node.right.left = node;
+        
+        if (node.priority.compareTo(minimumNode.priority) < 0) {
+            minimumNode = node;
         }
     }
     
@@ -341,8 +353,4 @@ implements PriorityQueue<E, P> {
             throw new NoSuchElementException("This DaryHeap is empty.");
         }
     }
-    /*
-    public static void main(String[] args) {
-        
-    }*/
 }
