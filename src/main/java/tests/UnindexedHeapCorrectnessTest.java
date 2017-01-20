@@ -13,23 +13,6 @@ public class UnindexedHeapCorrectnessTest {
 
     private static final int OPERATIONS_PER_HEAP = 100_000;
     
-    enum Operation {
-        ADD,
-        EXTRACT
-    }
-    
-    static class HeapTask {
-        Operation operation;
-        Integer element;
-        Integer priority;
-        
-        HeapTask(Operation operation, Integer element, Integer priority) {
-            this.operation = operation;
-            this.element = element;
-            this.priority = priority;
-        }
-    }
-    
     public static boolean test() {
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);

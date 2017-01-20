@@ -2,6 +2,8 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -14,7 +16,7 @@ import java.util.NoSuchElementException;
  * @param <E> the element type.
  * @param <P> the priority key type.
  */
-public final class DaryHeap<E, P extends Comparable<? super P>> 
+public final class IndexedDaryHeap<E, P extends Comparable<? super P>> 
         implements PriorityQueue<E, P> {
     
     /**
@@ -35,9 +37,10 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
      */
     private static final class DaryHeapNode<E, P> {
         
-        DaryHeapNode(E element, P priority) {
+        DaryHeapNode(E element, P priority, int index) {
             this.element = element;
             this.priority = priority;
+            this.index = index;
         }
         
         /**
@@ -49,6 +52,11 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
          * The priority of the element.
          */
         P priority;
+        
+        /**
+         * The index of the node in the node array.
+         */
+        int index;
     }
     
     /**
@@ -72,7 +80,12 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
      */
     private int size;
     
-    public DaryHeap(int degree) {
+    /**
+     * This map maps each element to its node.
+     */
+    private final Map<E, DaryHeapNode<E, P>> map = new HashMap<>();
+    
+    public IndexedDaryHeap(int degree) {
         this.degree = Math.max(degree, MINIMUM_DEGREE); 
         indices = new int[this.degree];
         daryHeapNodeArray = new DaryHeapNode[DEFAULT_CAPACITY];
@@ -83,11 +96,17 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
      */
     @Override
     public void add(E element, P priority) {
+        if (map.containsKey(element)) {
+            return;
+        }
+        
         checkHeapHasSpace();
         DaryHeapNode<E, P> newDaryHeapNode = new DaryHeapNode<>(element,
-                                                                priority);
+                                                                priority,
+                                                                size);
         daryHeapNodeArray[size] = newDaryHeapNode;
         siftUp(size++);
+        map.put(element, newDaryHeapNode);
     }
 
     /**
@@ -95,8 +114,21 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
      */
     @Override
     public boolean decreasePriority(E element, P newPriority) {
-        throw new UnsupportedOperationException(
-                "This DaryHeap is not indexed.");
+        DaryHeapNode<E, P> targetNode = map.get(element);
+        
+        if (targetNode == null) {
+            // Element not in this heap.
+            return false;
+        }
+        
+        if (targetNode.priority.compareTo(newPriority) <= 0) {
+            // Cannot improve the priority of the element.
+            return false;
+        }
+     
+        targetNode.priority = newPriority;
+        siftUp(targetNode.index);
+        return true;
     }
 
     /**
@@ -105,12 +137,17 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        E ret = daryHeapNodeArray[0].element;
-        DaryHeapNode<E, P> node = daryHeapNodeArray[--size];
+        DaryHeapNode<E, P> topNode = daryHeapNodeArray[0];
+        daryHeapNodeArray[0] = daryHeapNodeArray[--size];
         daryHeapNodeArray[size] = null;
-        daryHeapNodeArray[0] = node;
-        siftDownRoot();
-        return ret;
+        
+        if (size != 0) {
+            siftDown(0);
+        }
+            
+        E element = topNode.element;
+        map.remove(element);
+        return element;
     }
     
     /**
@@ -168,6 +205,8 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
             
             if (parentNode.priority.compareTo(targetNode.priority) > 0) {
                 daryHeapNodeArray[index] = parentNode;
+                parentNode.index = index;
+                        
                 index = parentNodeIndex;
                 parentNodeIndex = getParentNodeIndex(index);
             } else {
@@ -180,6 +219,7 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
         }
             
         daryHeapNodeArray[index] = targetNode;
+        targetNode.index = index;
     }
     
     /**
@@ -187,9 +227,8 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
      * 
      * @param index the index of the element to sift down.
      */
-    private void siftDownRoot() {
-        int index = 0;
-        DaryHeapNode<E, P> targetNode = daryHeapNodeArray[0];
+    private void siftDown(int index) {
+        DaryHeapNode<E, P> targetNode = daryHeapNodeArray[index];
         P priority = targetNode.priority;
         
         while (true) {
@@ -212,10 +251,12 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
             
             if (minChildIndex == -1) {
                 daryHeapNodeArray[index] = targetNode;
+                targetNode.index = index;
                 return;
             }
             
             daryHeapNodeArray[index] = daryHeapNodeArray[minChildIndex];
+            daryHeapNodeArray[index].index = index;
             index = minChildIndex;
         }
     }

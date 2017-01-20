@@ -18,7 +18,7 @@ public interface PriorityQueue<E, P extends Comparable<? super P>> {
      * @param element     the element whose priority to improve.
      * @param newPriority the new priority of the element.
      */
-    public void decreasePriority(E element, P newPriority);
+    public boolean decreasePriority(E element, P newPriority);
     
     /**
      * Extracts the element with the highest priority and returns it.

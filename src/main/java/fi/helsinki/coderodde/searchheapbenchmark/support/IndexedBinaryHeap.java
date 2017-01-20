@@ -2,10 +2,12 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
-
 /**
- * This class implements an un-indexed binary heap.
+ * This class implements an indexed binary heap that supports 
+ * {@code decreasePriority} in logarithmic time.
  * 
  * @author Rodion "(code)rodde" Efremov
  * @version 1.6 (Jan 19, 2017)
@@ -13,8 +15,8 @@ import java.util.NoSuchElementException;
  * @param <E> the element type.
  * @param <P> the priority key type.
  */
-public final class BinaryHeap<E, P extends Comparable<? super P>> 
-        implements PriorityQueue<E, P> {
+public final class IndexedBinaryHeap<E, P extends Comparable<? super P>> 
+implements PriorityQueue<E, P> {
 
     /**
      * This class bundles the element and its priority.
@@ -34,9 +36,15 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
          */
         P priority;
         
-        BinaryHeapNode(E element, P priority) {
+        /**
+         * The node array index at which this node is stored.
+         */
+        int index;
+        
+        BinaryHeapNode(E element, P priority, int index) {
             this.element = element;
             this.priority = priority;
+            this.index = index;
         }
     }
     
@@ -55,23 +63,49 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
      */
     private int size;
     
-    public BinaryHeap() {
+    /**
+     * This map maps each element to its node.
+     */
+    private final Map<E, BinaryHeapNode<E, P>> map = new HashMap<>();
+    
+    public IndexedBinaryHeap() {
         this.binaryHeapNodeArray = new BinaryHeapNode[DEFAULT_CAPACITY];
     }
     
     @Override
     public void add(E element, P priority) {
+        if (map.containsKey(element)) {
+            // This heap already holds the element.
+            return;
+        }
+            
         checkHeapHasSpace();
         
         BinaryHeapNode<E, P> newBinaryHeapNode = new BinaryHeapNode<>(element,
-                                                                      priority);
+                                                                      priority,
+                                                                      size);
         binaryHeapNodeArray[size] = newBinaryHeapNode;
         siftUp(size++);
+        map.put(element, newBinaryHeapNode);
     }
 
     @Override
     public boolean decreasePriority(E element, P newPriority) {
-        throw new UnsupportedOperationException("This heap is not indexed.");
+        BinaryHeapNode<E, P> targetNode = map.get(element);
+        
+        if (targetNode == null) {
+            // Element not in this heap.
+            return false;
+        }
+        
+        if (targetNode.priority.compareTo(newPriority) <= 0) {
+            // Cannot improve the priority of the element.
+            return false;
+        }
+        
+        targetNode.priority = newPriority;
+        siftUp(targetNode.index);
+        return true;
     }
 
     @Override
@@ -80,8 +114,14 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
         BinaryHeapNode<E, P> topNode = binaryHeapNodeArray[0];
         binaryHeapNodeArray[0] = binaryHeapNodeArray[--size];
         binaryHeapNodeArray[size] = null;
-        siftDownRoot();
-        return topNode.element;
+        
+        if (size != 0) {
+            siftDownRoot();
+        }
+            
+        E element = topNode.element;
+        map.remove(element);
+        return element;
     }
 
     @Override
@@ -92,6 +132,7 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
     @Override 
     public void clear() {
         Arrays.fill(binaryHeapNodeArray, 0, size, null);
+        map.clear();
         size = 0;
     }
     
@@ -116,8 +157,8 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
             P parentNodePriority = parentNode.priority;
             
             if (targetNodePriority.compareTo(parentNodePriority) < 0) {
-                binaryHeapNodeArray[index] =
-                        binaryHeapNodeArray[parentNodeIndex];
+                binaryHeapNodeArray[index] = parentNode;
+                parentNode.index = index;
                 
                 index = parentNodeIndex;
                 parentNodeIndex = getParentNodeIndex(index);
@@ -131,6 +172,7 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
         }
         
         binaryHeapNodeArray[index] = targetNode;
+        targetNode.index = index;
     }
     
     private void siftDownRoot() {
@@ -176,10 +218,12 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
             
             if (minChildNodeIndex == index) {
                 binaryHeapNodeArray[minChildNodeIndex] = targetHeapNode;
+                targetHeapNode.index = minChildNodeIndex;
                 return;
             }
             
             binaryHeapNodeArray[index] = binaryHeapNodeArray[minChildNodeIndex];
+            binaryHeapNodeArray[index].index = index;
             index = minChildNodeIndex;
             leftChildNodeIndex = getLeftChildIndex(index);
             rightChildNodeIndex = leftChildNodeIndex + 1;

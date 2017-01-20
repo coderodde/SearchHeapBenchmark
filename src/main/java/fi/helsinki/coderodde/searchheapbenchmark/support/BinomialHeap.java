@@ -113,7 +113,7 @@ implements PriorityQueue<E, P> {
     }
     
     @Override
-    public void decreasePriority(E element, P newPriority) {
+    public boolean decreasePriority(E element, P newPriority) {
         throw new UnsupportedOperationException(
                 "This BinomialHeap is un-indexed.");
     }
