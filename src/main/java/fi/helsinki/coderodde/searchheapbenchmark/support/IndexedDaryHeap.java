@@ -179,7 +179,7 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
      */
     @Override
     public String toString() {
-        return "DaryHeap: degree = " + degree;
+        return "IndexedDaryHeap: degree = " + degree;
     }
   
     /**

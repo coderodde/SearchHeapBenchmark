@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 public final class FibonacciHeap<E, P extends Comparable<? super P>>
 implements PriorityQueue<E, P> {
 
-    private static final int DEFAULT_CHILD_ARRAY_LENGTH = 100;
+    private static final int DEFAULT_CHILD_ARRAY_LENGTH = 5;
     
     /**
      * This class implements the Fibonacci heap nodes.

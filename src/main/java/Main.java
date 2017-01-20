@@ -8,15 +8,17 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DijkstraPathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.support.FibonacciHeap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Main {
 
-    private static final int GRAPH_NODES = 100;
-    private static final int SPARSE_GRAPH_ARCS = 300;
-    private static final int MEDIUM_GRAPH_ARCS = 1000;
-    private static final int DENSE_GRAPH_ARCS = 8000;
+    private static final int GRAPH_NODES = 10_000;
+    private static final int SPARSE_GRAPH_ARCS = 35_000;
+    private static final int MEDIUM_GRAPH_ARCS = 200_000;
+    private static final int DENSE_GRAPH_ARCS =  800_000;
     private static final int SEARCH_TASKS = 100;
     private static final double MAX_WEIGHT = 10.0;
     
@@ -37,13 +39,15 @@ public class Main {
                              
         System.out.println("Warming up...");
         //// Warming up. ////
-//        warmup(graphData, searchTaskList);
+        warmup(graphData, searchTaskList);
         System.out.println("Warming up done.");
         System.out.println();
+        System.gc();
         
         //// Benchmark on sparse graphs. ////
         System.out.println("===== SPARSE GRAPH =====");
         benchmark(graphData, searchTaskList);
+        System.gc();
         
         //// Benchmark on medium graphs. ////
         graphData = createRandomGraph(GRAPH_NODES,
@@ -57,10 +61,11 @@ public class Main {
         
         System.out.println("===== MEDIUM GRAPH =====");
         benchmark(graphData, searchTaskList);
+        System.gc();
         
         //// Benchmark on dense graphs. ////
         graphData = createRandomGraph(GRAPH_NODES,
-                                      MEDIUM_GRAPH_ARCS,
+                                      DENSE_GRAPH_ARCS,
                                       MAX_WEIGHT,
                                       random);
         
@@ -70,6 +75,7 @@ public class Main {
         
         System.out.println("===== DENSE GRAPH ======");
         benchmark(graphData, searchTaskList);
+        System.gc();
     }
     
     private static void benchmark(GraphData graphData, 
@@ -85,7 +91,23 @@ public class Main {
     private static void perform(GraphData graphData,
                                 List<SearchTask> searchTaskList,
                                 boolean output) {
-        List<List<DirectedGraphNode>> paths = new ArrayList<>();
+        Map<String, List<List<DirectedGraphNode>>> pathMap = new HashMap<>();
+        
+        pathMap.put(new BinaryHeap<>().toString(),
+                    new ArrayList<>(SEARCH_TASKS));
+        
+        for (int degree = 2; degree <= 10; ++degree) {
+            pathMap.put(new DaryHeap<>(degree).toString(),
+                        new ArrayList<>(SEARCH_TASKS));
+            
+        }
+        
+        pathMap.put(new BinomialHeap<>().toString(),
+                    new ArrayList<>(SEARCH_TASKS));
+        
+        pathMap.put(new FibonacciHeap<>().toString(),
+                    new ArrayList<>(SEARCH_TASKS));
+        
         PriorityQueue<DirectedGraphNode, Double> heap = new BinaryHeap<>();
         DijkstraPathFinder finder = new DijkstraPathFinder(heap);
         DirectedGraphWeightFunction weightFunction = graphData.weightFunction;
@@ -95,7 +117,10 @@ public class Main {
         for (SearchTask searchTask : searchTaskList) {
             DirectedGraphNode source = searchTask.source;
             DirectedGraphNode target = searchTask.target;
-            paths.add(finder.search(source, target, weightFunction));
+            List<DirectedGraphNode> path = finder.search(source, 
+                                                         target, 
+                                                         weightFunction);
+            pathMap.get(heap.toString()).add(path);
         }
         
         long end = System.currentTimeMillis();
@@ -114,7 +139,10 @@ public class Main {
             for (SearchTask searchTask : searchTaskList) {
                 DirectedGraphNode source = searchTask.source;
                 DirectedGraphNode target = searchTask.target;
-                paths.add(finder.search(source, target, weightFunction));
+                List<DirectedGraphNode> path = finder.search(source, 
+                                                             target, 
+                                                             weightFunction);
+                pathMap.get(heap.toString()).add(path);
             }
             
             end = System.currentTimeMillis();
@@ -133,7 +161,10 @@ public class Main {
         for (SearchTask searchTask : searchTaskList) {
             DirectedGraphNode source = searchTask.source;
             DirectedGraphNode target = searchTask.target;
-            paths.add(finder.search(source, target, weightFunction));
+            List<DirectedGraphNode> path = finder.search(source, 
+                                                         target, 
+                                                         weightFunction);
+            pathMap.get(heap.toString()).add(path);
         }
         
         end = System.currentTimeMillis();
@@ -151,7 +182,10 @@ public class Main {
         for (SearchTask searchTask : searchTaskList) {
             DirectedGraphNode source = searchTask.source;
             DirectedGraphNode target = searchTask.target;
-            paths.add(finder.search(source, target, weightFunction));
+            List<DirectedGraphNode> path = finder.search(source, 
+                                                         target, 
+                                                         weightFunction);
+            pathMap.get(heap.toString()).add(path);
         }
         
         end = System.currentTimeMillis();
@@ -160,6 +194,39 @@ public class Main {
             System.out.println(
                     heap + " in " + (end - start) + " milliseconds.");
         }
+        
+        if (output) {
+            System.out.println("Algorithms/heap agree: " + samePaths(pathMap));
+        }
+    }
+    
+    private static boolean 
+        samePaths(Map<String, List<List<DirectedGraphNode>>> pathMap) {
+        List<List<List<DirectedGraphNode>>> data = 
+                new ArrayList<>(pathMap.values());
+        
+        for (int i = 0; i < data.size() - 1; ++i) {
+            if (!samePaths(data.get(i), data.get(i + 1))) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+        
+    private static boolean samePaths(List<List<DirectedGraphNode>> paths1,
+                                     List<List<DirectedGraphNode>> paths2) {
+        if (paths1.size() != paths2.size()) {
+            return false;
+        }
+        
+        for (int i = 0; i < paths1.size(); ++i) {
+            if (!paths1.get(i).equals(paths2.get(i))) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     private static GraphData createRandomGraph(int nodes,

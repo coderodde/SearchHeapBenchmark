@@ -208,7 +208,7 @@ implements PriorityQueue<E, P> {
     
     @Override
     public String toString() {
-        return "FibonacciHeap";
+        return "IndexedFibonacciHeap";
     }
     
     private void cut(FibonacciHeapNode<E, P> x, FibonacciHeapNode<E, P> y) {

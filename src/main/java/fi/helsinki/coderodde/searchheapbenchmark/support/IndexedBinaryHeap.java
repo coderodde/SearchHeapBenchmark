@@ -134,7 +134,7 @@ implements PriorityQueue<E, P> {
     
     @Override
     public String toString() {
-        return "BinaryHeap";
+        return "IndexedBinaryHeap";
     }
     
     private void siftUp(int index) {

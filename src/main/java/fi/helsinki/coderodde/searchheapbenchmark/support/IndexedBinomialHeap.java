@@ -231,7 +231,7 @@ implements PriorityQueue<E, P> {
     
     @Override
     public String toString() {
-        return "BinomialHeap";
+        return "IndexedBinomialHeap";
     }
     
     private BinomialTree<E, P> mergeRoots(BinomialTree<E, P> other) {
