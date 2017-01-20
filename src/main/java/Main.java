@@ -3,6 +3,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphNode;
 import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DijkstraPathFinder;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,6 @@ public class Main {
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         
-        
         GraphData graphData = createRandomGraph(GRAPH_NODES,
                                                 SPARSE_GRAPH_ARCS,
                                                 MAX_WEIGHT,
@@ -31,9 +31,12 @@ public class Main {
                 getRandomSearchTaskList(SEARCH_TASKS,
                                         graphData.nodeList, 
                                         random);
-                               
+                             
+        System.out.println("Warming up...");
         //// Warming up. ////
         warmup(graphData, searchTaskList);
+        System.out.println("Warming up done.");
+        System.out.println();
         
         //// Benchmark on sparse graphs. ////
         System.out.println("===== SPARSE GRAPH =====");
@@ -96,11 +99,27 @@ public class Main {
         
         if (output) {
             System.out.println(
-                    "BinaryHeap in " + (end - start) + " milliseconds.");
+                    heap + " in " + (end - start) + " milliseconds.");
         }
             
         for (int degree = 2; degree <= 10; ++degree) {
+            heap = new DaryHeap<>(degree);
+            finder = new DijkstraPathFinder(heap);
             
+            start = System.currentTimeMillis();
+            
+            for (SearchTask searchTask : searchTaskList) {
+                DirectedGraphNode source = searchTask.source;
+                DirectedGraphNode target = searchTask.target;
+                paths.add(finder.search(source, target, weightFunction));
+            }
+            
+            end = System.currentTimeMillis();
+            
+            if (output) {
+                System.out.println(
+                        heap + " in " + (end - start) + " milliseconds.");
+            }
         }
     }
     

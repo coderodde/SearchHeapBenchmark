@@ -27,6 +27,7 @@ public final class DijkstraPathFinder implements PathFinder {
         search(DirectedGraphNode sourceNode, 
                DirectedGraphNode targetNode,
                DirectedGraphWeightFunction weightFunction) {
+        searchFrontier.clear();
         Set<DirectedGraphNode> closedSet = new HashSet<>();
         Map<DirectedGraphNode, Double> distanceMap = new HashMap<>();
         Map<DirectedGraphNode, DirectedGraphNode> parentMap = new HashMap<>();
