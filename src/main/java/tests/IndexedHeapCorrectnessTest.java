@@ -4,6 +4,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDaryHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedFibonacciHeap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -25,6 +26,8 @@ public class IndexedHeapCorrectnessTest {
         PriorityQueue<Integer, Integer> d5aryHeap = new IndexedDaryHeap<>(5);
         PriorityQueue<Integer, Integer> binomialHeap = 
                 new IndexedBinomialHeap<>();
+        PriorityQueue<Integer, Integer> fibonacciHeap = 
+                new IndexedFibonacciHeap<>();
         
         List<Integer> resultListOfBinaryHeap = test(binaryHeap, 
                                                     heapTaskList,
@@ -49,12 +52,17 @@ public class IndexedHeapCorrectnessTest {
         List<Integer> resultListOfBinomialHeap = test(binomialHeap,
                                                       heapTaskList,
                                                       new Random(seed));
+        
+        List<Integer> resultListOfFibonacciHeap = test(fibonacciHeap,
+                                                       heapTaskList,
+                                                       new Random(seed));
         return listsEqual(resultListOfBinaryHeap,
                           resultListOfDaryHeap2,
                           resultListOfDaryHeap3,
                           resultListOfDaryHeap4,
                           resultListOfDaryHeap5,
-                          resultListOfBinomialHeap);
+                          resultListOfBinomialHeap,
+                          resultListOfFibonacciHeap);
     }
     
     private static <T> boolean listsEqual(List<T>... lists) {

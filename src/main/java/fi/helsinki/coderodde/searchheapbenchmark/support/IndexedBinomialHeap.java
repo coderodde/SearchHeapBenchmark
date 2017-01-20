@@ -341,28 +341,4 @@ implements PriorityQueue<E, P> {
             throw new NoSuchElementException("This BinaryHeap is empty.");
         }
     }
-    
-    public static void main(String[] args) {
-        Random random = new Random();
-        PriorityQueue<Integer, Integer> heap = new IndexedBinomialHeap<>();
-        heap.add(1, 1);
-        heap.add(2, 2);
-        heap.decreasePriority(2, 0);
-        
-        /*
-        
-        for (int i = 0; i < 1_000_000; ++i) {
-            heap.add(i, i);
-        }
-        
-        long start = System.currentTimeMillis();
-        
-        for (int i = 500_000; i < 1_000_000; ++i) {
-            heap.decreasePriority(i, i - 1_000_000);
-        }
-        
-        long end = System.currentTimeMillis();
-        
-        System.out.println("Time: " + (end - start) + " milliseconds.");*/
-    }
 }
