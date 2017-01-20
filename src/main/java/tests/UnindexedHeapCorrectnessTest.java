@@ -54,7 +54,6 @@ public class UnindexedHeapCorrectnessTest {
         List<Integer> resultListOfFibonacciHeap = test(fibonacciHeap,
                                                        heapTaskList,
                                                        new Random(seed));
-        
         return listsEqual(resultListOfBinaryHeap,
                           resultListOf2aryHeap,
                           resultListOf3aryHeap,

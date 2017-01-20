@@ -1,6 +1,7 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 /**
@@ -28,7 +29,7 @@ implements PriorityQueue<E, P> {
         /**
          * The actual element.
          */
-        private final E element;
+        private E element;
         
         /**
          * The priority key of this node.
@@ -175,6 +176,65 @@ implements PriorityQueue<E, P> {
     private void consolidate() {
         int arraySize = ((int) Math.floor(Math.log(size) / LOG_PHI)) + 1;
         ensureArraySize(arraySize);
+        Arrays.fill(array, null);
+        
+        FibonacciHeapNode<E, P> w = minimumNode;
+        FibonacciHeapNode<E, P> wnext = w.right;
+        
+        do {
+            FibonacciHeapNode<E, P> x = w;
+            int d = x.degree;
+            
+            while (array[d] != null) {
+                FibonacciHeapNode<E, P> y = array[d];
+                
+                if (x.priority.compareTo(y.priority) > 0) {
+                    FibonacciHeapNode<E, P> tmp = x;
+                    x = y;
+                    y = tmp;
+                }
+                
+                link(y, x);
+                array[d] = null;
+                d++;
+            }
+            
+            array[d] = x;
+            w = wnext;
+            wnext = wnext.right;
+        } while (wnext != minimumNode);
+        
+        minimumNode = null;
+        
+        for (FibonacciHeapNode<E, P> y : array) {
+            if (y == null) {
+                continue;
+            }
+            
+            if (minimumNode == null) {
+                y.degree = 0;
+                y.parent = null;
+                y.left = y;
+                y.right = y;
+                y.child = null;
+                minimumNode = y;
+            } else {
+                y.left = minimumNode;
+                y.right = minimumNode.right;
+                minimumNode.right = y;
+                y.right.left = y;
+                
+                if (y.priority.compareTo(minimumNode.priority) < 0) {
+                    minimumNode = y;
+                }
+            }
+        }
+    }
+    
+    private void oldconsolidate() {
+        int arraySize = ((int) Math.floor(Math.log(size) / LOG_PHI)) + 1;
+//        int arraySize = ((int) Math.log(size)) + 1;
+        ensureArraySize(arraySize);
         
         for (int i = 0; i != arraySize; ++i) {
             array[i] = null;
@@ -198,6 +258,7 @@ implements PriorityQueue<E, P> {
             FibonacciHeapNode<E, P> next = x.right;
             
             while (true) {
+//                ensureArraySize(degree);
                 FibonacciHeapNode<E, P> y = array[degree];
                 
                 if (y == null) {
@@ -280,4 +341,8 @@ implements PriorityQueue<E, P> {
             throw new NoSuchElementException("This DaryHeap is empty.");
         }
     }
+    /*
+    public static void main(String[] args) {
+        
+    }*/
 }

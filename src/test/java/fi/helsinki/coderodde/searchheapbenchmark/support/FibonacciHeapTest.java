@@ -50,7 +50,6 @@ public class FibonacciHeapTest {
         assertEquals(Integer.valueOf(1), heap.extractMinimum());
         
         assertEquals(0, heap.size());
-        
     }
 
     @Test(expected = UnsupportedOperationException.class)

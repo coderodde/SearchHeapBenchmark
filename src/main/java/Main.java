@@ -3,8 +3,10 @@ import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphNode;
 import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.BinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DijkstraPathFinder;
+import fi.helsinki.coderodde.searchheapbenchmark.support.FibonacciHeap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -19,7 +21,8 @@ public class Main {
     private static final double MAX_WEIGHT = 10.0;
     
     public static void main(String[] args) {
-        long seed = System.currentTimeMillis();
+        long seed = 1484930215392L; System.currentTimeMillis();
+        System.out.println("Seed = " + seed);
         Random random = new Random(seed);
         
         GraphData graphData = createRandomGraph(GRAPH_NODES,
@@ -34,7 +37,7 @@ public class Main {
                              
         System.out.println("Warming up...");
         //// Warming up. ////
-        warmup(graphData, searchTaskList);
+//        warmup(graphData, searchTaskList);
         System.out.println("Warming up done.");
         System.out.println();
         
@@ -120,6 +123,43 @@ public class Main {
                 System.out.println(
                         heap + " in " + (end - start) + " milliseconds.");
             }
+        }
+        
+        heap = new BinomialHeap<>();
+        finder = new DijkstraPathFinder(heap);
+        
+        start = System.currentTimeMillis();
+        
+        for (SearchTask searchTask : searchTaskList) {
+            DirectedGraphNode source = searchTask.source;
+            DirectedGraphNode target = searchTask.target;
+            paths.add(finder.search(source, target, weightFunction));
+        }
+        
+        end = System.currentTimeMillis();
+        
+        if (output) {
+            System.out.println(
+                    heap + " in " + (end - start) + " milliseconds.");
+        }
+        
+        heap = new FibonacciHeap<>();
+        finder = new DijkstraPathFinder(heap);
+        
+        start = System.currentTimeMillis();
+        int i = 0;
+        for (SearchTask searchTask : searchTaskList) {
+            System.out.println(i++);
+            DirectedGraphNode source = searchTask.source;
+            DirectedGraphNode target = searchTask.target;
+            paths.add(finder.search(source, target, weightFunction));
+        }
+        
+        end = System.currentTimeMillis();
+        
+        if (output) {
+            System.out.println(
+                    heap + " in " + (end - start) + " milliseconds.");
         }
     }
     
