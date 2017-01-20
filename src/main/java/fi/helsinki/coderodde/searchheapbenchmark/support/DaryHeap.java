@@ -105,12 +105,12 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        E ret = daryHeapNodeArray[0].element;
+        E element = daryHeapNodeArray[0].element;
         DaryHeapNode<E, P> node = daryHeapNodeArray[--size];
-        daryHeapNodeArray[size] = null;
         daryHeapNodeArray[0] = node;
         siftDownRoot();
-        return ret;
+        daryHeapNodeArray[size] = null;
+        return element;
     }
     
     /**

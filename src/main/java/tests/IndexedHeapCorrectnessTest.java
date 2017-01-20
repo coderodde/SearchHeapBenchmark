@@ -42,7 +42,11 @@ public class IndexedHeapCorrectnessTest {
         List<Integer> resultListOfDaryHeap5 = test(d5aryHeap,
                                                    heapTaskList,
                                                    new Random(seed));
-        return listsEqual(resultListOfBinaryHeap);
+        return listsEqual(resultListOfBinaryHeap,
+                          resultListOfDaryHeap2,
+                          resultListOfDaryHeap3,
+                          resultListOfDaryHeap4,
+                          resultListOfDaryHeap5);
     }
     
     private static <T> boolean listsEqual(List<T>... lists) {

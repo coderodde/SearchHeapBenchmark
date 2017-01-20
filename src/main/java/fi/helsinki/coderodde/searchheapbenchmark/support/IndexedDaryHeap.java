@@ -137,15 +137,11 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        DaryHeapNode<E, P> topNode = daryHeapNodeArray[0];
-        daryHeapNodeArray[0] = daryHeapNodeArray[--size];
+        E element = daryHeapNodeArray[0].element;
+        DaryHeapNode<E, P> node = daryHeapNodeArray[--size];
+        daryHeapNodeArray[0] = node;
+        siftDownRoot();
         daryHeapNodeArray[size] = null;
-        
-        if (size != 0) {
-            siftDown(0);
-        }
-            
-        E element = topNode.element;
         map.remove(element);
         return element;
     }
@@ -227,8 +223,9 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
      * 
      * @param index the index of the element to sift down.
      */
-    private void siftDown(int index) {
-        DaryHeapNode<E, P> targetNode = daryHeapNodeArray[index];
+    private void siftDownRoot() {
+        int index = 0;
+        DaryHeapNode<E, P> targetNode = daryHeapNodeArray[0];
         P priority = targetNode.priority;
         
         while (true) {

@@ -113,12 +113,8 @@ implements PriorityQueue<E, P> {
         checkHeapIsNotEmpty();
         BinaryHeapNode<E, P> topNode = binaryHeapNodeArray[0];
         binaryHeapNodeArray[0] = binaryHeapNodeArray[--size];
+        siftDownRoot();
         binaryHeapNodeArray[size] = null;
-        
-        if (size != 0) {
-            siftDownRoot();
-        }
-            
         E element = topNode.element;
         map.remove(element);
         return element;
