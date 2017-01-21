@@ -2,6 +2,7 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -346,5 +347,10 @@ implements PriorityQueue<E, P> {
         if (size == 0) {
             throw new NoSuchElementException("This DaryHeap is empty.");
         }
+    }
+    
+    @Override
+    public Map<E, P> getPriorityMap() {
+        return null;
     }
 }

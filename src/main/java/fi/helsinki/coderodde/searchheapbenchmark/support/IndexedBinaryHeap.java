@@ -245,4 +245,14 @@ implements PriorityQueue<E, P> {
             throw new NoSuchElementException("This BinaryHeap is empty.");
         }
     }
+    
+    @Override
+    public Map<E, P> getPriorityMap() {
+        Map<E, P> m = new HashMap<>();
+        
+        for (Map.Entry<E, BinaryHeapNode<E, P>> entry : map.entrySet()) {
+            m.put(entry.getKey(), entry.getValue().priority);
+        }
+        return m;
+    }
 }

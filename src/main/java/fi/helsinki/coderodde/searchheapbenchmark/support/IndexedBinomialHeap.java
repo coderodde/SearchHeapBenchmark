@@ -4,7 +4,6 @@ import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 /**
  * This class implements a binomial heap.
@@ -151,6 +150,11 @@ implements PriorityQueue<E, P> {
                 && upperNode.priority.compareTo(newPriority) > 0) {
             lowerNode.element = upperNode.element;
             lowerNode.priority = upperNode.priority;
+            map.put(lowerNode.element, lowerNode);
+            
+            if (!map.get(lowerNode.element).element.equals(lowerNode.element)) {
+                throw new IllegalStateException("YESSS!!");
+            }
             
             lowerNode = upperNode;
             upperNode = upperNode.parent;
@@ -158,6 +162,7 @@ implements PriorityQueue<E, P> {
         
         lowerNode.element = storeElement;
         lowerNode.priority = newPriority;
+        map.put(storeElement, lowerNode); // Remap the element to its new node.
         
         if (minimumTree.priority.compareTo(lowerNode.priority) > 0) {
             minimumTree = lowerNode;
@@ -341,5 +346,44 @@ implements PriorityQueue<E, P> {
         if (size == 0) {
             throw new NoSuchElementException("This BinaryHeap is empty.");
         }
+    }
+    
+    public static void main(String[] args) {
+        PriorityQueue<Integer, Integer> heap = new IndexedBinomialHeap<>();
+        PriorityQueue<Integer, Integer> heap2 = new IndexedFibonacciHeap<>();
+        
+        for (int i = 0; i < 100; ++i) {
+            heap.add(i, i);
+            heap2.add(i, i);
+        }
+        
+        heap.decreasePriority(99, 1);
+        heap.decreasePriority(98, 1);
+        heap2.decreasePriority(99, 1);
+        heap2.decreasePriority(98, 1);
+        
+        heap.extractMinimum();
+        heap2.extractMinimum();
+        
+        System.out.println(heap.extractMinimum());
+        System.out.println(heap.extractMinimum());
+        System.out.println(heap.extractMinimum());
+        
+        System.out.println();
+        
+        System.out.println(heap2.extractMinimum());
+        System.out.println(heap2.extractMinimum());
+        System.out.println(heap2.extractMinimum());
+    }
+    
+    
+    @Override
+    public Map<E, P> getPriorityMap() {
+        Map<E, P> m = new HashMap<>();
+        
+        for (Map.Entry<E, BinomialTree<E, P>> entry : map.entrySet()) {
+            m.put(entry.getKey(), entry.getValue().priority);
+        }
+        return m;
     }
 }

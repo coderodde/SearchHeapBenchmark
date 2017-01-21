@@ -1,5 +1,7 @@
 package fi.helsinki.coderodde.searchheapbenchmark;
 
+import java.util.Map;
+
 public interface PriorityQueue<E, P extends Comparable<? super P>> {
 
     /**
@@ -38,4 +40,6 @@ public interface PriorityQueue<E, P extends Comparable<? super P>> {
      * Clears the priority queue.
      */
     public void clear();
+    
+    public Map<E, P> getPriorityMap();
 }

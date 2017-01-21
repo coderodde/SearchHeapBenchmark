@@ -3,6 +3,7 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -13,7 +14,7 @@ public class IndexedHeapBruteForceTest {
     
     @Test
     public void test() {
-        long seed = 1484995062257L; //System.currentTimeMillis();
+        long seed = 1484998845800L; System.currentTimeMillis();
         Random random = new Random(seed);
         System.out.println("IndexedHeapCorrectnessTest seed = " + seed);
         List<HeapTask> heapTaskList = getRandomHeapTaskList(OPERATIONS_PER_HEAP,
@@ -56,14 +57,21 @@ public class IndexedHeapBruteForceTest {
         List<Integer> resultListOfFibonacciHeap = test(fibonacciHeap,
                                                        heapTaskList,
                                                        new Random(seed));
+        
+        Map<Integer, Integer> map1 = binaryHeap.getPriorityMap();
+        Map<Integer, Integer> map2 = binomialHeap.getPriorityMap();
+        
+        System.out.println(map1.size() + " vs. " + map2.size());
+        assertTrue(map1.equals(map2));
+        
         boolean allEqual = 
-                listsEqual(resultListOfBinaryHeap,
+                listsEqual(resultListOfBinaryHeap,/*
                            resultListOfDaryHeap2,
                            resultListOfDaryHeap3,
                            resultListOfDaryHeap4,
-                           resultListOfDaryHeap5,
-                           /*resultListOfBinomialHeap,*/
-                           resultListOfFibonacciHeap);
+                           resultListOfDaryHeap5,*/
+                           resultListOfBinomialHeap/*,
+                           resultListOfFibonacciHeap*/);
         
         assertTrue(allEqual);
     }
