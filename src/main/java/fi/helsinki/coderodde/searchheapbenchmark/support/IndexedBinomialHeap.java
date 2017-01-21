@@ -227,6 +227,7 @@ implements PriorityQueue<E, P> {
     public void clear() {
         this.head = null;
         this.size = 0;
+        this.map.clear();
     }
     
     @Override

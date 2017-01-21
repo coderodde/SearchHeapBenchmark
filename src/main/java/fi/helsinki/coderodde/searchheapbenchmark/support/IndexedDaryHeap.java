@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 /**
  * This class implements {@code d}-ary heap. {@code d} is the "degree" of the
@@ -137,11 +138,12 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        E element = daryHeapNodeArray[0].element;
-        DaryHeapNode<E, P> node = daryHeapNodeArray[--size];
-        daryHeapNodeArray[0] = node;
+        DaryHeapNode<E, P> topNode = daryHeapNodeArray[0];
+        daryHeapNodeArray[0] = daryHeapNodeArray[--size];
+        daryHeapNodeArray[0].index = 0;
         siftDownRoot();
         daryHeapNodeArray[size] = null;
+        E element = topNode.element;
         map.remove(element);
         return element;
     }
@@ -161,6 +163,7 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
     public void clear() {
         Arrays.fill(daryHeapNodeArray, 0, size, null);
         size = 0;
+        map.clear();
     }
 
     /**
@@ -306,5 +309,22 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
      */
     private int getParentNodeIndex(int index) {
         return (index - 1) / degree;
+    }
+    
+    public static void main(String[] args) {
+        PriorityQueue<Integer, Integer> heap = new IndexedDaryHeap<>(2);
+        Random random = new Random(4900);
+        
+        for (int i = 0; i < 10; ++i) {
+            heap.add(i, i);
+        }
+        
+        for (int i = 0; i < 100; ++i) {
+            heap.decreasePriority(random.nextInt(10), random.nextInt(100) - 50);
+        }
+        
+        while (heap.size() > 0) {
+            heap.extractMinimum();
+        }
     }
 }

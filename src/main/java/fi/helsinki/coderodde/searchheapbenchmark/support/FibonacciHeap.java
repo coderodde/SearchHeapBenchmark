@@ -61,12 +61,6 @@ implements PriorityQueue<E, P> {
          */
         private int degree;
         
-        /**
-         * Indicates whether this node has lost a child since the last time this
-         * node was made the child of another node.
-         */
-        private boolean marked;
-        
         FibonacciHeapNode(E element, P priority) {
             this.element = element;
             this.priority = priority;

@@ -1,6 +1,7 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -204,6 +205,7 @@ implements PriorityQueue<E, P> {
     public void clear() {
         minimumNode = null;
         size = 0;
+        map.clear();
     }
     
     @Override
@@ -249,34 +251,27 @@ implements PriorityQueue<E, P> {
     private void consolidate() {
         int arraySize = ((int) Math.floor(Math.log(size) / LOG_PHI)) + 1;
         ensureArraySize(arraySize);
+        Arrays.fill(array, null);
         
-        for (int i = 0; i != arraySize; ++i) {
-            array[i] = null;
-        }
-        
-        int numberOfRoots = 0;
         FibonacciHeapNode<E, P> x = minimumNode;
+        int rootListSize = 0;
         
         if (x != null) {
-            ++numberOfRoots;
+            rootListSize = 1;
             x = x.right;
             
             while (x != minimumNode) {
-                ++numberOfRoots;
+                rootListSize++;
                 x = x.right;
             }
         }
         
-        while (numberOfRoots > 0) {
+        while (rootListSize > 0) {
             int degree = x.degree;
             FibonacciHeapNode<E, P> next = x.right;
             
-            while (true) {
+            while (array[degree] != null) {
                 FibonacciHeapNode<E, P> y = array[degree];
-                
-                if (y == null) {
-                    break;
-                }
                 
                 if (x.priority.compareTo(y.priority) > 0) {
                     FibonacciHeapNode<E, P> tmp = y;
@@ -291,7 +286,7 @@ implements PriorityQueue<E, P> {
             
             array[degree] = x;
             x = next;
-            numberOfRoots--;
+            rootListSize--;
         }
         
         minimumNode = null;
@@ -301,21 +296,25 @@ implements PriorityQueue<E, P> {
                 continue;
             }
             
-            if (minimumNode != null) {
-                y.left.right = y.right;
-                y.right.left = y.left;
-                
-                y.left = minimumNode;
-                y.right = minimumNode.right;
-                minimumNode.right = y;
-                y.right.left = y;
-                
-                if (y.priority.compareTo(minimumNode.priority) < 0) {
-                    minimumNode = y;
-                }
-            } else {
+            if (minimumNode == null) {
                 minimumNode = y;
+            } else {
+                moveToRootList(y);
             }
+        }
+    }
+    
+    private void moveToRootList(FibonacciHeapNode<E, P> node) {
+        node.left.right = node.right;
+        node.right.left = node.left;
+        
+        node.left = minimumNode;
+        node.right = minimumNode.right;
+        minimumNode.right = node;
+        node.right.left = node;
+        
+        if (minimumNode.priority.compareTo(node.priority) > 0) {
+            minimumNode = node;
         }
     }
     

@@ -1,12 +1,18 @@
 
 import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphNode;
 import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
+import fi.helsinki.coderodde.searchheapbenchmark.PathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DijkstraPathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.support.FibonacciHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinaryHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinomialHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDaryHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDijkstraPathFinder;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedFibonacciHeap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +29,8 @@ public class Main {
     private static final double MAX_WEIGHT = 10.0;
     
     public static void main(String[] args) {
-        long seed = 1484930215392L; System.currentTimeMillis();
+//        long seed = 1484930215392L; System.currentTimeMillis();
+        long seed = 14849302153933L; System.currentTimeMillis();
         System.out.println("Seed = " + seed);
         Random random = new Random(seed);
         
@@ -39,7 +46,7 @@ public class Main {
                              
         System.out.println("Warming up...");
         //// Warming up. ////
-        warmup(graphData, searchTaskList);
+        //warmup(graphData, searchTaskList);
         System.out.println("Warming up done.");
         System.out.println();
         System.gc();
@@ -48,6 +55,7 @@ public class Main {
         System.out.println("===== SPARSE GRAPH =====");
         benchmark(graphData, searchTaskList);
         System.gc();
+        System.exit(0);
         
         //// Benchmark on medium graphs. ////
         graphData = createRandomGraph(GRAPH_NODES,
@@ -91,6 +99,10 @@ public class Main {
     private static void perform(GraphData graphData,
                                 List<SearchTask> searchTaskList,
                                 boolean output) {
+        //////////////////////////
+        //// Unindexed heaps. ////
+        //////////////////////////
+        
         Map<String, List<List<DirectedGraphNode>>> pathMap = new HashMap<>();
         
         pathMap.put(new BinaryHeap<>().toString(),
@@ -108,8 +120,26 @@ public class Main {
         pathMap.put(new FibonacciHeap<>().toString(),
                     new ArrayList<>(SEARCH_TASKS));
         
+        ////////////////////////
+        //// Indexed heaps. ////
+        ////////////////////////
+        
+        pathMap.put(new IndexedBinaryHeap<>().toString(),
+                    new ArrayList<>(SEARCH_TASKS));
+        
+        for (int degree = 2; degree <= 10; ++degree) {
+            pathMap.put(new IndexedDaryHeap<>(degree).toString(),
+                        new ArrayList<>(SEARCH_TASKS));
+        }
+        
+        pathMap.put(new IndexedBinomialHeap<>().toString(),
+                    new ArrayList<>(SEARCH_TASKS));
+        
+        pathMap.put(new IndexedFibonacciHeap<>().toString(),
+                    new ArrayList<>(SEARCH_TASKS));
+        
         PriorityQueue<DirectedGraphNode, Double> heap = new BinaryHeap<>();
-        DijkstraPathFinder finder = new DijkstraPathFinder(heap);
+        PathFinder finder = new DijkstraPathFinder(heap);
         DirectedGraphWeightFunction weightFunction = graphData.weightFunction;
         
         long start = System.currentTimeMillis();
@@ -128,8 +158,8 @@ public class Main {
         if (output) {
             System.out.println(
                     heap + " in " + (end - start) + " milliseconds.");
-        }
-            
+        }   
+        
         for (int degree = 2; degree <= 10; ++degree) {
             heap = new DaryHeap<>(degree);
             finder = new DijkstraPathFinder(heap);
@@ -195,8 +225,94 @@ public class Main {
                     heap + " in " + (end - start) + " milliseconds.");
         }
         
+        heap = new IndexedBinaryHeap<>();
+        finder = new IndexedDijkstraPathFinder(heap);
+        
+        start = System.currentTimeMillis();
+        
+        for (SearchTask searchTask : searchTaskList) {
+            DirectedGraphNode source = searchTask.source;
+            DirectedGraphNode target = searchTask.target;
+            List<DirectedGraphNode> path = finder.search(source,
+                                                         target, 
+                                                         weightFunction);
+            pathMap.get(heap.toString()).add(path);
+        }
+        
+        end = System.currentTimeMillis();
+        
         if (output) {
-            System.out.println("Algorithms/heap agree: " + samePaths(pathMap));
+            System.out.println(
+                    heap + " in " + (end - start) + " milliseconds.");
+        }
+        
+        for (int degree = 2; degree <= 10; ++degree) {
+            heap = new IndexedDaryHeap<>(degree);
+            finder = new IndexedDijkstraPathFinder(heap);
+            
+            start = System.currentTimeMillis();
+            
+            for (SearchTask searchTask : searchTaskList) {
+                DirectedGraphNode source = searchTask.source;
+                DirectedGraphNode target = searchTask.target;
+                List<DirectedGraphNode> path = finder.search(source, 
+                                                             target, 
+                                                             weightFunction);
+                pathMap.get(heap.toString()).add(path);
+            }
+            
+            end = System.currentTimeMillis();
+            
+            if (output) {
+                System.out.println(
+                        heap + " in " + (end - start) + " milliseconds.");
+            }
+        }
+        
+        heap = new IndexedBinomialHeap<>();
+        finder = new IndexedDijkstraPathFinder(heap);
+        
+        start = System.currentTimeMillis();
+        
+        for (SearchTask searchTask : searchTaskList) {
+            DirectedGraphNode source = searchTask.source;
+            DirectedGraphNode target = searchTask.target;
+            List<DirectedGraphNode> path = finder.search(source,
+                                                         target, 
+                                                         weightFunction);
+            pathMap.get(heap.toString()).add(path);
+        }
+        
+        end = System.currentTimeMillis();
+        
+        if (output) {
+            System.out.println(
+                    heap + " in " + (end - start) + " milliseconds.");
+        }
+        
+        heap = new IndexedFibonacciHeap<>();
+        finder = new IndexedDijkstraPathFinder(heap);
+        
+        start = System.currentTimeMillis();
+        
+        for (SearchTask searchTask : searchTaskList) {
+            DirectedGraphNode source = searchTask.source;
+            DirectedGraphNode target = searchTask.target;
+            List<DirectedGraphNode> path = finder.search(source,
+                                                         target, 
+                                                         weightFunction);
+            pathMap.get(heap.toString()).add(path);
+        }
+        
+        end = System.currentTimeMillis();
+        
+        if (output) {
+            System.out.println(
+                    heap + " in " + (end - start) + " milliseconds.");
+        }
+        
+        if (output) {
+            System.out.println("Algorithms/heaps agree: " + samePaths(pathMap));
         }
     }
     
