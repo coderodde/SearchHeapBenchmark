@@ -29,8 +29,7 @@ public class Main {
     private static final double MAX_WEIGHT = 10.0;
     
     public static void main(String[] args) {
-//        long seed = 1484930215392L; System.currentTimeMillis();
-        long seed = 14849302153933L; System.currentTimeMillis();
+        long seed = 1484994832389L; //System.currentTimeMillis();
         System.out.println("Seed = " + seed);
         Random random = new Random(seed);
         
@@ -54,9 +53,8 @@ public class Main {
         //// Benchmark on sparse graphs. ////
         System.out.println("===== SPARSE GRAPH =====");
         benchmark(graphData, searchTaskList);
-        System.gc();
         System.exit(0);
-        
+        System.gc();
         //// Benchmark on medium graphs. ////
         graphData = createRandomGraph(GRAPH_NODES,
                                       MEDIUM_GRAPH_ARCS,

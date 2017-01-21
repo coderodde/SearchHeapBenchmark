@@ -1,4 +1,4 @@
-package tests;
+package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 class HeapTask {
 
