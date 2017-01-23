@@ -5,10 +5,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class IndexedPairingHeapTest {
+public class PairingHeapTest {
 
-    private final PriorityQueue<Integer, Integer> heap = 
-            new IndexedPairingHeap<>();
+    private final PriorityQueue<Integer, Integer> heap = new PairingHeap<>();
     
     @Before
     public void setUp() {
@@ -51,40 +50,11 @@ public class IndexedPairingHeapTest {
         assertEquals(Integer.valueOf(1), heap.extractMinimum());
         
         assertEquals(0, heap.size());
+        
     }
-    
-    @Test
-    public void testDecreaseKey() {
-        heap.add(1, 1);
-        heap.add(2, 2);
-        
-        heap.decreasePriority(2, 3);
-        
-        assertEquals(Integer.valueOf(1), heap.extractMinimum());
-        assertEquals(Integer.valueOf(2), heap.extractMinimum());
-        
-        heap.add(1, 1);
-        heap.add(2, 2);
-        
-        heap.decreasePriority(2, 0);
-        
-        assertEquals(Integer.valueOf(2), heap.extractMinimum());
-        assertEquals(Integer.valueOf(1), heap.extractMinimum());
-        
-        for (int i = 0; i < 100; ++i) {
-            heap.add(i, i);
-        }
-        
-        for (int i = 50; i < 100; ++i) {
-            heap.decreasePriority(i, i - 100);
-        }
-        
-        for (int i = 0; i < 50; ++i) {
-            assertEquals(Integer.valueOf(i + 50), heap.extractMinimum());
-        }
-        
-        for (int i = 0; i < 50; ++i) {
-            assertEquals(Integer.valueOf(i), heap.extractMinimum());
-        }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testDecreasePrioirty() {
+        heap.decreasePriority(0, 0);
     }
 }

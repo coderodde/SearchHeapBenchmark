@@ -271,9 +271,4 @@ implements PriorityQueue<E, P> {
             throw new NoSuchElementException("This BinaryHeap is empty.");
         }
     }
-    
-    @Override
-    public Map<E, P> getPriorityMap() {
-        return null;
-    }
 }

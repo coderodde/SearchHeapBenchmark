@@ -64,10 +64,6 @@ public class IndexedHeapBruteForceTest {
                                                      heapTaskList,
                                                      new Random(seed));
         
-//        Map<Integer, Integer> map1 = binaryHeap.getPriorityMap();
-//        Map<Integer, Integer> map2 = binomialHeap.getPriorityMap();
-//        assertTrue(map1.equals(map2));
-        
         boolean allEqual = 
                 listsEqual(resultListOfBinaryHeap,
                            resultListOfDaryHeap2,

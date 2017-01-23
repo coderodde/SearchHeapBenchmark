@@ -270,9 +270,4 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
     private int getParentNodeIndex(int index) {
         return (index - 1) / degree;
     }
-
-    @Override
-    public Map<E, P> getPriorityMap() {
-        return null;
-    }
 }

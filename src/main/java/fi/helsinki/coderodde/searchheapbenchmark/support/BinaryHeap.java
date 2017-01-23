@@ -206,9 +206,4 @@ public final class BinaryHeap<E, P extends Comparable<? super P>>
             throw new NoSuchElementException("This BinaryHeap is empty.");
         }
     }
-    
-    @Override
-    public Map<E, P> getPriorityMap() {
-        return null;
-    }
 }

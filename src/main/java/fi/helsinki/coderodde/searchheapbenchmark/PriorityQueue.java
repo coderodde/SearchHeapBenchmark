@@ -40,6 +40,4 @@ public interface PriorityQueue<E, P extends Comparable<? super P>> {
      * Clears the priority queue.
      */
     public void clear();
-    
-    public Map<E, P> getPriorityMap();
 }

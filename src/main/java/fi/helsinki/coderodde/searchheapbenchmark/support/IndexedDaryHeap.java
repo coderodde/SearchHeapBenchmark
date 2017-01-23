@@ -327,14 +327,4 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
             heap.extractMinimum();
         }
     }
-    
-    @Override
-    public Map<E, P> getPriorityMap() {
-        Map<E, P> m = new HashMap<>();
-        
-        for (Map.Entry<E, DaryHeapNode<E, P>> entry : map.entrySet()) {
-            m.put(entry.getKey(), entry.getValue().priority);
-        }
-        return m;
-    }
 }

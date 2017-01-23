@@ -348,9 +348,4 @@ implements PriorityQueue<E, P> {
             throw new NoSuchElementException("This DaryHeap is empty.");
         }
     }
-    
-    @Override
-    public Map<E, P> getPriorityMap() {
-        return null;
-    }
 }

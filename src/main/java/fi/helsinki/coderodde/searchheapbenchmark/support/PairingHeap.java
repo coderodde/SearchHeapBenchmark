@@ -147,10 +147,6 @@ implements PriorityQueue<E, P> {
         return "PairingHeap";
     }
     
-    @Override
-    public Map<E, P> getPriorityMap() {
-        return null;
-    }
     
     private PairingHeapNode<E, P> merge(PairingHeapNode<E, P> node1,
                                         PairingHeapNode<E, P> node2) {
