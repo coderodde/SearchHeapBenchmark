@@ -147,7 +147,6 @@ implements PriorityQueue<E, P> {
         return "PairingHeap";
     }
     
-    
     private PairingHeapNode<E, P> merge(PairingHeapNode<E, P> node1,
                                         PairingHeapNode<E, P> node2) {
         if (node1 == null) {
