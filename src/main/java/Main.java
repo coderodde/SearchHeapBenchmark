@@ -45,7 +45,7 @@ public class Main {
                              
         System.out.println("Warming up...");
         //// Warming up. ////
-        //warmup(graphData, searchTaskList);
+        warmup(graphData, searchTaskList);
         System.out.println("Warming up done.");
         System.out.println();
         System.gc();
@@ -53,8 +53,8 @@ public class Main {
         //// Benchmark on sparse graphs. ////
         System.out.println("===== SPARSE GRAPH =====");
         benchmark(graphData, searchTaskList);
-        System.exit(0);
         System.gc();
+        
         //// Benchmark on medium graphs. ////
         graphData = createRandomGraph(GRAPH_NODES,
                                       MEDIUM_GRAPH_ARCS,

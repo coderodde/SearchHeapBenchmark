@@ -29,6 +29,8 @@ public class IndexedHeapBruteForceTest {
                 new IndexedBinomialHeap<>();
         PriorityQueue<Integer, Integer> fibonacciHeap = 
                 new IndexedFibonacciHeap<>();
+        PriorityQueue<Integer, Integer> pairingHeap = 
+                new IndexedPairingHeap<>();
         
         List<Integer> resultListOfBinaryHeap = test(binaryHeap, 
                                                     heapTaskList,
@@ -58,9 +60,13 @@ public class IndexedHeapBruteForceTest {
                                                        heapTaskList,
                                                        new Random(seed));
         
-        Map<Integer, Integer> map1 = binaryHeap.getPriorityMap();
-        Map<Integer, Integer> map2 = binomialHeap.getPriorityMap();
-        assertTrue(map1.equals(map2));
+        List<Integer> resultListOfPairingHeap = test(pairingHeap,
+                                                     heapTaskList,
+                                                     new Random(seed));
+        
+//        Map<Integer, Integer> map1 = binaryHeap.getPriorityMap();
+//        Map<Integer, Integer> map2 = binomialHeap.getPriorityMap();
+//        assertTrue(map1.equals(map2));
         
         boolean allEqual = 
                 listsEqual(resultListOfBinaryHeap,
@@ -69,7 +75,8 @@ public class IndexedHeapBruteForceTest {
                            resultListOfDaryHeap4,
                            resultListOfDaryHeap5,
                            resultListOfBinomialHeap,
-                           resultListOfFibonacciHeap);
+                           resultListOfFibonacciHeap,
+                           resultListOfPairingHeap);
         
         assertTrue(allEqual);
     }
