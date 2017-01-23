@@ -69,11 +69,6 @@ implements PriorityQueue<E, P> {
      * The leftmost node in the root list of this heap.
      */
     private BinomialTree<E, P> head;
-
-    /**
-     * The binomial tree with the highest priority.
-     */
-    private BinomialTree<E, P> minimumTree;
         
     /**
      * Constructs a new empty binomial heap.
@@ -91,7 +86,6 @@ implements PriorityQueue<E, P> {
     private BinomialHeap(E element, P priority) {
         BinomialTree<E, P> tree = new BinomialTree<>(element, priority);
         head = tree;
-        minimumTree = tree;
         size = 1;
     }
     
@@ -101,16 +95,11 @@ implements PriorityQueue<E, P> {
         
         if (size == 0) {
             this.head = h.head;
-            this.minimumTree = h.head;
-            this.size = 1;
         } else {
             heapUnion(h.head);
-            size++;
-            
-            if (minimumTree.priority.compareTo(h.minimumTree.priority) > 0) {
-                minimumTree = h.minimumTree;
-            }
         }
+        
+        size++;
     }
     
     @Override
@@ -147,25 +136,15 @@ implements PriorityQueue<E, P> {
             bestprev.sibling = best.sibling;
         }
         
-        heapUnion(reverseRootList(best.child));
+        BinomialTree<E, P> child = best.child;
         
-        if (--size > 0) {
-            BinomialTree<E, P> minTree = head;
-            BinomialTree<E, P> t = head.sibling;
-            P minPriority = head.priority;
-            
-            while (t != null) {
-                if (minPriority.compareTo(t.priority) > 0) {
-                    minPriority = t.priority;
-                    minTree = t;
-                }
-                
-                t = t.sibling;
-            }
-            
-            minimumTree = minTree;
+        while (child != null) {
+            child.parent = null;
+            child = child.sibling;
         }
         
+        heapUnion(reverseRootList(best.child));
+        --size;
         return best.element;
     }
     

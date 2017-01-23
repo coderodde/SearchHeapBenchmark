@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class UnindexedHeapBruteForceTest {
     
-    private static final int OPERATIONS_PER_HEAP = 100_000;
+    private static final int OPERATIONS_PER_HEAP = 1_000_000;
     
     @Test
     public void test() {

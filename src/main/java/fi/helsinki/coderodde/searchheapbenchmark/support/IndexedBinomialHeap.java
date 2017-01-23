@@ -72,11 +72,6 @@ implements PriorityQueue<E, P> {
     private BinomialTree<E, P> head;
 
     /**
-     * The binomial tree with the highest priority.
-     */
-    private BinomialTree<E, P> minimumTree;
-        
-    /**
      * Maps each element to the binomial tree node it is stored in.
      */
     private final Map<E, BinomialTree<E, P>> map;
@@ -97,7 +92,6 @@ implements PriorityQueue<E, P> {
     private IndexedBinomialHeap(E element, P priority) {
         BinomialTree<E, P> tree = new BinomialTree<>(element, priority);
         head = tree;
-        minimumTree = tree;
         size = 1;
         map = null;
     }
@@ -114,17 +108,12 @@ implements PriorityQueue<E, P> {
         
         if (size == 0) {
             this.head = h.head;
-            this.minimumTree = h.head;
             this.size = 1;
             this.map.put(element, this.head);
         } else {
             heapUnion(h.head);
             this.map.put(element, h.head);
             size++;
-            
-            if (minimumTree.priority.compareTo(h.minimumTree.priority) > 0) {
-                minimumTree = h.minimumTree;
-            }
         }
     }
     
@@ -152,10 +141,6 @@ implements PriorityQueue<E, P> {
             lowerNode.priority = upperNode.priority;
             map.put(lowerNode.element, lowerNode);
             
-            if (!map.get(lowerNode.element).element.equals(lowerNode.element)) {
-                throw new IllegalStateException("YESSS!!");
-            }
-            
             lowerNode = upperNode;
             upperNode = upperNode.parent;
         }
@@ -163,11 +148,6 @@ implements PriorityQueue<E, P> {
         lowerNode.element = storeElement;
         lowerNode.priority = newPriority;
         map.put(storeElement, lowerNode); // Remap the element to its new node.
-        
-        if (minimumTree.priority.compareTo(lowerNode.priority) > 0) {
-            minimumTree = lowerNode;
-        }
-        
         return true;
     }
     
@@ -199,27 +179,23 @@ implements PriorityQueue<E, P> {
             bestprev.sibling = best.sibling;
         }
         
-        heapUnion(reverseRootList(best.child));
+        BinomialTree<E, P> child = best.child;
         
-        if (--size > 0) {
-            BinomialTree<E, P> minTree = head;
-            BinomialTree<E, P> t = head.sibling;
-            P minPriority = head.priority;
-            
-            while (t != null) {
-                if (minPriority.compareTo(t.priority) > 0) {
-                    minPriority = t.priority;
-                    minTree = t;
-                }
-                
-                t = t.sibling;
-            }
-            
-            minimumTree = minTree;
+        while (child != null) {
+            child.parent = null;
+            child = child.sibling;
         }
+        
+        heapUnion(reverseRootList(best.child));
+        --size;
         
         E element = best.element;
         map.remove(element);
+        
+        if (size != map.size()) {
+            throw new IllegalStateException("MEGAFUCK " + size + " " + map.size());
+        }
+            
         return element;
     }
     
@@ -347,35 +323,6 @@ implements PriorityQueue<E, P> {
             throw new NoSuchElementException("This BinaryHeap is empty.");
         }
     }
-    
-    public static void main(String[] args) {
-        PriorityQueue<Integer, Integer> heap = new IndexedBinomialHeap<>();
-        PriorityQueue<Integer, Integer> heap2 = new IndexedFibonacciHeap<>();
-        
-        for (int i = 0; i < 100; ++i) {
-            heap.add(i, i);
-            heap2.add(i, i);
-        }
-        
-        heap.decreasePriority(99, 1);
-        heap.decreasePriority(98, 1);
-        heap2.decreasePriority(99, 1);
-        heap2.decreasePriority(98, 1);
-        
-        heap.extractMinimum();
-        heap2.extractMinimum();
-        
-        System.out.println(heap.extractMinimum());
-        System.out.println(heap.extractMinimum());
-        System.out.println(heap.extractMinimum());
-        
-        System.out.println();
-        
-        System.out.println(heap2.extractMinimum());
-        System.out.println(heap2.extractMinimum());
-        System.out.println(heap2.extractMinimum());
-    }
-    
     
     @Override
     public Map<E, P> getPriorityMap() {

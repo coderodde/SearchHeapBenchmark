@@ -33,35 +33,33 @@ public class IndexedHeapBruteForceTest {
         List<Integer> resultListOfBinaryHeap = test(binaryHeap, 
                                                     heapTaskList,
                                                     new Random(seed));
-        
-        List<Integer> resultListOfDaryHeap2 = test(d2aryHeap,
-                                                   heapTaskList,
-                                                   new Random(seed));
-        
-        List<Integer> resultListOfDaryHeap3 = test(d3aryHeap,
-                                                   heapTaskList,
-                                                   new Random(seed));
-        
-        List<Integer> resultListOfDaryHeap4 = test(d4aryHeap,
-                                                   heapTaskList,
-                                                   new Random(seed));
-        
-        List<Integer> resultListOfDaryHeap5 = test(d5aryHeap,
-                                                   heapTaskList,
-                                                   new Random(seed));
-        
+//        
+//        List<Integer> resultListOfDaryHeap2 = test(d2aryHeap,
+//                                                   heapTaskList,
+//                                                   new Random(seed));
+//        
+//        List<Integer> resultListOfDaryHeap3 = test(d3aryHeap,
+//                                                   heapTaskList,
+//                                                   new Random(seed));
+//        
+//        List<Integer> resultListOfDaryHeap4 = test(d4aryHeap,
+//                                                   heapTaskList,
+//                                                   new Random(seed));
+//        
+//        List<Integer> resultListOfDaryHeap5 = test(d5aryHeap,
+//                                                   heapTaskList,
+//                                                   new Random(seed));
+//        
         List<Integer> resultListOfBinomialHeap = test(binomialHeap,
                                                       heapTaskList,
                                                       new Random(seed));
         
-        List<Integer> resultListOfFibonacciHeap = test(fibonacciHeap,
-                                                       heapTaskList,
-                                                       new Random(seed));
+//        List<Integer> resultListOfFibonacciHeap = test(fibonacciHeap,
+//                                                       heapTaskList,
+//                                                       new Random(seed));
         
         Map<Integer, Integer> map1 = binaryHeap.getPriorityMap();
         Map<Integer, Integer> map2 = binomialHeap.getPriorityMap();
-        
-        System.out.println(map1.size() + " vs. " + map2.size());
         assertTrue(map1.equals(map2));
         
         boolean allEqual = 
