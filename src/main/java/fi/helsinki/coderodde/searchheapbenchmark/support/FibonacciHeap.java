@@ -3,6 +3,7 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 /**
  * This class implements a Fibonacci heap.
@@ -166,8 +167,7 @@ implements PriorityQueue<E, P> {
     public String toString() {
         return "FibonacciHeap";
     }
-
-    private void consolidate() {
+private void consolidate() {
         int arraySize = ((int) Math.floor(Math.log(size) / LOG_PHI)) + 1;
         ensureArraySize(arraySize);
         Arrays.fill(array, null);
@@ -237,81 +237,6 @@ implements PriorityQueue<E, P> {
         }
     }
     
-    private void oldconsolidate() {
-        int arraySize = ((int) Math.floor(Math.log(size) / LOG_PHI)) + 1;
-//        int arraySize = ((int) Math.log(size)) + 1;
-        ensureArraySize(arraySize);
-        
-        for (int i = 0; i != arraySize; ++i) {
-            array[i] = null;
-        }
-        
-        int numberOfRoots = 0;
-        FibonacciHeapNode<E, P> x = minimumNode;
-        
-        if (x != null) {
-            ++numberOfRoots;
-            x = x.right;
-            
-            while (x != minimumNode) {
-                ++numberOfRoots;
-                x = x.right;
-            }
-        }
-        
-        while (numberOfRoots > 0) {
-            int degree = x.degree;
-            FibonacciHeapNode<E, P> next = x.right;
-            
-            while (true) {
-//                ensureArraySize(degree);
-                FibonacciHeapNode<E, P> y = array[degree];
-                
-                if (y == null) {
-                    break;
-                }
-                
-                if (x.priority.compareTo(y.priority) > 0) {
-                    FibonacciHeapNode<E, P> tmp = y;
-                    y = x;
-                    x = tmp;
-                }
-                
-                link(y, x);
-                array[degree] = null;
-                degree++;
-            }
-            
-            array[degree] = x;
-            x = next;
-            numberOfRoots--;
-        }
-        
-        minimumNode = null;
-        
-        for (FibonacciHeapNode<E, P> y : array) {
-            if (y == null) {
-                continue;
-            }
-            
-            if (minimumNode != null) {
-                y.left.right = y.right;
-                y.right.left = y.left;
-                
-                y.left = minimumNode;
-                y.right = minimumNode.right;
-                minimumNode.right = y;
-                y.right.left = y;
-                
-                if (y.priority.compareTo(minimumNode.priority) < 0) {
-                    minimumNode = y;
-                }
-            } else {
-                minimumNode = y;
-            }
-        }
-    }
-    
     private void link(FibonacciHeapNode<E, P> y, FibonacciHeapNode<E, P> x) {
         y.left.right = y.right;
         y.right.left = y.left;
@@ -331,13 +256,14 @@ implements PriorityQueue<E, P> {
         
         ++x.degree;
     }
-    
+        
     private void ensureArraySize(int arraySize) {
-        if (array.length < arraySize) {
+        if (arraySize > array.length) {
             array = new FibonacciHeapNode[arraySize];
+        } else {
+            Arrays.fill(array, null);
         }
     }
-        
     
     /**
      * Makes sure that the heap is not empty. If it is, an exception is thrown.
