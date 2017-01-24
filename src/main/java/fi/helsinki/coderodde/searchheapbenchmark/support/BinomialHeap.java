@@ -1,7 +1,6 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**

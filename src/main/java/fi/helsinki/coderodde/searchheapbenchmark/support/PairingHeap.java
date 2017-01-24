@@ -3,8 +3,6 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**

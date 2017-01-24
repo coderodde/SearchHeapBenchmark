@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Random;
 /**
  * This class implements an indexed binary heap that supports 
  * {@code decreasePriority} in logarithmic time.
@@ -188,6 +189,10 @@ implements PriorityQueue<E, P> {
                         .compareTo(targetHeapNode.priority) < 0) {
                     minChildNodeIndex = leftChildNodeIndex;
                 }
+            } else {
+                binaryHeapNodeArray[minChildNodeIndex] = targetHeapNode;
+                targetHeapNode.index = minChildNodeIndex;
+                return;
             } 
             
             if (minChildNodeIndex == index) {
