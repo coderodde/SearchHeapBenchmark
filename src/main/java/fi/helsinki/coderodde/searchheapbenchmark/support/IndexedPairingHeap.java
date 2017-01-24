@@ -103,7 +103,12 @@ implements PriorityQueue<E, P> {
         
         PairingHeapNode<E, P> node = new PairingHeapNode<>(element, priority);
         
-        root = merge(root, node);
+        if (root == null) {
+            root = node;
+        } else {
+            root = merge(root, node);
+        }
+            
         map.put(element, node);
         ++size;
     }
@@ -195,14 +200,6 @@ implements PriorityQueue<E, P> {
     
     private PairingHeapNode<E, P> merge(PairingHeapNode<E, P> node1,
                                         PairingHeapNode<E, P> node2) {
-        if (node1 == null) {
-            return node2;
-        }
-        
-        if (node2 == null) {
-            return node1;
-        }
-        
         if (node1.priority.compareTo(node2.priority) < 0) {
             PairingHeapNode<E, P> oldChild = node1.child;
             node1.child = node2;
