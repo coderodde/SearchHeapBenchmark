@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Random;
+
 /**
  * This class implements an indexed binary heap that supports 
- * {@code decreasePriority} in logarithmic time.
+ * {@code decreasePriority} in logarithmic time. "Indexed" means that this heap
+ * maintains internally a hash map mapping each present element to the heap node
+ * holding that element. This allows efficient decrease key operation.
  * 
  * @author Rodion "(code)rodde" Efremov
  * @version 1.6 (Jan 19, 2017)
@@ -73,6 +75,9 @@ implements PriorityQueue<E, P> {
         this.binaryHeapNodeArray = new BinaryHeapNode[DEFAULT_CAPACITY];
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public void add(E element, P priority) {
         if (map.containsKey(element)) {
@@ -80,7 +85,7 @@ implements PriorityQueue<E, P> {
             return;
         }
             
-        checkHeapHasSpace();
+        expandStorageArrayIfNeeded();
         
         BinaryHeapNode<E, P> newBinaryHeapNode = new BinaryHeapNode<>(element,
                                                                       priority,
@@ -90,6 +95,9 @@ implements PriorityQueue<E, P> {
         map.put(element, newBinaryHeapNode);
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public boolean decreasePriority(E element, P newPriority) {
         BinaryHeapNode<E, P> targetNode = map.get(element);
@@ -109,6 +117,9 @@ implements PriorityQueue<E, P> {
         return true;
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
@@ -121,11 +132,17 @@ implements PriorityQueue<E, P> {
         return element;
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public int size() {
         return size;
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override 
     public void clear() {
         Arrays.fill(binaryHeapNodeArray, 0, size, null);
@@ -190,6 +207,8 @@ implements PriorityQueue<E, P> {
                     minChildNodeIndex = leftChildNodeIndex;
                 }
             } else {
+                // This avoids checking 'minChildNodeIndex == index' which was
+                // measured to have a positive effect on efficiency.
                 binaryHeapNodeArray[minChildNodeIndex] = targetHeapNode;
                 targetHeapNode.index = minChildNodeIndex;
                 return;
@@ -231,15 +250,34 @@ implements PriorityQueue<E, P> {
         }
     }
     
+    /**
+     * Given the index of a start node, returns the index of the parent node of
+     * the start node.
+     * 
+     * @param index the index of the start node.
+     * @return the index of the parent node of the start node.
+     */
     private static int getParentNodeIndex(int index) {
         return (index - 1) >>> 1;
     }
     
+    /**
+     * Given the index of a start node, returns the index of the left child node
+     * of the start node. The index of the right child node may be computed via
+     * {@code getLeftChildIndex(index) + 1}.
+     * 
+     * @param index the index of the start node.
+     * @return the index of the parent node of the start node.
+     */
     private static int getLeftChildIndex(int index) {
         return (index << 1) + 1;
     }
     
-    private void checkHeapHasSpace() {
+    /**
+     * Makes sure that the underlying storage array has capacity for new
+     * elements.
+     */
+    private void expandStorageArrayIfNeeded() {
         if (size == binaryHeapNodeArray.length) {
             binaryHeapNodeArray = Arrays.copyOf(binaryHeapNodeArray, 2 * size);
         }

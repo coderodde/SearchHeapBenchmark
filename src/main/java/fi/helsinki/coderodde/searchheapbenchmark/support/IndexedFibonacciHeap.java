@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
- * This class implements a Fibonacci heap.
+ * This class implements an indexed Fibonacci heap. "Indexed" means that this 
+ * heap maintains internally a hash map mapping each present element to the heap 
+ * node holding that element. This allows efficient decrease key operation.
  * 
  * @author Rodion "(code)rodde" Efremov
  * @version 1.6 (Jan 19, 2017)
@@ -18,7 +20,7 @@ import java.util.NoSuchElementException;
 public final class IndexedFibonacciHeap<E, P extends Comparable<? super P>>
 implements PriorityQueue<E, P> {
 
-    private static final int DEFAULT_CHILD_ARRAY_LENGTH = 10;
+    private static final int DEFAULT_CHILD_ARRAY_LENGTH = 5;
     
     /**
      * This class implements the Fibonacci heap nodes.
@@ -75,6 +77,9 @@ implements PriorityQueue<E, P> {
         }
     }
     
+    /**
+     * Fibonacci heap -related math.
+     */
     private static final double LOG_PHI = Math.log((1 + Math.sqrt(5)) / 2);
     
     /**
@@ -98,6 +103,9 @@ implements PriorityQueue<E, P> {
      */
     private final Map<E, FibonacciHeapNode<E, P>> map = new HashMap<>();
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public void add(E element, P priority) {
         if (map.containsKey(element)) {
@@ -125,6 +133,9 @@ implements PriorityQueue<E, P> {
         ++size;
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public boolean decreasePriority(E element, P newPriority) {
         FibonacciHeapNode<E, P> targetNode = map.get(element);
@@ -155,6 +166,9 @@ implements PriorityQueue<E, P> {
         return true;
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
@@ -196,11 +210,17 @@ implements PriorityQueue<E, P> {
         return element;
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public void clear() {
         minimumNode = null;
@@ -208,6 +228,9 @@ implements PriorityQueue<E, P> {
         map.clear();
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public String toString() {
         return "IndexedFibonacciHeap";

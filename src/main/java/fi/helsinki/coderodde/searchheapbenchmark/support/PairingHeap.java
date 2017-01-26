@@ -107,6 +107,9 @@ implements PriorityQueue<E, P> {
                 "PairingHeap.decreasePriority is not implemented.");
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public E extractMinimum() {
         checkHeapNotEmpty();
@@ -135,11 +138,17 @@ implements PriorityQueue<E, P> {
         return element;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void clear() {
         root = null;
@@ -153,14 +162,6 @@ implements PriorityQueue<E, P> {
     
     private PairingHeapNode<E, P> merge(PairingHeapNode<E, P> node1,
                                         PairingHeapNode<E, P> node2) {
-        /*if (node1 == null) {
-            return node2;
-        }
-        
-        if (node2 == null) {
-            return node1;
-        }*/
-        
         if (node1.priority.compareTo(node2.priority) < 0) {
             PairingHeapNode<E, P> oldChild = node1.child;
             node1.child = node2;

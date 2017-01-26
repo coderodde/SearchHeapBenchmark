@@ -5,11 +5,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 /**
- * This class implements {@code d}-ary heap. {@code d} is the "degree" of the
- * heap, or ,namely, the maximum amount of children of a node. 
+ * This class implements an indexed {@code d}-ary heap. {@code d} is the 
+ * "degree" of the heap, or ,namely, the maximum amount of children of a node. 
+ * "Indexed" means that this heap maintains internally a hash map mapping each 
+ * present element to the heap node holding that element. This allows efficient
+ * decrease key operation.
  * 
  * @author Rodion "(code)rodde" Efremov
  * @version 1.61 (Jan 19, 2017)
@@ -309,22 +311,5 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
      */
     private int getParentNodeIndex(int index) {
         return (index - 1) / degree;
-    }
-    
-    public static void main(String[] args) {
-        PriorityQueue<Integer, Integer> heap = new IndexedDaryHeap<>(2);
-        Random random = new Random(4900);
-        
-        for (int i = 0; i < 10; ++i) {
-            heap.add(i, i);
-        }
-        
-        for (int i = 0; i < 100; ++i) {
-            heap.decreasePriority(random.nextInt(10), random.nextInt(100) - 50);
-        }
-        
-        while (heap.size() > 0) {
-            heap.extractMinimum();
-        }
     }
 }

@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
- * This class implements a binomial heap.
+ * This class implements a indexed binomial heap. "Indexed" means that this heap
+ * maintains internally a hash map mapping each present element to the heap node
+ * holding that element. This allows efficient decrease key operation.
  * 
  * @author Rodion "(code)rodde" Efremov
  * @version 1.6 (Jan 19, 2017)
@@ -96,6 +98,9 @@ implements PriorityQueue<E, P> {
         map = null;
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public void add(E element, P priority) {
         if (map.containsKey(element)) {
@@ -117,6 +122,9 @@ implements PriorityQueue<E, P> {
         }
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public boolean decreasePriority(E element, P newPriority) {
         BinomialTree<E, P> targetNode = map.get(element);
@@ -139,8 +147,8 @@ implements PriorityQueue<E, P> {
                 && upperNode.priority.compareTo(newPriority) > 0) {
             lowerNode.element = upperNode.element;
             lowerNode.priority = upperNode.priority;
-            map.put(lowerNode.element, lowerNode);
-            
+            map.put(lowerNode.element, lowerNode); // Remap the element to a
+                                                   // new node.
             lowerNode = upperNode;
             upperNode = upperNode.parent;
         }
@@ -151,6 +159,9 @@ implements PriorityQueue<E, P> {
         return true;
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
@@ -199,11 +210,17 @@ implements PriorityQueue<E, P> {
         return element;
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public int size() {
         return size;
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public void clear() {
         this.head = null;
@@ -211,11 +228,20 @@ implements PriorityQueue<E, P> {
         this.map.clear();
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public String toString() {
         return "IndexedBinomialHeap";
     }
     
+    /**
+     * Merges the two sorted (by degree) lists of nodes into one sorted list.
+     * 
+     * @param other the head node of the second list.
+     * @return the head of the new merged list.
+     */
     private BinomialTree<E, P> mergeRoots(BinomialTree<E, P> other) {
         BinomialTree<E, P> a = head;
         BinomialTree<E, P> b = other;
@@ -229,6 +255,7 @@ implements PriorityQueue<E, P> {
         BinomialTree<E, P> rootListHead;
         BinomialTree<E, P> rootListTail;
         
+        // Initialize the lists:
         if (a.degree < b.degree) {
             rootListHead = a;
             rootListTail = a;
@@ -239,6 +266,7 @@ implements PriorityQueue<E, P> {
             b = b.sibling;
         }
         
+        // Actual merge:
         while (a != null & b != null) {
             if (a.degree < b.degree) {
                 rootListTail.sibling = a;
@@ -251,6 +279,8 @@ implements PriorityQueue<E, P> {
             }
         }
         
+        // Here, one list is exhausted, just append the leftover list to the 
+        // tail:
         if (a != null) {
             rootListTail.sibling = a;
         } else {
@@ -296,6 +326,12 @@ implements PriorityQueue<E, P> {
         this.head = t;
     }
     
+    /**
+     * Makes the node {@code child} the child node of the node {@code parent}.
+     * 
+     * @param child  the node to make a child of the {@code parent}.
+     * @param parent the target parent node.
+     */
     private void link(BinomialTree<E, P> child, BinomialTree<E, P> parent) {
         child.parent = parent;
         child.sibling = parent.child;
@@ -303,6 +339,12 @@ implements PriorityQueue<E, P> {
         parent.degree++;
     }
     
+    /**
+     * Reverses the node list.
+     * 
+     * @param first the head node of the input list.
+     * @return the new head node of the resulting list.
+     */
     private BinomialTree<E, P> reverseRootList(BinomialTree<E, P> first) {
         BinomialTree<E, P> tmp = first;
         BinomialTree<E, P> tmpnext;

@@ -5,8 +5,11 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 /**
- * This class implements {@code d}-ary heap. {@code d} is the "degree" of the
- * heap, or ,namely, the maximum amount of children of a node. 
+ * This class implements a {@code d}-ary heap. {@code d} is the "degree" of the
+ * heap, or ,namely, the maximum amount of children of a node. This version is
+ * unindexed. "Unindexed" means that this heap does not map elements to their
+ * nodes, for which reason the decrease operation of the priority key of an 
+ * element is not implemented.
  * 
  * @author Rodion "(code)rodde" Efremov
  * @version 1.61 (Jan 19, 2017)
@@ -28,7 +31,7 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
     private static final int MINIMUM_DEGREE = 2;
     
     /**
-     * Stores an element, its priority, and its index in the storage array.
+     * Stores an element and its priority in the storage array.
      * 
      * @param <E> the element type.
      * @param <P> the priority key type.
@@ -83,7 +86,7 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
      */
     @Override
     public void add(E element, P priority) {
-        checkHeapHasSpace();
+        expandStorageArrayIfNeeded();
         DaryHeapNode<E, P> newDaryHeapNode = new DaryHeapNode<>(element,
                                                                 priority);
         daryHeapNodeArray[size] = newDaryHeapNode;
@@ -244,7 +247,7 @@ public final class DaryHeap<E, P extends Comparable<? super P>>
      * Makes sure that a new element fits into this heap. If the heap is full,
      * doubles the size of the node array.
      */
-    private void checkHeapHasSpace() {
+    private void expandStorageArrayIfNeeded() {
         if (size == daryHeapNodeArray.length) {
             daryHeapNodeArray = Arrays.copyOf(daryHeapNodeArray, 2 * size);
         }

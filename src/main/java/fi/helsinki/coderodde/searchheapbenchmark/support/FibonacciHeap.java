@@ -3,10 +3,11 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 /**
- * This class implements a Fibonacci heap.
+ * This class implements a Fibonacci heap. "Unindexed" means that this heap does 
+ * not map elements to their nodes, for which reason the decrease operation of 
+ * the priority key of an element is not implemented.
  * 
  * @author Rodion "(code)rodde" Efremov
  * @version 1.6 (Jan 19, 2017)
@@ -17,6 +18,9 @@ import java.util.Random;
 public final class FibonacciHeap<E, P extends Comparable<? super P>>
 implements PriorityQueue<E, P> {
 
+    /**
+     * The default length of the root list node array used for consolidation.
+     */
     private static final int DEFAULT_CHILD_ARRAY_LENGTH = 5;
     
     /**
@@ -30,12 +34,12 @@ implements PriorityQueue<E, P> {
         /**
          * The actual element.
          */
-        private E element;
+        private final E element;
         
         /**
          * The priority key of this node.
          */
-        private P priority;
+        private final P priority;
         
         /**
          * The parent node of this node.
@@ -53,7 +57,7 @@ implements PriorityQueue<E, P> {
         private FibonacciHeapNode<E, P> right = this;
         
         /**
-         * The number of children of this node.
+         * The leftmost child of this node.
          */
         private FibonacciHeapNode<E, P> child;
         
@@ -68,6 +72,9 @@ implements PriorityQueue<E, P> {
         }
     }
     
+    /**
+     * Fibonacci heap -specific math.
+     */
     private static final double LOG_PHI = Math.log((1 + Math.sqrt(5)) / 2);
     
     /**
@@ -86,11 +93,13 @@ implements PriorityQueue<E, P> {
     private FibonacciHeapNode<E, P>[] array = 
             new FibonacciHeapNode[DEFAULT_CHILD_ARRAY_LENGTH];
     
+   /**
+    * {@inheritDoc } 
+    */ 
     @Override
     public void add(E element, P priority) {
         FibonacciHeapNode<E, P> node = new FibonacciHeapNode<>(element, 
                                                                priority);
-        
         if (minimumNode != null) {
             node.left = minimumNode;
             node.right = minimumNode.right;
@@ -107,12 +116,18 @@ implements PriorityQueue<E, P> {
         ++size;
     }
 
+   /**
+    * {@inheritDoc } 
+    */ 
     @Override
     public boolean decreasePriority(E element, P newPriority) {
         throw new UnsupportedOperationException(
                 "This FibonacciHeap is not indexed."); 
     }
 
+   /**
+    * {@inheritDoc } 
+    */ 
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
@@ -152,11 +167,17 @@ implements PriorityQueue<E, P> {
         return z.element;
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public void clear() {
         minimumNode = null;
@@ -167,7 +188,8 @@ implements PriorityQueue<E, P> {
     public String toString() {
         return "FibonacciHeap";
     }
-private void consolidate() {
+    
+    private void consolidate() {
         int arraySize = ((int) Math.floor(Math.log(size) / LOG_PHI)) + 1;
         ensureArraySize(arraySize);
         Arrays.fill(array, null);
@@ -257,6 +279,11 @@ private void consolidate() {
         ++x.degree;
     }
         
+    /**
+     * Makes sure that all the root list nodes fit in the array.
+     * 
+     * @param arraySize new requested size.
+     */
     private void ensureArraySize(int arraySize) {
         if (arraySize > array.length) {
             array = new FibonacciHeapNode[arraySize];

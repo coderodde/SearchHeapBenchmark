@@ -150,7 +150,10 @@ implements PriorityQueue<E, P> {
         
         return true;
     }
-
+    
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public E extractMinimum() {
         checkHeapNotEmpty();
@@ -180,12 +183,18 @@ implements PriorityQueue<E, P> {
         --size;
         return element;
     }
-
+ 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void clear() {
         map.clear();

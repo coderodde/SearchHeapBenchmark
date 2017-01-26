@@ -4,7 +4,9 @@ import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.NoSuchElementException;
 
 /**
- * This class implements a binomial heap.
+ * This class implements an unindexed binomial heap. "Unindexed" means that this 
+ * heap does not map elements to their nodes, for which reason the decrease 
+ * operation of the priority key of an element is not implemented.
  * 
  * @author Rodion "(code)rodde" Efremov
  * @version 1.6 (Jan 19, 2017)
@@ -16,7 +18,8 @@ public final class BinomialHeap<E, P extends Comparable<? super P>>
 implements PriorityQueue<E, P> {
 
     /**
-     * This class implements a binomial tree.
+     * This class implements a binomial tree. A tree may have other trees as its
+     * children.
      * 
      * @param <E> the element type.
      * @param <P> the priority key of the element.
@@ -83,11 +86,12 @@ implements PriorityQueue<E, P> {
      * @param priority the priority of the element.
      */
     private BinomialHeap(E element, P priority) {
-        BinomialTree<E, P> tree = new BinomialTree<>(element, priority);
-        head = tree;
-        size = 1;
+        head = new BinomialTree<>(element, priority);
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public void add(E element, P priority) {
         BinomialHeap<E, P> h = new BinomialHeap<>(element, priority);
@@ -101,12 +105,18 @@ implements PriorityQueue<E, P> {
         size++;
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public boolean decreasePriority(E element, P newPriority) {
         throw new UnsupportedOperationException(
                 "This BinomialHeap is un-indexed.");
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
@@ -138,20 +148,31 @@ implements PriorityQueue<E, P> {
         BinomialTree<E, P> child = best.child;
         
         while (child != null) {
-            child.parent = null;
-            child = child.sibling;
+            child.parent = null; // The children will be moved to the root list.
+                                 // For that reason, we have to set their parent
+                                 // links to null.
+            child = child.sibling; // Process the next child node.
         }
         
+        // Both root list and children list are sorted by degree, yet in
+        // opposite direction, so we need to reverse the child list so the two
+        // may be merged.
         heapUnion(reverseRootList(best.child));
         --size;
         return best.element;
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public int size() {
         return size;
     }
     
+    /**
+     * {@inheritDoc } 
+     */
     @Override
     public void clear() {
         this.head = null;
@@ -163,6 +184,14 @@ implements PriorityQueue<E, P> {
         return "BinomialHeap";
     }
     
+    /**
+     * Both {@code this.head} and {@code other.head} are sorted by degree, so
+     * in this method we merge the two lists such the entire merged list remains
+     * sorted by the node degrees.
+     * 
+     * @param other another list to merge.
+     * @return the head node of the entire list holding the least degree.
+     */
     private BinomialTree<E, P> mergeRoots(BinomialTree<E, P> other) {
         BinomialTree<E, P> a = head;
         BinomialTree<E, P> b = other;
@@ -176,6 +205,7 @@ implements PriorityQueue<E, P> {
         BinomialTree<E, P> rootListHead;
         BinomialTree<E, P> rootListTail;
         
+        // Initialize the lists:
         if (a.degree < b.degree) {
             rootListHead = a;
             rootListTail = a;
@@ -198,6 +228,7 @@ implements PriorityQueue<E, P> {
             }
         }
         
+        // One of the lists are iterated over, just merge the leftovers.
         if (a != null) {
             rootListTail.sibling = a;
         } else {
@@ -243,6 +274,12 @@ implements PriorityQueue<E, P> {
         this.head = t;
     }
     
+    /**
+     * Make the node {@code child} a leftmost child of {@code parent}.
+     * 
+     * @param child  the node to make the child of parent of.
+     * @param parent the parent node.
+     */
     private void link(BinomialTree<E, P> child, BinomialTree<E, P> parent) {
         child.parent = parent;
         child.sibling = parent.child;
@@ -250,6 +287,12 @@ implements PriorityQueue<E, P> {
         parent.degree++;
     }
     
+    /**
+     * Reverses the tree list so that it might be merged with the root list.
+     * 
+     * @param first the first node of the list.
+     * @return the new head node.
+     */
     private BinomialTree<E, P> reverseRootList(BinomialTree<E, P> first) {
         BinomialTree<E, P> tmp = first;
         BinomialTree<E, P> tmpnext;
