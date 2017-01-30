@@ -1,7 +1,7 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphNode;
-import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
+import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphDoubleWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public final class IndexedDijkstraPathFinder implements PathFinder {
     public List<DirectedGraphNode> 
         search(DirectedGraphNode sourceNode, 
                DirectedGraphNode targetNode,
-               DirectedGraphWeightFunction weightFunction) {
+               DirectedGraphDoubleWeightFunction weightFunction) {
         searchFrontier.clear();
         Set<DirectedGraphNode> closedSet = new HashSet<>();
         Map<DirectedGraphNode, Double> distanceMap = new HashMap<>();

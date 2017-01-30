@@ -27,6 +27,7 @@ public class UnindexedHeapBruteForceTest {
         PriorityQueue<Integer, Integer> binomialHeap = new BinomialHeap<>();
         PriorityQueue<Integer, Integer> fibonacciHeap = new FibonacciHeap<>();
         PriorityQueue<Integer, Integer> pairingHeap = new PairingHeap<>();
+        PriorityQueue<Integer, Integer> dialsHeap = new DialsHeap<>();
         
         List<Integer> resultListOfBinaryHeap = test(binaryHeap, 
                                                     heapTaskList,
@@ -59,6 +60,10 @@ public class UnindexedHeapBruteForceTest {
         List<Integer> resultListOfPairingHeap = test(pairingHeap,
                                                      heapTaskList,
                                                      new Random(seed));
+        
+        List<Integer> resultListOfDialsHeap = test(dialsHeap,
+                                                   heapTaskList,
+                                                   new Random(seed));
         boolean allEqual = 
                 listsEqual(resultListOfBinaryHeap,
                            resultListOf2aryHeap,
@@ -67,7 +72,8 @@ public class UnindexedHeapBruteForceTest {
                            resultListOf5aryHeap,
                            resultListOfBinomialHeap,
                            resultListOfFibonacciHeap,
-                           resultListOfPairingHeap);
+                           resultListOfPairingHeap,
+                           resultListOfDialsHeap);
         
         assertTrue(allEqual);
     }

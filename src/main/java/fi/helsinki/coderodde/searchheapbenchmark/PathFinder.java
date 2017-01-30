@@ -7,5 +7,5 @@ public interface PathFinder {
     public List<DirectedGraphNode> 
         search(DirectedGraphNode source,
                DirectedGraphNode target,
-               DirectedGraphWeightFunction weightFunction);
+               DirectedGraphDoubleWeightFunction weightFunction);
 }

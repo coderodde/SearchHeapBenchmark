@@ -3,14 +3,14 @@ package fi.helsinki.coderodde.searchheapbenchmark;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class DirectedGraphWeightFunction {
+public final class DirectedGraphDoubleWeightFunction {
 
     private final Map<DirectedGraphNode, Map<DirectedGraphNode, Double>> map =
             new HashMap<>();
     
     public void addWeight(DirectedGraphNode tail, 
                           DirectedGraphNode head, 
-                          double weight) {
+                          Double weight) {
         if (!map.containsKey(tail)) {
             map.put(tail, new HashMap<>());
         }
@@ -18,7 +18,7 @@ public final class DirectedGraphWeightFunction {
         map.get(tail).put(head, weight);
     }
     
-    public double getWeight(DirectedGraphNode tail, DirectedGraphNode head) {
+    public Double getWeight(DirectedGraphNode tail, DirectedGraphNode head) {
         return map.get(tail).get(head);
     }
 }
