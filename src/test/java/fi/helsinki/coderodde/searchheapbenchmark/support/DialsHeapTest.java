@@ -1,6 +1,8 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,5 +76,68 @@ public class DialsHeapTest {
         while (heap1.size() > 0) {
             assertEquals(heap1.extractMinimum(), heap2.extractMinimum());
         }
+    }
+    
+    @Test
+    public void bruteForceTest2() {
+        long seed = System.currentTimeMillis();
+        Random random = new Random(seed);
+        List<HeapTask> heapTaskList = getRandomHeapTaskList(5_000, 
+                                                            500_000, 
+                                                            random);
+        
+        PriorityQueue<Integer, Integer> heap1 = new BinaryHeap<>();
+        PriorityQueue<Integer, Integer> heap2 = new DialsHeap<>();
+        
+        List<Integer> list1 = test(heap1, heapTaskList, new Random(seed));
+        List<Integer> list2 = test(heap2, heapTaskList, new Random(seed));
+        
+        assertEquals(list1, list2);
+    }
+    
+    static List<HeapTask> getRandomHeapTaskList(int length, 
+                                                int maxPriority,
+                                                Random random) {
+        List<HeapTask> heapTaskList = new ArrayList<>(length);
+        
+        for (int i = 0; i < length; ++i) {
+            Operation operation = random.nextFloat() < 0.4f ?
+                    Operation.EXTRACT : 
+                    Operation.ADD;
+            
+            heapTaskList.add(new HeapTask(operation, 
+                                          random.nextInt(), 
+                                          random.nextInt(maxPriority)));
+        }
+        
+        return heapTaskList;
+    }
+    
+    static List<Integer> test(PriorityQueue<Integer, Integer> queue,
+                              List<HeapTask> heapTaskList,
+                              Random random) {
+        System.out.println(queue);
+        List<Integer> resultList = new ArrayList<>(heapTaskList.size());
+        
+        for (HeapTask task : heapTaskList) {
+            switch (task.operation) {
+                case ADD:
+                    Integer element = task.element;
+                    Integer priority = task.priority;
+                    queue.add(element, priority);
+                    break;
+                    
+                case EXTRACT:
+                    
+                    if (queue.size() == 0) {
+                        continue;
+                    }
+                    
+                    resultList.add(queue.extractMinimum());
+                    break;
+            }
+        }
+        
+        return resultList;
     }
 }

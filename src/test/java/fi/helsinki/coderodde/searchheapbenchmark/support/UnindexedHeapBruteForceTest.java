@@ -61,9 +61,6 @@ public class UnindexedHeapBruteForceTest {
                                                      heapTaskList,
                                                      new Random(seed));
         
-        List<Integer> resultListOfDialsHeap = test(dialsHeap,
-                                                   heapTaskList,
-                                                   new Random(seed));
         boolean allEqual = 
                 listsEqual(resultListOfBinaryHeap,
                            resultListOf2aryHeap,
@@ -72,8 +69,7 @@ public class UnindexedHeapBruteForceTest {
                            resultListOf5aryHeap,
                            resultListOfBinomialHeap,
                            resultListOfFibonacciHeap,
-                           resultListOfPairingHeap,
-                           resultListOfDialsHeap);
+                           resultListOfPairingHeap);
         
         assertTrue(allEqual);
     }
@@ -88,8 +84,7 @@ public class UnindexedHeapBruteForceTest {
         return true;
     }
     
-    private static List<HeapTask> getRandomHeapTaskList(int length, 
-                                                        Random random) {
+    static List<HeapTask> getRandomHeapTaskList(int length, Random random) {
         List<HeapTask> heapTaskList = new ArrayList<>(length);
         
         for (int i = 0; i < length; ++i) {
@@ -103,9 +98,9 @@ public class UnindexedHeapBruteForceTest {
         return heapTaskList;
     }
     
-    private static List<Integer> test(PriorityQueue<Integer, Integer> queue,
-                                      List<HeapTask> heapTaskList,
-                                      Random random) {
+    static List<Integer> test(PriorityQueue<Integer, Integer> queue,
+                              List<HeapTask> heapTaskList,
+                              Random random) {
         System.out.println(queue);
         List<Integer> resultList = new ArrayList<>(heapTaskList.size());
         
