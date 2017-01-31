@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
  * 
  * @param <E> the actual element type.
  */
-public final class IndexedDialsHeap<E> implements PriorityQueue<E, Integer> {
+public final class IndexedIntegerDialsHeap<E> implements PriorityQueue<E, Integer> {
 
     private static final int DEFAULT_STORAGE_ARRAY_LENGTH = 1024;
 

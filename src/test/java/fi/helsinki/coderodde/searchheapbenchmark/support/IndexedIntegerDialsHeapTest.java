@@ -1,14 +1,18 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import static fi.helsinki.coderodde.searchheapbenchmark.support.Utils.test;
+import java.util.List;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static fi.helsinki.coderodde.searchheapbenchmark.support.Utils.getExtendedRandomHeapTaskList;
 
-public class IndexedDialsHeapTest {
+public class IndexedIntegerDialsHeapTest {
 
     private final PriorityQueue<Integer, Integer> heap = 
-            new IndexedDialsHeap<>();
+            new IndexedIntegerDialsHeap<>();
     
     @Before
     public void setUp() {
@@ -86,5 +90,23 @@ public class IndexedDialsHeapTest {
         for (int i = 100; i < 150; ++i) {
             assertEquals(Integer.valueOf(i), heap.extractMinimum());
         }
+    }
+    
+    @Test
+    public void testBruteForce() {
+        long seed = System.currentTimeMillis();
+        Random random = new Random(seed);
+        List<HeapTask> heapTaskList = getExtendedRandomHeapTaskList(10_000, 
+                                                                    500_000, 
+                                                                    random);
+        List<Integer> result1 = test(new IndexedBinaryHeap<>(),
+                                     heapTaskList,
+                                     new Random(seed));
+        
+        List<Integer> result2 = test(new IndexedIntegerDialsHeap<>(),
+                                     heapTaskList,
+                                     new Random(seed));
+        
+        assertEquals(result1, result2);
     }
 }

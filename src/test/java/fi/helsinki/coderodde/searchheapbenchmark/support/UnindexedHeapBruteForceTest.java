@@ -27,39 +27,39 @@ public class UnindexedHeapBruteForceTest {
         PriorityQueue<Integer, Integer> binomialHeap = new BinomialHeap<>();
         PriorityQueue<Integer, Integer> fibonacciHeap = new FibonacciHeap<>();
         PriorityQueue<Integer, Integer> pairingHeap = new PairingHeap<>();
-        PriorityQueue<Integer, Integer> dialsHeap = new DialsHeap<>();
+        PriorityQueue<Integer, Integer> dialsHeap = new IntegerDialsHeap<>();
         
-        List<Integer> resultListOfBinaryHeap = test(binaryHeap, 
-                                                    heapTaskList,
-                                                    new Random(seed));
+        List<Integer> resultListOfBinaryHeap = Utils.test(binaryHeap, 
+                                                          heapTaskList,
+                                                          new Random(seed));
         
-        List<Integer> resultListOf2aryHeap = test(d2aryHeap,
-                                                  heapTaskList,
-                                                  new Random(seed));
+        List<Integer> resultListOf2aryHeap = Utils.test(d2aryHeap,
+                                                        heapTaskList,
+                                                        new Random(seed));
         
-        List<Integer> resultListOf3aryHeap = test(d3aryHeap,
-                                                  heapTaskList,
-                                                  new Random(seed));
+        List<Integer> resultListOf3aryHeap = Utils.test(d3aryHeap,
+                                                        heapTaskList,
+                                                        new Random(seed));
         
-        List<Integer> resultListOf4aryHeap = test(d4aryHeap,
-                                                  heapTaskList,
-                                                  new Random(seed));
+        List<Integer> resultListOf4aryHeap = Utils.test(d4aryHeap,
+                                                        heapTaskList,
+                                                        new Random(seed));
         
-        List<Integer> resultListOf5aryHeap = test(d5aryHeap,
-                                                  heapTaskList,
-                                                  new Random(seed));
+        List<Integer> resultListOf5aryHeap = Utils.test(d5aryHeap,
+                                                        heapTaskList,
+                                                        new Random(seed));
         
-        List<Integer> resultListOfBinomialHeap = test(binomialHeap,
-                                                      heapTaskList,
-                                                      new Random(seed));
+        List<Integer> resultListOfBinomialHeap = Utils.test(binomialHeap,
+                                                            heapTaskList,
+                                                            new Random(seed));
         
-        List<Integer> resultListOfFibonacciHeap = test(fibonacciHeap,
-                                                       heapTaskList,
-                                                       new Random(seed));
+        List<Integer> resultListOfFibonacciHeap = Utils.test(fibonacciHeap,
+                                                             heapTaskList,
+                                                             new Random(seed));
         
-        List<Integer> resultListOfPairingHeap = test(pairingHeap,
-                                                     heapTaskList,
-                                                     new Random(seed));
+        List<Integer> resultListOfPairingHeap = Utils.test(pairingHeap,
+                                                           heapTaskList,
+                                                           new Random(seed));
         
         boolean allEqual = 
                 listsEqual(resultListOfBinaryHeap,
@@ -96,33 +96,5 @@ public class UnindexedHeapBruteForceTest {
         }
         
         return heapTaskList;
-    }
-    
-    static List<Integer> test(PriorityQueue<Integer, Integer> queue,
-                              List<HeapTask> heapTaskList,
-                              Random random) {
-        System.out.println(queue);
-        List<Integer> resultList = new ArrayList<>(heapTaskList.size());
-        
-        for (HeapTask task : heapTaskList) {
-            switch (task.operation) {
-                case ADD:
-                    Integer element = random.nextInt();
-                    Integer priority = random.nextInt();
-                    queue.add(element, priority);
-                    break;
-                    
-                case EXTRACT:
-                    
-                    if (queue.size() == 0) {
-                        continue;
-                    }
-                    
-                    resultList.add(queue.extractMinimum());
-                    break;
-            }
-        }
-        
-        return resultList;
     }
 }
