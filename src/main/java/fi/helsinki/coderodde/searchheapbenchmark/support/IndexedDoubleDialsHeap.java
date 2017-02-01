@@ -152,7 +152,7 @@ public final class IndexedDoubleDialsHeap<E>
 
     @Override
     public void clear() {
-        Arrays.fill(storageArray, 0, size, null);
+        Arrays.fill(storageArray, null);
         map.clear();
         size = 0;
     }

@@ -127,7 +127,7 @@ public final class DoubleDialsHeap<E> implements PriorityQueue<E, Double> {
      */
     @Override
     public void clear() {
-        Arrays.fill(storageArray, 0, size, null);
+        Arrays.fill(storageArray, null);
         size = 0;
     }
     

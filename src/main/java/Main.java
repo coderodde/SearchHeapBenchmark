@@ -26,7 +26,7 @@ import java.util.Random;
 
 public class Main {
 
-    private static final double[] RANGES = { 0.5, 2.5, 10.0 };
+    private static final double[] RANGES = { 0.1, 0.3, 0.5 };
     private static final int GRAPH_NODES = 10_000;
     private static final int SPARSE_GRAPH_ARCS = 35_000;
     private static final int MEDIUM_GRAPH_ARCS = 200_000;
@@ -57,7 +57,7 @@ public class Main {
         perform(finder, heap, true);
     }
     
-    private void perform(PathFinder finder, 
+    private void perform(PathFinder<Double> finder, 
                          PriorityQueue<DirectedGraphNode, Double> heap,
                          boolean output) {
         long startTime = System.currentTimeMillis();
@@ -101,10 +101,10 @@ public class Main {
         this.pathMap.put(new PairingHeap<>().toString(),
                          new ArrayList<>(SEARCH_TASKS));
         
-        for (double range : RANGES) {
-            this.pathMap.put(new DoubleDialsHeap<>(range).toString(),
-                             new ArrayList<>(SEARCH_TASKS));
-        }
+//        for (double range : RANGES) {
+//            this.pathMap.put(new DoubleDialsHeap<>(range).toString(),
+//                             new ArrayList<>(SEARCH_TASKS));
+//        }
         
         this.pathMap.put(new IndexedBinaryHeap<>().toString(), 
                          new ArrayList<>(SEARCH_TASKS));
@@ -123,10 +123,10 @@ public class Main {
         this.pathMap.put(new IndexedPairingHeap<>().toString(),
                          new ArrayList<>(SEARCH_TASKS));
         
-        for (double range : RANGES) {
-            this.pathMap.put(new IndexedDoubleDialsHeap<>(range).toString(),
-                             new ArrayList<>(SEARCH_TASKS));
-        }
+//        for (double range : RANGES) {
+//            this.pathMap.put(new IndexedDoubleDialsHeap<>(range).toString(),
+//                             new ArrayList<>(SEARCH_TASKS));
+//        }
     }
     
     private void warmup() {
@@ -156,13 +156,13 @@ public class Main {
         finder = new DijkstraPathFinder(heap);
         
         warmup(finder, heap);
-        
-        for (double range : RANGES) {
-            heap = new DoubleDialsHeap<>(range);
-            finder = new DijkstraPathFinder(heap);
-            
-            warmup(finder, heap);
-        }
+//        
+//        for (double range : RANGES) {
+//            heap = new DoubleDialsHeap<>(range);
+//            finder = new DijkstraPathFinder(heap);
+//            
+//            warmup(finder, heap);
+//        }
         
         //// Indexed heaps:
         heap = new IndexedBinaryHeap<>();
@@ -191,12 +191,12 @@ public class Main {
         
         warmup(finder, heap);   
         
-        for (double range : RANGES) {
-            heap = new IndexedDoubleDialsHeap<>(range);
-            finder = new IndexedDijkstraPathFinder(heap);
-            
-            warmup(finder, heap);
-        }
+//        for (double range : RANGES) {
+//            heap = new IndexedDoubleDialsHeap<>(range);
+//            finder = new IndexedDijkstraPathFinder(heap);
+//            
+//            warmup(finder, heap);
+//        }
     }
     
     private void benchmark() {
@@ -227,12 +227,12 @@ public class Main {
         
         benchmark(finder, heap);
         
-        for (double range : RANGES) {
-            heap = new DoubleDialsHeap<>(range);
-            finder = new DijkstraPathFinder(heap);
-            
-            benchmark(finder, heap);
-        }
+//        for (double range : RANGES) {
+//            heap = new DoubleDialsHeap<>(range);
+//            finder = new DijkstraPathFinder(heap);
+//            
+//            benchmark(finder, heap);
+//        }
         
         //// Indexed heaps:
         heap = new IndexedBinaryHeap<>();
@@ -261,19 +261,19 @@ public class Main {
         
         benchmark(finder, heap);  
         
-        for (double range : RANGES) {
-            heap = new IndexedDoubleDialsHeap<>(range);
-            finder = new DijkstraPathFinder(heap);
-            
-            benchmark(finder, heap);
-        }
+//        for (double range : RANGES) {
+//            heap = new IndexedDoubleDialsHeap<>(range);
+//            finder = new DijkstraPathFinder(heap);
+//            
+//            benchmark(finder, heap);
+//        }
         
         System.out.println("---");
         System.out.println("Algorithms/heaps agree: " + samePaths(pathMap));
     }
     
     public static void main(String[] args) {
-        long seed = System.currentTimeMillis();
+        long seed = 1485967725419L; System.currentTimeMillis();
         System.out.println("Seed = " + seed);
         Random random = new Random(seed);
         GraphData graphData = createRandomGraph(GRAPH_NODES,
@@ -317,48 +317,6 @@ public class Main {
 //                                         random);
         
 //        profileDialsHeap(graphData);
-    }
-    
-    private static void profileDialsHeap(GraphData graphData, long seed) {
-        Random random = new Random(seed);
-        List<SearchTask> searchTaskList = 
-                getRandomSearchTaskList(SEARCH_TASKS, 
-                                        graphData.nodeList,
-                                        random);
-        warmupDialsHeap(graphData, searchTaskList, random);
-        benchmarkDialsHeap(graphData, searchTaskList, random);
-    }
-    
-    private static void warmupDialsHeap(GraphData graphData,
-                                        List<SearchTask> searchTaskList,
-                                        Random random) {
-        perform(graphData, searchTaskList, random, false);
-    }
-    
-    private static void benchmarkDialsHeap(GraphData graphData,
-                                           List<SearchTask> searchTaskList,
-                                           Random random) {
-        perform(graphData, searchTaskList, random, true);
-    }
-    
-    private static void perform(GraphData graphData, 
-                                List<SearchTask> searchTaskList,
-                                Random random,
-                                boolean output) {
-        PathFinder finder = new DijkstraPathFinder(new BinaryHeap<>());
-        long startTime = System.currentTimeMillis();
-        
-        for (SearchTask searchTask : searchTaskList) {
-            DirectedGraphNode source = searchTask.source;
-            DirectedGraphNode target = searchTask.target;
-//            finder.search(source, target, graphData.getW)
-        }
-        
-        long endTime = System.currentTimeMillis();
-        
-        if (output) {
-            System.out.println("Dials'heap ");
-        }
     }
     
     private static boolean 
