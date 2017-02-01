@@ -1,9 +1,10 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphNode;
-import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphDoubleWeightFunction;
+import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import fi.helsinki.coderodde.searchheapbenchmark.Weight;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,11 +14,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public final class DijkstraPathFinder implements PathFinder {
+public final class DijkstraPathFinder<W extends Comparable<? super W>>
+        implements PathFinder<W> {
 
-    private final PriorityQueue<DirectedGraphNode, Double> searchFrontier;
+    private final PriorityQueue<DirectedGraphNode, W> searchFrontier;
     
-    public DijkstraPathFinder(PriorityQueue<DirectedGraphNode, Double> heap) {
+    public DijkstraPathFinder(PriorityQueue<DirectedGraphNode, W> heap) {
         heap.clear();
         this.searchFrontier = Objects.requireNonNull(heap, "The heap is null.");
     }
@@ -26,14 +28,15 @@ public final class DijkstraPathFinder implements PathFinder {
     public List<DirectedGraphNode> 
         search(DirectedGraphNode sourceNode, 
                DirectedGraphNode targetNode,
-               DirectedGraphDoubleWeightFunction weightFunction) {
+               DirectedGraphWeightFunction<W> weightFunction,
+               Weight<W> weight) {
         searchFrontier.clear();
         Set<DirectedGraphNode> closedSet = new HashSet<>();
-        Map<DirectedGraphNode, Double> distanceMap = new HashMap<>();
+        Map<DirectedGraphNode, W> distanceMap = new HashMap<>();
         Map<DirectedGraphNode, DirectedGraphNode> parentMap = new HashMap<>();
         
-        searchFrontier.add(sourceNode, 0.0);
-        distanceMap.put(sourceNode, 0.0);
+        searchFrontier.add(sourceNode, weight.zero());
+        distanceMap.put(sourceNode, weight.zero());
         parentMap.put(sourceNode, null);
         
         while (searchFrontier.size() > 0) {
@@ -54,12 +57,13 @@ public final class DijkstraPathFinder implements PathFinder {
                     continue;
                 }
                 
-                double tentativeDistance = 
-                        distanceMap.get(currentNode) +
-                        weightFunction.getWeight(currentNode, childNode);
-                
-                if (!distanceMap.containsKey(childNode) 
-                        || distanceMap.get(childNode) > tentativeDistance) {
+                W tentativeDistance = 
+                        weight.add(distanceMap.get(currentNode),
+                                   weightFunction.getWeight(currentNode, 
+                                                            childNode));
+                if (!distanceMap.containsKey(childNode)
+                        || distanceMap.get(childNode)
+                                      .compareTo(tentativeDistance) > 0) {
                     searchFrontier.add(childNode, tentativeDistance);
                     distanceMap.put(childNode, tentativeDistance);
                     parentMap.put(childNode, currentNode);

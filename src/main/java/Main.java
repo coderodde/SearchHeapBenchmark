@@ -1,18 +1,20 @@
 
 import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphNode;
-import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphDoubleWeightFunction;
-import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphIntegerWeightFunction;
+import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DijkstraPathFinder;
+import fi.helsinki.coderodde.searchheapbenchmark.support.DoubleDialsHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.DoubleWeight;
 import fi.helsinki.coderodde.searchheapbenchmark.support.FibonacciHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDijkstraPathFinder;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDoubleDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedFibonacciHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedPairingHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.PairingHeap;
@@ -24,6 +26,7 @@ import java.util.Random;
 
 public class Main {
 
+    private static final double[] RANGES = { 0.5, 2.5, 10.0 };
     private static final int GRAPH_NODES = 10_000;
     private static final int SPARSE_GRAPH_ARCS = 35_000;
     private static final int MEDIUM_GRAPH_ARCS = 200_000;
@@ -32,24 +35,24 @@ public class Main {
     private static final double MAX_WEIGHT = 10.0;
     private static final int MAX_INT_WEIGHT = 10;
     
-    private final DirectedGraphDoubleWeightFunction weightFunction;
+    private final DirectedGraphWeightFunction<Double> weightFunction;
     private final Map<String, List<List<DirectedGraphNode>>> pathMap = 
             new HashMap<>();
     private final List<SearchTask> searchTaskList;
     
-    Main(GraphData graphData, Random random) {
-        this.weightFunction = graphData.doubleWeightFunction;
+    Main(GraphData<Double> graphData, Random random) {
+        this.weightFunction = graphData.weightFunction;
         this.searchTaskList = getRandomSearchTaskList(SEARCH_TASKS, 
                                                       graphData.nodeList, 
                                                       random);
     }
     
-    private void warmup(PathFinder finder, 
+    private void warmup(PathFinder<Double> finder, 
                         PriorityQueue<DirectedGraphNode, Double> heap) {
         perform(finder, heap, false);
     }
     
-    private void benchmark(PathFinder finder, 
+    private void benchmark(PathFinder<Double> finder, 
                            PriorityQueue<DirectedGraphNode, Double> heap) {
         perform(finder, heap, true);
     }
@@ -64,7 +67,8 @@ public class Main {
             DirectedGraphNode target = searchTask.target;
             List<DirectedGraphNode> path = finder.search(source,
                                                          target, 
-                                                         weightFunction);
+                                                         weightFunction,
+                                                         new DoubleWeight());
             
             pathMap.get(heap.toString()).add(path);
         }
@@ -97,6 +101,11 @@ public class Main {
         this.pathMap.put(new PairingHeap<>().toString(),
                          new ArrayList<>(SEARCH_TASKS));
         
+        for (double range : RANGES) {
+            this.pathMap.put(new DoubleDialsHeap<>(range).toString(),
+                             new ArrayList<>(SEARCH_TASKS));
+        }
+        
         this.pathMap.put(new IndexedBinaryHeap<>().toString(), 
                          new ArrayList<>(SEARCH_TASKS));
         
@@ -113,6 +122,11 @@ public class Main {
         
         this.pathMap.put(new IndexedPairingHeap<>().toString(),
                          new ArrayList<>(SEARCH_TASKS));
+        
+        for (double range : RANGES) {
+            this.pathMap.put(new IndexedDoubleDialsHeap<>(range).toString(),
+                             new ArrayList<>(SEARCH_TASKS));
+        }
     }
     
     private void warmup() {
@@ -143,6 +157,13 @@ public class Main {
         
         warmup(finder, heap);
         
+        for (double range : RANGES) {
+            heap = new DoubleDialsHeap<>(range);
+            finder = new DijkstraPathFinder(heap);
+            
+            warmup(finder, heap);
+        }
+        
         //// Indexed heaps:
         heap = new IndexedBinaryHeap<>();
         finder = new IndexedDijkstraPathFinder(heap);
@@ -168,7 +189,14 @@ public class Main {
         heap = new IndexedPairingHeap<>();
         finder = new IndexedDijkstraPathFinder(heap);
         
-        warmup(finder, heap);        
+        warmup(finder, heap);   
+        
+        for (double range : RANGES) {
+            heap = new IndexedDoubleDialsHeap<>(range);
+            finder = new IndexedDijkstraPathFinder(heap);
+            
+            warmup(finder, heap);
+        }
     }
     
     private void benchmark() {
@@ -199,6 +227,13 @@ public class Main {
         
         benchmark(finder, heap);
         
+        for (double range : RANGES) {
+            heap = new DoubleDialsHeap<>(range);
+            finder = new DijkstraPathFinder(heap);
+            
+            benchmark(finder, heap);
+        }
+        
         //// Indexed heaps:
         heap = new IndexedBinaryHeap<>();
         finder = new IndexedDijkstraPathFinder(heap);
@@ -225,6 +260,13 @@ public class Main {
         finder = new IndexedDijkstraPathFinder(heap);
         
         benchmark(finder, heap);  
+        
+        for (double range : RANGES) {
+            heap = new IndexedDoubleDialsHeap<>(range);
+            finder = new DijkstraPathFinder(heap);
+            
+            benchmark(finder, heap);
+        }
         
         System.out.println("---");
         System.out.println("Algorithms/heaps agree: " + samePaths(pathMap));
@@ -348,13 +390,13 @@ public class Main {
         return true;
     }
     
-    private static GraphData createRandomGraph(int nodes,
-                                               int arcs,
-                                               double maxArcWeight,
-                                               Random random) {
+    private static GraphData<Double> createRandomGraph(int nodes,
+                                                       int arcs,
+                                                       double maxArcWeight,
+                                                       Random random) {
         List<DirectedGraphNode> nodeList = new ArrayList<>(nodes);
-        DirectedGraphDoubleWeightFunction weightFunction =
-                new DirectedGraphDoubleWeightFunction();
+        DirectedGraphWeightFunction<Double> weightFunction =
+                new DirectedGraphWeightFunction<>();
         
         for (int id = 0; id < nodes; ++id) {
             DirectedGraphNode node = new DirectedGraphNode(id);
@@ -370,16 +412,16 @@ public class Main {
                                      random.nextDouble() * maxArcWeight);
         }
         
-        return new GraphData(nodeList, weightFunction, null);
+        return new GraphData(nodeList, weightFunction);
     }
     
-    private static GraphData createRandomIntGraph(int nodes,
-                                                  int arcs,
-                                                  int maxArcWeight,
-                                                  Random random) {
+    private static GraphData<Integer> createRandomIntGraph(int nodes,
+                                                           int arcs,
+                                                           int maxArcWeight,
+                                                           Random random) {
         List<DirectedGraphNode> nodeList = new ArrayList<>(nodes);
-        DirectedGraphIntegerWeightFunction weightFunction =
-                new DirectedGraphIntegerWeightFunction();
+        DirectedGraphWeightFunction<Integer> weightFunction =
+                new DirectedGraphWeightFunction<>();
         
         for (int id = 0; id < nodes; ++id) {
             DirectedGraphNode node = new DirectedGraphNode(id);
@@ -395,7 +437,7 @@ public class Main {
                                      random.nextInt(maxArcWeight + 1));
         }
         
-        return new GraphData(nodeList, null, weightFunction);
+        return new GraphData(nodeList, weightFunction);
     }
     
     static List<SearchTask> 
@@ -416,17 +458,14 @@ public class Main {
         return list.get(random.nextInt(list.size()));
     }
     
-    static class GraphData {
+    static class GraphData<W> {
         List<DirectedGraphNode> nodeList;
-        DirectedGraphDoubleWeightFunction doubleWeightFunction;
-        DirectedGraphIntegerWeightFunction intWeightFunction;
+        DirectedGraphWeightFunction<W> weightFunction;
         
         GraphData(List<DirectedGraphNode> nodeList, 
-                  DirectedGraphDoubleWeightFunction doubleWeightFunction,
-                  DirectedGraphIntegerWeightFunction integerWeightFunction) {
+                  DirectedGraphWeightFunction<W> weightFunction) {
             this.nodeList = nodeList;
-            this.doubleWeightFunction = doubleWeightFunction;
-            this.intWeightFunction = integerWeightFunction;
+            this.weightFunction = weightFunction;
         }
     }
     
