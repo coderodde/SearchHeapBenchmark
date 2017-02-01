@@ -131,6 +131,11 @@ public final class DoubleDialsHeap<E> implements PriorityQueue<E, Double> {
         size = 0;
     }
     
+    @Override
+    public String toString() {
+        return "DoubleDialsHeap, range = " + range;
+    }
+    
     private DoubleDialsHeapNode<E> findMinimumPriorityNode() {
         DoubleDialsHeapNode<E> bestNode = null;
         DoubleDialsHeapNode<E> currentNode = storageArray[minimumBucketIndex];

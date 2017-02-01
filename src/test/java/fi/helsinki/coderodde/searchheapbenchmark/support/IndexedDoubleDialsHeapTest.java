@@ -35,7 +35,7 @@ public class IndexedDoubleDialsHeapTest {
         assertEquals(Integer.valueOf(3), heap.extractMinimum());
     }
     
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void throwsOnDecreaseKey() {
         heap.add(3, 6.0);
         heap.add(2, 4.0);
@@ -52,7 +52,7 @@ public class IndexedDoubleDialsHeapTest {
     @Test
     public void bruteForceTest() {
         PriorityQueue<Integer, Double> heap2 = new IndexedBinaryHeap<>();
-        long seed = 1485883048239L; System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         System.out.println("Seed = " + seed);
         
@@ -70,7 +70,11 @@ public class IndexedDoubleDialsHeapTest {
                 heap.decreasePriority(element, priority);
                 heap2.decreasePriority(element, priority);
             } else {
-                assertEquals(heap2.extractMinimum(), heap.extractMinimum());
+                if (heap2.size() == 0) {
+                    assertEquals(0, heap.size());
+                } else {
+                    assertEquals(heap2.extractMinimum(), heap.extractMinimum());
+                }
             }
         }
         

@@ -177,6 +177,11 @@ public final class IndexedIntegerDialsHeap<E> implements PriorityQueue<E, Intege
         size = 0;
     }
     
+    @Override
+    public String toString() {
+        return "IndexedIntegerDialsHeap";
+    }
+    
     private void checkHeapNotEmpty() {
         if (size == 0) {
             throw new NoSuchElementException("This DialsHeap is empty.");

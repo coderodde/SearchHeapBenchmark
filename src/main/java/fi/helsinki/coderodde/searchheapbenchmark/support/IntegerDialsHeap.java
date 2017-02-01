@@ -114,7 +114,7 @@ public final class IntegerDialsHeap<E> implements PriorityQueue<E, Integer> {
     
     @Override
     public String toString() {
-        return "DialsHeap";
+        return "IntegerDialsHeap";
     }
     
     private void ensureCapacityFor(int priority) {

@@ -106,12 +106,12 @@ public final class IndexedDoubleDialsHeap<E>
             return false;
         }
         
-        int targetBucketIndex = (int)(newPriority / range);
+        int sourceBucketIndex = (int)(targetNode.priority / range);
         
+        // Unlink the target node from its current bucket:
         if (targetNode.prev != null) {
             targetNode.prev.next = targetNode.next;
         } else {
-            int sourceBucketIndex = (int)(targetNode.priority / range);
             storageArray[sourceBucketIndex] = targetNode.next;
         }
         
@@ -119,13 +119,17 @@ public final class IndexedDoubleDialsHeap<E>
             targetNode.next.prev = targetNode.prev;
         }
         
+        // Link the target node to its new bucket:
         targetNode.priority = newPriority;
+        int targetBucketIndex = (int)(newPriority / range);
         targetNode.next = storageArray[targetBucketIndex];
         
         if (storageArray[targetBucketIndex] != null) {
             storageArray[targetBucketIndex].prev = targetNode;
         }
         
+        storageArray[targetBucketIndex] = targetNode;
+        targetNode.prev = null;
         minimumBucketIndex = Math.min(minimumBucketIndex, targetBucketIndex);
         return true;
     }
@@ -151,6 +155,11 @@ public final class IndexedDoubleDialsHeap<E>
         Arrays.fill(storageArray, 0, size, null);
         map.clear();
         size = 0;
+    }
+    
+    @Override
+    public String toString() {
+        return "IndexedDoubleDialsHeap, range = " + range;
     }
 
     private double checkRange(double range) {
@@ -197,6 +206,10 @@ public final class IndexedDoubleDialsHeap<E>
             node.prev.next = node.next;
         } else if ((storageArray[minimumBucketIndex] = node.next) == null) {
             updateMinimumBucketIndex();
+        }
+        
+        if (node.next != null) {
+            node.next.prev = node.prev;
         }
     }        
     
