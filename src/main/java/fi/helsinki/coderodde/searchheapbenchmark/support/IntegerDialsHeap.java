@@ -20,8 +20,20 @@ public final class IntegerDialsHeap<E> implements PriorityQueue<E, Integer> {
     private static final int DEFAULT_STORAGE_ARRAY_LENGTH = 1024;
     
     private static final class DialsHeapNode<E> {
+        
+        /**
+         * The actual element.
+         */
         E element;
+        
+        /**
+         * The integer priority of the element.
+         */
         Integer priority;
+        
+        /**
+         * The sibling node in the collision chain.
+         */
         DialsHeapNode<E> next;
         
         DialsHeapNode(E element, Integer priority, DialsHeapNode<E> next) {

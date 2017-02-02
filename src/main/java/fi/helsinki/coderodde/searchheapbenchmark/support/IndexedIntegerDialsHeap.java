@@ -132,6 +132,7 @@ public final class IndexedIntegerDialsHeap<E> implements PriorityQueue<E, Intege
         
         minimumPriority = Math.min(minimumPriority, newPriority);
         storageArray[newPriority] = targetNode;
+        targetNode.prev = null;
         return true;
     }
 

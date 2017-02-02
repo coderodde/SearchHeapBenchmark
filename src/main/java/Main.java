@@ -519,8 +519,8 @@ public class Main {
         finder = new IndexedDijkstraPathFinder<>(heap);
         warmup(heap, finder, graphData, searchTaskList);
         
-        ///////////////
-        // BENCHMARK //
+          ///////////////
+         // BENCHMARK //
         ///////////////
         System.out.println("Warming up done.");
         
@@ -580,17 +580,87 @@ public class Main {
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
         System.out.println("Integer weight algorithms/heaps agree: " + 
-                eq(paths));
+                eq(paths, graphData.weightFunction, searchTaskList));
     }
     
-    private static boolean eq(List<List<List<DirectedGraphNode>>> paths) {
+    private static boolean 
+        eq(List<List<List<DirectedGraphNode>>> paths,
+           DirectedGraphWeightFunction<Integer> weightFunction,
+           List<SearchTask> searchTaskList) {
         for (int i = 0; i < paths.size() - 1; ++i) {
-            if (!paths.get(i).equals(paths.get(i + 1))) {
+            if (!eq(paths.get(i), 
+                    paths.get(i + 1),
+                    weightFunction, 
+                    searchTaskList)) {
                 return false;
             }
         }
         
         return true;
+    }
+        
+    private static boolean 
+        eq(List<List<DirectedGraphNode>> paths1,
+           List<List<DirectedGraphNode>> paths2,
+           DirectedGraphWeightFunction<Integer> weightFunction,
+           List<SearchTask> searchTaskList) {
+        if (paths1.size() != paths2.size()) {
+            return false;
+        }       
+        
+        if (paths1.size() != searchTaskList.size()) {
+            return false;
+        }
+        
+        for (int i = 0; i < paths1.size(); ++i) {
+            SearchTask searchTask = searchTaskList.get(i);
+            List<DirectedGraphNode> path1 = paths1.get(i);
+            List<DirectedGraphNode> path2 = paths2.get(i);
+            
+            DirectedGraphNode source = searchTask.source;
+            DirectedGraphNode target = searchTask.target;
+            
+            if (path1.isEmpty() && path2.isEmpty()) {
+                continue;
+            }
+            
+            if (!path1.get(0).equals(source)) {
+                return false;
+            }
+            
+            if (!path1.get(path1.size() - 1).equals(target)) {
+                return false;
+            }
+            
+            if (!path2.get(0).equals(source)) {
+                return false;
+            }
+            
+            if (!path2.get(path2.size() - 1).equals(target)) {
+                return false;
+            }
+            
+            int path1Length = getPathLength(path1, weightFunction);
+            int path2Length = getPathLength(path2, weightFunction);
+            
+            if (path1Length != path2Length) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+        
+    private static int
+         getPathLength(List<DirectedGraphNode> path,
+                       DirectedGraphWeightFunction<Integer> weightFunction) {
+        int length = 0;
+        
+        for (int i = 0; i < path.size() - 1; ++i) {
+            length += weightFunction.getWeight(path.get(i), path.get(i + 1));
+        }
+        
+        return length;
     }
     
     private static void warmup(PriorityQueue<DirectedGraphNode, Integer> heap,
