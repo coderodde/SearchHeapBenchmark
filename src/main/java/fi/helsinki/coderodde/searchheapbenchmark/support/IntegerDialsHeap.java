@@ -108,7 +108,7 @@ public final class IntegerDialsHeap<E> implements PriorityQueue<E, Integer> {
      */
     @Override
     public void clear() {
-        Arrays.fill(storageArray, 0, size, null);
+        Arrays.fill(storageArray, null);
         size = 0;
     }
     

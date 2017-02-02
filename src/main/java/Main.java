@@ -3,6 +3,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphNode;
 import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import fi.helsinki.coderodde.searchheapbenchmark.Weight;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
@@ -16,7 +17,10 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDijkstraPathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDoubleDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedFibonacciHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedIntegerDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedPairingHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IntegerDialsHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IntegerWeight;
 import fi.helsinki.coderodde.searchheapbenchmark.support.PairingHeap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -273,7 +277,9 @@ public class Main {
     }
     
     public static void main(String[] args) {
-        long seed = 1485967725419L; System.currentTimeMillis();
+        warmupAndProfileIntegerWeightGraph();
+        System.exit(0);
+        long seed = System.currentTimeMillis();
         System.out.println("Seed = " + seed);
         Random random = new Random(seed);
         GraphData graphData = createRandomGraph(GRAPH_NODES,
@@ -285,6 +291,10 @@ public class Main {
         System.out.println("Warming up...");
         main.warmup();
         System.out.println("Warming up done!");
+        System.gc();
+        
+        System.out.println("===== Integer weight graph =====");
+        warmupAndProfileIntegerWeightGraph();
         System.gc();
         
         System.out.println("===== Sparse graph =====");
@@ -435,5 +445,196 @@ public class Main {
             this.source = source;
             this.target = target;
         }
+    }
+    
+    private static void warmupAndProfileIntegerWeightGraph() {
+        long seed = 1486042803858L; System.currentTimeMillis();
+        Random random = new Random(seed);
+        GraphData<Integer> graphData = createRandomIntGraph(GRAPH_NODES,
+                                                            MEDIUM_GRAPH_ARCS,
+                                                            MAX_INT_WEIGHT,
+                                                            random);
+        System.out.println(
+                "warmupAndProfileIntegerWeightGraph, seed = " + seed);
+        
+        List<SearchTask> searchTaskList = 
+                getRandomSearchTaskList(SEARCH_TASKS, 
+                                        graphData.nodeList, 
+                                        random);
+        // Warmup unindexed:
+        PriorityQueue<DirectedGraphNode, Integer> heap = new BinaryHeap<>();
+        PathFinder<Integer> finder = new DijkstraPathFinder<>(heap);
+        
+        System.out.println("Warming up...");
+        
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        for (int degree = 2; degree <= 10; ++degree) {
+            heap = new DaryHeap<>(degree);
+            finder = new DijkstraPathFinder<>(heap);
+            warmup(heap, finder, graphData, searchTaskList);
+        }
+        
+        heap = new BinomialHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        heap = new FibonacciHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        heap = new PairingHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        heap = new IntegerDialsHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        // Warmup indexed heaps:
+        heap = new IndexedBinaryHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        for (int degree = 2; degree <= 10; ++degree) {
+            heap = new IndexedDaryHeap<>(degree);
+            finder = new IndexedDijkstraPathFinder<>(heap);
+            warmup(heap, finder, graphData, searchTaskList);
+        }
+        
+        heap = new IndexedBinomialHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        heap = new IndexedFibonacciHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        heap = new IndexedPairingHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        heap = new IndexedIntegerDialsHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        ///////////////
+        // BENCHMARK //
+        ///////////////
+        System.out.println("Warming up done.");
+        
+        List<List<List<DirectedGraphNode>>> paths = new ArrayList<>();
+        heap = new BinaryHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        for (int degree = 2; degree <= 10; ++degree) {
+            heap = new DaryHeap<>(degree);
+            finder = new DijkstraPathFinder<>(heap);
+            benchmark(heap, finder, graphData, searchTaskList);
+        }
+        
+        heap = new BinomialHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        heap = new FibonacciHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        heap = new PairingHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        heap = new IntegerDialsHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        // Indexed benchmarks:
+        heap = new IndexedBinaryHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        for (int degree = 2; degree <= 10; ++degree) {
+            heap = new IndexedDaryHeap<>(degree);
+            finder = new IndexedDijkstraPathFinder<>(heap);
+            paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        }
+        
+        heap = new IndexedBinomialHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        heap = new IndexedFibonacciHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        heap = new IndexedPairingHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        heap = new IndexedIntegerDialsHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        System.out.println("Integer weight algorithms/heaps agree: " + 
+                eq(paths));
+    }
+    
+    private static boolean eq(List<List<List<DirectedGraphNode>>> paths) {
+        for (int i = 0; i < paths.size() - 1; ++i) {
+            if (!paths.get(i).equals(paths.get(i + 1))) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private static void warmup(PriorityQueue<DirectedGraphNode, Integer> heap,
+                               PathFinder<Integer> finder,
+                               GraphData<Integer> graphData,
+                               List<SearchTask> searchTaskList) {
+        perform(heap, finder, graphData, searchTaskList, false);
+    }
+    
+    private static List<List<DirectedGraphNode>> 
+        benchmark(PriorityQueue<DirectedGraphNode, Integer> heap,
+                  PathFinder<Integer> finder,
+                  GraphData<Integer> graphData,
+                  List<SearchTask> searchTaskList) {
+        return perform(heap, finder, graphData, searchTaskList, true);
+    }
+    
+    private static List<List<DirectedGraphNode>>
+         perform(PriorityQueue<DirectedGraphNode, Integer> heap,
+                 PathFinder<Integer> finder,
+                 GraphData<Integer> graphData,
+                 List<SearchTask> searchTaskList,
+                 boolean output) {
+        Weight<Integer> weight = new IntegerWeight();
+        List<List<DirectedGraphNode>> listOfPaths = 
+                new ArrayList<>(searchTaskList.size());
+        long start = System.currentTimeMillis();
+        
+        for (SearchTask searchTask : searchTaskList) {
+            DirectedGraphNode source = searchTask.source;
+            DirectedGraphNode target = searchTask.target;
+            listOfPaths.add(finder.search(source, 
+                                          target, 
+                                          graphData.weightFunction, 
+                                          weight));
+        }
+        
+        long end = System.currentTimeMillis();
+        
+        if (output) {
+            System.out.println(
+                    heap + " in " + (end - start) + " milliseconds.");
+        }
+        
+        return listOfPaths;
     }
 }
