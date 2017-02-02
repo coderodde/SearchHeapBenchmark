@@ -56,7 +56,7 @@ public class IndexedDoubleDialsHeapTest {
         Random random = new Random(seed);
         System.out.println("Seed = " + seed);
         
-        for (int i = 0; i < 10_000; ++i) {
+        for (int i = 0; i < 100_000; ++i) {
             float coin  = random.nextFloat();
             
             if (coin < 0.5f) {

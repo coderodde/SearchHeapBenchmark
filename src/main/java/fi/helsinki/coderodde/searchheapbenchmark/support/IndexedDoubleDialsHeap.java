@@ -76,6 +76,7 @@ public final class IndexedDoubleDialsHeap<E>
             return;
         }
         
+        ensureCapacityFor(priority);
         DoubleDialsHeapNode<E> newNode = new DoubleDialsHeapNode<>(element,
                                                                    priority);
         int bucketIndex = (int)(priority / range);
@@ -224,6 +225,18 @@ public final class IndexedDoubleDialsHeap<E>
                 minimumBucketIndex = i;
                 return;
             }
+        }
+    }
+    
+    private void ensureCapacityFor(Double priority) {
+        int bucketIndex = (int)(priority / range);
+        int requestedBucketSize = bucketIndex + 1;
+        
+        if (requestedBucketSize > storageArray.length) {
+            storageArray = 
+                    Arrays.copyOf(storageArray, 
+                                  Math.max(requestedBucketSize, 
+                                           2 * storageArray.length));
         }
     }
 }

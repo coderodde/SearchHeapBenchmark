@@ -31,7 +31,7 @@ public class Main {
     private static final int SPARSE_GRAPH_ARCS = 35_000;
     private static final int MEDIUM_GRAPH_ARCS = 200_000;
     private static final int DENSE_GRAPH_ARCS =  800_000;
-    private static final int SEARCH_TASKS = 100;
+    private static final int SEARCH_TASKS = 30;
     private static final double MAX_WEIGHT = 10.0;
     private static final int MAX_INT_WEIGHT = 10;
     
@@ -101,10 +101,10 @@ public class Main {
         this.pathMap.put(new PairingHeap<>().toString(),
                          new ArrayList<>(SEARCH_TASKS));
         
-//        for (double range : RANGES) {
-//            this.pathMap.put(new DoubleDialsHeap<>(range).toString(),
-//                             new ArrayList<>(SEARCH_TASKS));
-//        }
+        for (double range : RANGES) {
+            this.pathMap.put(new DoubleDialsHeap<>(range).toString(),
+                             new ArrayList<>(SEARCH_TASKS));
+        }
         
         this.pathMap.put(new IndexedBinaryHeap<>().toString(), 
                          new ArrayList<>(SEARCH_TASKS));
@@ -123,10 +123,10 @@ public class Main {
         this.pathMap.put(new IndexedPairingHeap<>().toString(),
                          new ArrayList<>(SEARCH_TASKS));
         
-//        for (double range : RANGES) {
-//            this.pathMap.put(new IndexedDoubleDialsHeap<>(range).toString(),
-//                             new ArrayList<>(SEARCH_TASKS));
-//        }
+        for (double range : RANGES) {
+            this.pathMap.put(new IndexedDoubleDialsHeap<>(range).toString(),
+                             new ArrayList<>(SEARCH_TASKS));
+        }
     }
     
     private void warmup() {
@@ -156,13 +156,13 @@ public class Main {
         finder = new DijkstraPathFinder(heap);
         
         warmup(finder, heap);
-//        
-//        for (double range : RANGES) {
-//            heap = new DoubleDialsHeap<>(range);
-//            finder = new DijkstraPathFinder(heap);
-//            
-//            warmup(finder, heap);
-//        }
+        
+        for (double range : RANGES) {
+            heap = new DoubleDialsHeap<>(range);
+            finder = new DijkstraPathFinder(heap);
+            
+            warmup(finder, heap);
+        }
         
         //// Indexed heaps:
         heap = new IndexedBinaryHeap<>();
@@ -191,12 +191,12 @@ public class Main {
         
         warmup(finder, heap);   
         
-//        for (double range : RANGES) {
-//            heap = new IndexedDoubleDialsHeap<>(range);
-//            finder = new IndexedDijkstraPathFinder(heap);
-//            
-//            warmup(finder, heap);
-//        }
+        for (double range : RANGES) {
+            heap = new IndexedDoubleDialsHeap<>(range);
+            finder = new IndexedDijkstraPathFinder(heap);
+            
+            warmup(finder, heap);
+        }
     }
     
     private void benchmark() {
@@ -227,12 +227,12 @@ public class Main {
         
         benchmark(finder, heap);
         
-//        for (double range : RANGES) {
-//            heap = new DoubleDialsHeap<>(range);
-//            finder = new DijkstraPathFinder(heap);
-//            
-//            benchmark(finder, heap);
-//        }
+        for (double range : RANGES) {
+            heap = new DoubleDialsHeap<>(range);
+            finder = new DijkstraPathFinder(heap);
+            
+            benchmark(finder, heap);
+        }
         
         //// Indexed heaps:
         heap = new IndexedBinaryHeap<>();
@@ -261,12 +261,12 @@ public class Main {
         
         benchmark(finder, heap);  
         
-//        for (double range : RANGES) {
-//            heap = new IndexedDoubleDialsHeap<>(range);
-//            finder = new DijkstraPathFinder(heap);
-//            
-//            benchmark(finder, heap);
-//        }
+        for (double range : RANGES) {
+            heap = new IndexedDoubleDialsHeap<>(range);
+            finder = new IndexedDijkstraPathFinder(heap);
+            
+            benchmark(finder, heap);
+        }
         
         System.out.println("---");
         System.out.println("Algorithms/heaps agree: " + samePaths(pathMap));
