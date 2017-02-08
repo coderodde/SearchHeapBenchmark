@@ -448,7 +448,7 @@ public class Main {
     }
     
     private static void warmupAndProfileIntegerWeightGraph() {
-        long seed = 1486042803858L; System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         GraphData<Integer> graphData = createRandomIntGraph(GRAPH_NODES,
                                                             MEDIUM_GRAPH_ARCS,
