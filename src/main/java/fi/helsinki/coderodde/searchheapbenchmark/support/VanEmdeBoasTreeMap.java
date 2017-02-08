@@ -81,6 +81,7 @@ public class VanEmdeBoasTreeMap<E> {
                 if (x == 0 && max == 1) {
                     return 1;
                 }
+                
                 return null;
             }
             
@@ -107,6 +108,125 @@ public class VanEmdeBoasTreeMap<E> {
             int offset = cluster[successorCluster].getMinimumKey();
             return index(successorCluster, offset, universeSize);
         }
+        
+        Integer getPredecessor(Integer x) {
+            if (universeSize == 2) {
+                if (x == 1 && min == 0) {
+                    return 0;
+                }
+                
+                return null;
+            }
+            
+            if (max != null && x > max) {
+                return max;
+            }
+            
+            Integer minimumLow = cluster[high(x, universeSize)].getMinimumKey();
+            
+            if (minimumLow != null && low(x, universeSize) > minimumLow) {
+                int offset = cluster[high(x, universeSize)]
+                      .getPredecessor(low(x, universeSize));
+                return index(high(x, universeSize), offset, universeSize);
+            }
+            
+            Integer predecessorCluster = 
+                    summary.getPredecessor(high(x, universeSize));
+            
+            if (predecessorCluster == null) {
+                if (min != null && x > min) {
+                    return min;
+                }
+                
+                return null;
+            }
+            
+            int offset = cluster[predecessorCluster].getMaximumKey();
+            return index(predecessorCluster, offset, universeSize);
+        }
+        
+        void emptyTreeInsert(Integer x) {
+            min = x;
+            max = x;
+        }
+        
+        void treeInsert(Integer x) {
+            if (min == null) {
+                emptyTreeInsert(x);
+            }
+            
+            if (x < min) {
+                Integer tmp = x;
+                x = min;
+                min = tmp;
+            }
+            
+            if (universeSize != 2) {
+                Integer minimum = cluster[high(x, universeSize)]
+                        .getMinimumKey();
+                
+                if (minimum == null) {
+                    summary.treeInsert(high(x, universeSize));
+                    cluster[high(x, universeSize)]
+                            .emptyTreeInsert(low(x, universeSize));
+                } else {
+                    cluster[high(x, universeSize)]
+                            .treeInsert(low(x, universeSize));
+                }
+            }
+            
+            if (max < x) {
+                max = x;
+            }
+        }
+        
+        void treeDelete(Integer x) {
+            if (min.equals(max)) {
+                min = null;
+                max = null;
+                return;
+            }
+            
+            if (universeSize == 2) {
+                if (x == 0) {
+                    min = 1;
+                } else {
+                    min = 0;
+                }
+                
+                max = min;
+                return; // This looks suspicious.
+            }
+            
+            if (min.equals(x)) {
+                Integer firstCluster = summary.getMinimumKey();
+                x = index(firstCluster,
+                          cluster[firstCluster].getMinimumKey(), universeSize);
+                min = x;
+            } 
+            
+            cluster[high(x, universeSize)].treeDelete(low(x, universeSize));
+            
+            if (cluster[high(x, universeSize)].getMinimumKey() == null) {
+                summary.treeDelete(high(x, universeSize));
+                
+                if (x.equals(max)) {
+                    Integer summaryMaximum = summary.getMaximumKey();
+                    
+                    if (summaryMaximum == null) {
+                        max = min;
+                    } else {
+                        max = index(summaryMaximum,
+                                    cluster[summaryMaximum].getMaximumKey(),
+                                    universeSize);
+                    }
+                }
+            } else if (x.equals(max)) {
+                max = index(high(x, universeSize), 
+                            cluster[high(x, universeSize)].getMaximumKey(), 
+                            universeSize);
+            }
+        }
     }
     
     /**
@@ -125,6 +245,33 @@ public class VanEmdeBoasTreeMap<E> {
         root = new VEBTree<>(requestedUniverseSize);
     }
     
+    public void insert(Integer x) {
+        root.treeInsert(x);
+    }
+    
+    public boolean contains(Integer x) {
+        return root.contains(x);
+    }
+    
+    public Integer getMinimum() {
+        return root.getMinimumKey();
+    }
+    
+    public Integer getPredessor(Integer x) {
+        return root.getPredecessor(x);
+    }
+    
+    public Integer getSuccessor(Integer x) {
+        return root.getSuccessor(x);
+    }
+    
+    public Integer getMaximum() {
+        return root.getMaximumKey();
+    }
+    
+    public void delete(Integer x) {
+        root.treeDelete(x);
+    }
     
     /**
      * Returns the fixed universe size that is a power of two and no smaller

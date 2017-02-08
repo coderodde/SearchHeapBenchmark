@@ -71,7 +71,7 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
         HeapNodeList<E> collisionList = map.get(priority);
         
         if (collisionList == null) {
-            map.put(priority, collisionList = new HeapNodeList<>());
+            map.insert(priority, collisionList = new HeapNodeList<>());
         }
         
         collisionList.addLast(newNode);
