@@ -160,6 +160,7 @@ public class VanEmdeBoasTreeMap<E> {
         void treeInsert(Integer x) {
             if (min == null) {
                 emptyTreeInsert(x);
+                return;
             }
             
             if (x < min) {
@@ -204,6 +205,13 @@ public class VanEmdeBoasTreeMap<E> {
             
             if (min.equals(x)) {
                 Integer firstCluster = summary.getMinimumKey();
+                
+                if (cluster[firstCluster].min == null) {
+                    min = max;
+                    System.out.println("Shit!");
+                    return;
+                }
+                
                 x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
             } 
@@ -335,7 +343,7 @@ public class VanEmdeBoasTreeMap<E> {
         int tmp = Integer.highestOneBit(requestedUniverseSize);
         return tmp == requestedUniverseSize ? 
                       requestedUniverseSize : 
-                     (requestedUniverseSize << 1);
+                     (tmp << 1);
     }
     
     private void checkRequestedUniverseSize(int requestedUniverseSize) {
@@ -358,12 +366,21 @@ public class VanEmdeBoasTreeMap<E> {
     }
     
     public static void main(String[] args) {
-        for (int i = 1; i < 100; i *= 2) {
+        /*for (int i = 1; i < 100; i *= 2) {
             System.out.println(i + " -> " + upperSquare(i) + " : " + lowerSquare(i));
         }
         
         VanEmdeBoasTreeMap<Integer> tree = new VanEmdeBoasTreeMap<>(4);
         
-        System.out.println("yeah");
+        System.out.println("yeah");*/
+        VanEmdeBoasTreeMap<Integer> tree = new VanEmdeBoasTreeMap<>(9);
+        tree.insert(4);
+        tree.insert(3);
+        tree.insert(2);
+        tree.insert(5);
+        tree.insert(15);
+        tree.insert(14);
+        tree.insert(7);
+        System.out.println("");
     }
 }
