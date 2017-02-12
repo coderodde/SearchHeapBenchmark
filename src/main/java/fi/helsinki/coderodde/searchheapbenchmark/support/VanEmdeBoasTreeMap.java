@@ -68,6 +68,10 @@ public class VanEmdeBoasTreeMap<E> {
             }
         }
         
+        int getUniverseSize() {
+            return universeSize;
+        }
+        
         Integer getMinimumKey() {
             return min;
         }
@@ -90,6 +94,10 @@ public class VanEmdeBoasTreeMap<E> {
         
         Integer getSuccessor(Integer x) {
             if (universeSize == 2) {
+                if (max == null) {
+                    return null;
+                }
+                
                 if (x == 0 && max == 1) {
                     return 1;
                 }
@@ -120,6 +128,10 @@ public class VanEmdeBoasTreeMap<E> {
         
         Integer getPredecessor(Integer x) {
             if (universeSize == 2) {
+                if (min == null) {
+                    return null;
+                }
+                
                 if (x == 1 && min == 0) {
                     return 0;
                 }
@@ -152,12 +164,9 @@ public class VanEmdeBoasTreeMap<E> {
             return index(predecessorCluster, offset);
         }
         
-        void emptyTreeInsert(Integer x) {
-            min = x;
-            max = x;
-        }
-        
         void treeInsert(Integer x) {
+            checkIntegerWithinUniverse(x);
+            
             if (min == null) {
                 emptyTreeInsert(x);
                 return;
@@ -236,6 +245,11 @@ public class VanEmdeBoasTreeMap<E> {
             }
         }
         
+        private void emptyTreeInsert(Integer x) {
+            min = x;
+            max = x;
+        }
+        
         private int high(int x) {
             return x / universeSizeLowerSquare;
         }
@@ -246,6 +260,20 @@ public class VanEmdeBoasTreeMap<E> {
 
         private int index(int x, int y) {
             return x * universeSizeLowerSquare + y;
+        }
+        
+        private void checkIntegerWithinUniverse(int x) {
+            if (x < 0) {
+                throw new IllegalArgumentException(
+                        "This VanEmdeBoasTreeMap supports only non-negative " +
+                        "keys. Received " + x + ".");
+            }
+            
+            if (x >= universeSize) {
+                throw new IllegalArgumentException(
+                        "The input integer is too large: " + x + ". " +
+                        "Must be at most " + (universeSize - 1) + ".");
+            }
         }
     }
     
@@ -293,6 +321,7 @@ public class VanEmdeBoasTreeMap<E> {
             "Asking for predecessor integer key in empty VanEmdeBoasTreeMap.");
         }
         
+        root.checkIntegerWithinUniverse(x);
         return root.getPredecessor(x);
     }
     
@@ -302,6 +331,7 @@ public class VanEmdeBoasTreeMap<E> {
             "Asking for successor integer key in empty VanEmdeBoasTreeMap.");
         }
         
+        root.checkIntegerWithinUniverse(x);
         return root.getSuccessor(x);
     }
     
