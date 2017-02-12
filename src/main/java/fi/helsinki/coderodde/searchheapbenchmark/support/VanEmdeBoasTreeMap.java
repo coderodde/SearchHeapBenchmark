@@ -1,5 +1,9 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
 public class VanEmdeBoasTreeMap<E> {
     
     /**
@@ -18,40 +22,49 @@ public class VanEmdeBoasTreeMap<E> {
         /**
          * The universe size of this vEB-tree.
          */
-        int universeSize;
+        private final int universeSize;
+        
+        /**
+         * The lower square of the universe size.
+         */
+        private final int universeSizeLowerSquare;
         
         /**
          * The minimum integer key in this tree.
          */
-        Integer min;
+        private Integer min;
         
         /**
          * The maximum integer key in this tree.
          */
-        Integer max;
+        private Integer max;
         
         /**
          * The summary vEB-tree.
          */
-        VEBTree<E> summary;
+        private final VEBTree<E> summary;
         
         /**
          * The children vEB-trees of this tree.
          */
-        VEBTree<E>[] cluster;
+        private final VEBTree<E>[] cluster;
         
         VEBTree(int universeSize) {
             this.universeSize = universeSize;
+            this.universeSizeLowerSquare = lowerSquare(universeSize);
             
             if (universeSize != MINIMUM_UNIVERSE_SIZE) {
-                int upperUniverseSquare = upperSquare(universeSize);
-                int lowerUniverseSquare = lowerSquare(universeSize);
-                this.summary = new VEBTree<>(upperUniverseSquare);
-                this.cluster = new VEBTree[upperUniverseSquare];
+                int upperUniverseSizeSquare = upperSquare(universeSize);
+                int lowerUniverseSizeSquare = lowerSquare(universeSize);
+                this.summary = new VEBTree<>(upperUniverseSizeSquare);
+                this.cluster = new VEBTree[upperUniverseSizeSquare];
                 
-                for (int i = 0; i != upperUniverseSquare; ++i) {
-                    this.cluster[i] = new VEBTree<>(lowerUniverseSquare);
+                for (int i = 0; i != upperUniverseSizeSquare; ++i) {
+                    this.cluster[i] = new VEBTree<>(lowerUniverseSizeSquare);
                 }
+            } else {
+                this.summary = null;
+                this.cluster = null;
             }
         }
         
@@ -72,8 +85,7 @@ public class VanEmdeBoasTreeMap<E> {
                 return false;
             }
             
-            return cluster[high(x, universeSize)]
-                  .contains(low(x, universeSize));
+            return cluster[high(x)].contains(low(x));
         }
         
         Integer getSuccessor(Integer x) {
@@ -89,24 +101,21 @@ public class VanEmdeBoasTreeMap<E> {
                 return min;
             }
             
-            Integer maximumLow = cluster[high(x, universeSize)].getMaximumKey();
+            Integer maximumLow = cluster[high(x)].getMaximumKey();
             
-            if (maximumLow != null && low(x, universeSize) < maximumLow) {
-                int offset = cluster[high(x, universeSize)]
-                        .getSuccessor(low(x, universeSize));
-                
-                return index(high(x, universeSize), offset, universeSize);
+            if (maximumLow != null && low(x) < maximumLow) {
+                int offset = cluster[high(x)].getSuccessor(low(x));
+                return index(high(x), offset);
             }
             
-            Integer successorCluster = 
-                    summary.getSuccessor(high(x, universeSize));
+            Integer successorCluster = summary.getSuccessor(high(x));
             
             if (successorCluster == null) {
                 return null;
             }
             
             int offset = cluster[successorCluster].getMinimumKey();
-            return index(successorCluster, offset, universeSize);
+            return index(successorCluster, offset);
         }
         
         Integer getPredecessor(Integer x) {
@@ -122,16 +131,14 @@ public class VanEmdeBoasTreeMap<E> {
                 return max;
             }
             
-            Integer minimumLow = cluster[high(x, universeSize)].getMinimumKey();
+            Integer minimumLow = cluster[high(x)].getMinimumKey();
             
-            if (minimumLow != null && low(x, universeSize) > minimumLow) {
-                int offset = cluster[high(x, universeSize)]
-                      .getPredecessor(low(x, universeSize));
-                return index(high(x, universeSize), offset, universeSize);
+            if (minimumLow != null && low(x) > minimumLow) {
+                int offset = cluster[high(x)].getPredecessor(low(x));
+                return index(high(x), offset);
             }
             
-            Integer predecessorCluster = 
-                    summary.getPredecessor(high(x, universeSize));
+            Integer predecessorCluster = summary.getPredecessor(high(x));
             
             if (predecessorCluster == null) {
                 if (min != null && x > min) {
@@ -142,7 +149,7 @@ public class VanEmdeBoasTreeMap<E> {
             }
             
             int offset = cluster[predecessorCluster].getMaximumKey();
-            return index(predecessorCluster, offset, universeSize);
+            return index(predecessorCluster, offset);
         }
         
         void emptyTreeInsert(Integer x) {
@@ -162,16 +169,13 @@ public class VanEmdeBoasTreeMap<E> {
             }
             
             if (universeSize != 2) {
-                Integer minimum = cluster[high(x, universeSize)]
-                        .getMinimumKey();
+                Integer minimum = cluster[high(x)].getMinimumKey();
                 
                 if (minimum == null) {
-                    summary.treeInsert(high(x, universeSize));
-                    cluster[high(x, universeSize)]
-                            .emptyTreeInsert(low(x, universeSize));
+                    summary.treeInsert(high(x));
+                    cluster[high(x)].emptyTreeInsert(low(x));
                 } else {
-                    cluster[high(x, universeSize)]
-                            .treeInsert(low(x, universeSize));
+                    cluster[high(x)].treeInsert(low(x));
                 }
             }
             
@@ -200,15 +204,14 @@ public class VanEmdeBoasTreeMap<E> {
             
             if (min.equals(x)) {
                 Integer firstCluster = summary.getMinimumKey();
-                x = index(firstCluster,
-                          cluster[firstCluster].getMinimumKey(), universeSize);
+                x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
             } 
             
-            cluster[high(x, universeSize)].treeDelete(low(x, universeSize));
+            cluster[high(x)].treeDelete(low(x));
             
-            if (cluster[high(x, universeSize)].getMinimumKey() == null) {
-                summary.treeDelete(high(x, universeSize));
+            if (cluster[high(x)].getMinimumKey() == null) {
+                summary.treeDelete(high(x));
                 
                 if (x.equals(max)) {
                     Integer summaryMaximum = summary.getMaximumKey();
@@ -217,27 +220,36 @@ public class VanEmdeBoasTreeMap<E> {
                         max = min;
                     } else {
                         max = index(summaryMaximum,
-                                    cluster[summaryMaximum].getMaximumKey(),
-                                    universeSize);
+                                    cluster[summaryMaximum].getMaximumKey());
                     }
                 }
             } else if (x.equals(max)) {
-                max = index(high(x, universeSize), 
-                            cluster[high(x, universeSize)].getMaximumKey(), 
-                            universeSize);
+                max = index(high(x), cluster[high(x)].getMaximumKey());
             }
         }
+        
+        private int high(int x) {
+            return x / universeSizeLowerSquare;
+        }
+
+        private int low(int x) {
+            return x % universeSizeLowerSquare;
+        }
+
+        private int index(int x, int y) {
+            return x * universeSizeLowerSquare + y;
+        }
     }
-    
-    /**
-     * Caches the number of elements in this tree.
-     */
-    private int size;
     
     /**
      * The root tree.
      */
     private VEBTree<E> root;
+    
+    /**
+     * A hash table set for keeping track of the integer keys used so far.
+     */
+    private final Set<Integer> set = new HashSet<>();
     
     public VanEmdeBoasTreeMap(int requestedUniverseSize) {
         checkRequestedUniverseSize(requestedUniverseSize);
@@ -246,31 +258,70 @@ public class VanEmdeBoasTreeMap<E> {
     }
     
     public void insert(Integer x) {
+        if (set.contains(x)) {
+            return;
+        }
+        
+        set.add(x);
         root.treeInsert(x);
     }
     
     public boolean contains(Integer x) {
-        return root.contains(x);
+        return set.contains(x);
     }
     
     public Integer getMinimum() {
+        if (set.isEmpty()) {
+            throw new NoSuchElementException(
+            "Asking for minimum integer key in empty VanEmdeBoasTreeMap.");
+        }
+            
         return root.getMinimumKey();
     }
     
     public Integer getPredessor(Integer x) {
+        if (set.isEmpty()) {
+            throw new NoSuchElementException(
+            "Asking for predecessor integer key in empty VanEmdeBoasTreeMap.");
+        }
+        
         return root.getPredecessor(x);
     }
     
     public Integer getSuccessor(Integer x) {
+        if (set.isEmpty()) {
+            throw new NoSuchElementException(
+            "Asking for successor integer key in empty VanEmdeBoasTreeMap.");
+        }
+        
         return root.getSuccessor(x);
     }
     
     public Integer getMaximum() {
+        if (set.isEmpty()) {
+            throw new NoSuchElementException(
+            "Asking for maximum integer key in empty VanEmdeBoasTreeMap.");
+        }
+        
         return root.getMaximumKey();
     }
     
     public void delete(Integer x) {
+        if (!set.contains(x)) {
+            return;
+        }
+        
+        set.remove(x);
         root.treeDelete(x);
+    }
+    
+    public int size() {
+        return set.size();
+    }
+    
+    public void clear() {
+        root = new VEBTree<>(root.universeSize);
+        set.clear();
     }
     
     /**
@@ -304,18 +355,6 @@ public class VanEmdeBoasTreeMap<E> {
     private static int lowerSquare(int number) {
         double exponent = Math.floor(Math.log(number) / Math.log(2.0) / 2.0);
         return (int) Math.pow(2.0, exponent);
-    }
-    
-    private static int high(int x, int universeSize) {
-        return x / lowerSquare(universeSize);
-    }
-    
-    private static int low(int x, int universeSize) {
-        return x % lowerSquare(universeSize);
-    }
-    
-    private static int index(int x, int y, int universeSize) {
-        return x * lowerSquare(universeSize) + y;
     }
     
     public static void main(String[] args) {

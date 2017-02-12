@@ -68,13 +68,13 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
     @Override
     public void add(E element, Integer priority) {
         HeapNode<E> newNode = new HeapNode<>(element);
-        HeapNodeList<E> collisionList = map.get(priority);
+//        HeapNodeList<E> collisionList = map.get(priority);
         
-        if (collisionList == null) {
-            map.insert(priority, collisionList = new HeapNodeList<>());
-        }
-        
-        collisionList.addLast(newNode);
+//        if (collisionList == null) {
+//           // map.insert(priority, collisionList = new HeapNodeList<>());
+//        }
+//        
+//        collisionList.addLast(newNode);
         ++size;
     }
 
@@ -86,9 +86,10 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
 
     @Override
     public E extractMinimum() {
-        HeapNodeList<E> collisionChain = map.getMinimum();
-        --size;
-        return collisionChain.removeFirst().element;
+//        HeapNodeList<E> collisionChain = map.getMinimum();
+//        --size;
+//        return collisionChain.removeFirst().element;
+        return null;
     }
 
     @Override
