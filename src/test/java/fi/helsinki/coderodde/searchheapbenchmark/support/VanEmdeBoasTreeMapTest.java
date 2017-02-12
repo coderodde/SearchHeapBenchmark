@@ -1,10 +1,7 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import java.util.NoSuchElementException;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -19,9 +16,14 @@ public class VanEmdeBoasTreeMapTest {
 
     @Test
     public void testInsert() {
+        // Insert 0, 2, 4, 6.
         for (int i = 0; i < 8; i += 2) {
-            map.insert(i);
+            map.insert(i, 2 * i);
         }
+        
+        assertEquals(4, map.size());
+        map.insert(2, -2); // vEB tree does not allow duplicates.
+        assertEquals(4, map.size());
 
         for (int i = 0; i < 8; i += 2) {
             assertTrue(map.contains(i));
@@ -37,12 +39,12 @@ public class VanEmdeBoasTreeMapTest {
         assertFalse(map.contains(2));
         assertFalse(map.contains(6));
         
-        map.insert(6);
+        map.insert(6, 12);
         
         assertFalse(map.contains(2));
         assertTrue(map.contains(6));
         
-        map.insert(2);
+        map.insert(2, 12);
         
         assertTrue(map.contains(2));
         assertTrue(map.contains(6));
@@ -61,7 +63,7 @@ public class VanEmdeBoasTreeMapTest {
     @Test
     public void testGetMaximum() {
         for (int i = 0; i < 8; ++i) {
-            map.insert(i);
+            map.insert(i, 3 * i);
             assertEquals(Integer.valueOf(i), map.getMaximum());
         }
         
@@ -74,7 +76,7 @@ public class VanEmdeBoasTreeMapTest {
     @Test
     public void testGetMinimum() {
         for (int i = 7; i >= 0; --i) {
-            map.insert(i);
+            map.insert(i, 3 * i);
             assertEquals(Integer.valueOf(i), map.getMinimum());
         }
         
@@ -96,10 +98,10 @@ public class VanEmdeBoasTreeMapTest {
     
     @Test
     public void testGetPredessor() {
-        map.insert(3);
+        map.insert(3, 9);
         assertNull(map.getPredessor(3));
         
-        map.insert(5);
+        map.insert(5, 15);
         assertEquals(Integer.valueOf(3), map.getPredessor(4));
         assertEquals(Integer.valueOf(3), map.getPredessor(5));
         assertEquals(Integer.valueOf(5), map.getPredessor(6));
@@ -113,10 +115,10 @@ public class VanEmdeBoasTreeMapTest {
     
     @Test
     public void testGetSuccessor() {
-        map.insert(5);
+        map.insert(5, 15);
         assertNull(map.getSuccessor(5));
         
-        map.insert(3);
+        map.insert(3, 9);
         assertEquals(Integer.valueOf(5), map.getSuccessor(4));
         assertEquals(Integer.valueOf(5), map.getSuccessor(3));
         assertEquals(Integer.valueOf(3), map.getSuccessor(2));
@@ -139,6 +141,72 @@ public class VanEmdeBoasTreeMapTest {
     
     @Test
     public void testDelete() {
-    
+        int sz = 0;
+        
+        for (int i : new int[] { 2, 4, 1, 3 }) {
+            assertEquals(sz, map.size());
+            map.insert(i, 2 * i);
+            assertEquals(++sz, map.size());
+        }
+        
+        assertTrue(map.contains(1));
+        assertTrue(map.contains(2));
+        assertTrue(map.contains(3));
+        assertTrue(map.contains(4));
+        
+        assertEquals(Integer.valueOf(1), map.getMinimum());
+        assertEquals(Integer.valueOf(4), map.getMaximum());
+        
+        map.delete(2);
+        
+        assertTrue(map.contains(1));
+        assertFalse(map.contains(2));
+        assertTrue(map.contains(3));
+        assertTrue(map.contains(4));
+        assertEquals(3, map.size());
+        
+        assertEquals(Integer.valueOf(1), map.getMinimum());
+        assertEquals(Integer.valueOf(4), map.getMaximum());
+        
+        map.delete(4);
+        
+        assertTrue(map.contains(1));
+        assertFalse(map.contains(2));
+        assertTrue(map.contains(3));
+        assertFalse(map.contains(4));
+        assertEquals(2, map.size());
+        
+        assertEquals(Integer.valueOf(1), map.getMinimum());
+        assertEquals(Integer.valueOf(3), map.getMaximum());
+        
+        map.delete(2); // Cannot remove twice.
+        
+        assertTrue(map.contains(1));
+        assertFalse(map.contains(2));
+        assertTrue(map.contains(3));
+        assertFalse(map.contains(4));
+        assertEquals(2, map.size());
+        
+        assertEquals(Integer.valueOf(1), map.getMinimum());
+        assertEquals(Integer.valueOf(3), map.getMaximum());
+        
+        map.delete(1);
+        
+        assertFalse(map.contains(1));
+        assertFalse(map.contains(2));
+        assertTrue(map.contains(3));
+        assertFalse(map.contains(4));
+        assertEquals(1, map.size());
+        
+        assertEquals(Integer.valueOf(3), map.getMinimum());
+        assertEquals(Integer.valueOf(3), map.getMaximum());
+        
+        map.delete(3);
+        
+        assertFalse(map.contains(1));
+        assertFalse(map.contains(2));
+        assertFalse(map.contains(3));
+        assertFalse(map.contains(4));
+        assertEquals(0, map.size());
     }
 }

@@ -40,6 +40,16 @@ public class VanEmdeBoasTreeMap<E> {
         private Integer max;
         
         /**
+         * The element associated with the minimum key.
+         */
+        private E minValue;
+        
+        /**
+         * The element associated with the maximum key.
+         */
+        private E maxValue;
+        
+        /**
          * The summary vEB-tree.
          */
         private final VEBTree<E> summary;
@@ -80,6 +90,22 @@ public class VanEmdeBoasTreeMap<E> {
             return max;
         }
         
+        E get(Integer x) {
+            if (x.equals(min)) {
+                return minValue;
+            }
+            
+            if (x.equals(max)) {
+                return maxValue;
+            }
+            
+            if (universeSize == 2) {
+                return null;
+            }
+            
+            return cluster[high(x)].get(low(x));
+        }
+        
         boolean contains(Integer x) {
             if (x.equals(min) || x.equals(max)) {
                 return true;
@@ -94,10 +120,6 @@ public class VanEmdeBoasTreeMap<E> {
         
         Integer getSuccessor(Integer x) {
             if (universeSize == 2) {
-                if (max == null) {
-                    return null;
-                }
-                
                 if (x == 0 && max == 1) {
                     return 1;
                 }
@@ -164,11 +186,9 @@ public class VanEmdeBoasTreeMap<E> {
             return index(predecessorCluster, offset);
         }
         
-        void treeInsert(Integer x) {
-            checkIntegerWithinUniverse(x);
-            
+        void treeInsert(Integer x, E value) {
             if (min == null) {
-                emptyTreeInsert(x);
+                emptyTreeInsert(x, value);
                 return;
             }
             
@@ -182,10 +202,16 @@ public class VanEmdeBoasTreeMap<E> {
                 Integer minimum = cluster[high(x)].getMinimumKey();
                 
                 if (minimum == null) {
-                    summary.treeInsert(high(x));
-                    cluster[high(x)].emptyTreeInsert(low(x));
+                    summary.treeInsert(high(x), value);
+                    cluster[high(x)].emptyTreeInsert(low(x), value);
                 } else {
-                    cluster[high(x)].treeInsert(low(x));
+                    cluster[high(x)].treeInsert(low(x), value);
+                }
+            } else {
+                if (x == 0) {
+                    minValue = value;
+                } else if (x == 1) {
+                    maxValue = value;
                 }
             }
             
@@ -194,38 +220,35 @@ public class VanEmdeBoasTreeMap<E> {
             }
         }
         
-        void treeDelete(Integer x) {
+        E treeDelete(Integer x) {
             if (min.equals(max)) {
                 min = null;
                 max = null;
-                return;
+                return minValue;
             }
             
             if (universeSize == 2) {
+                E returnValue;
+                
                 if (x == 0) {
                     min = 1;
+                    returnValue = minValue;
                 } else {
                     min = 0;
+                    returnValue = maxValue;
                 }
                 
                 max = min;
-                return; // This looks suspicious.
+                return returnValue;
             }
             
             if (min.equals(x)) {
                 Integer firstCluster = summary.getMinimumKey();
-                
-                if (cluster[firstCluster].min == null) {
-                    min = max;
-                    System.out.println("Shit!");
-                    return;
-                }
-                
                 x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
             } 
             
-            cluster[high(x)].treeDelete(low(x));
+            E returnValue = cluster[high(x)].treeDelete(low(x));
             
             if (cluster[high(x)].getMinimumKey() == null) {
                 summary.treeDelete(high(x));
@@ -243,11 +266,15 @@ public class VanEmdeBoasTreeMap<E> {
             } else if (x.equals(max)) {
                 max = index(high(x), cluster[high(x)].getMaximumKey());
             }
+            
+            return returnValue;
         }
         
-        private void emptyTreeInsert(Integer x) {
+        private void emptyTreeInsert(Integer x, E value) {
             min = x;
             max = x;
+            minValue = value;
+            maxValue = value;
         }
         
         private int high(int x) {
@@ -260,20 +287,6 @@ public class VanEmdeBoasTreeMap<E> {
 
         private int index(int x, int y) {
             return x * universeSizeLowerSquare + y;
-        }
-        
-        private void checkIntegerWithinUniverse(int x) {
-            if (x < 0) {
-                throw new IllegalArgumentException(
-                        "This VanEmdeBoasTreeMap supports only non-negative " +
-                        "keys. Received " + x + ".");
-            }
-            
-            if (x >= universeSize) {
-                throw new IllegalArgumentException(
-                        "The input integer is too large: " + x + ". " +
-                        "Must be at most " + (universeSize - 1) + ".");
-            }
         }
     }
     
@@ -293,13 +306,12 @@ public class VanEmdeBoasTreeMap<E> {
         root = new VEBTree<>(requestedUniverseSize);
     }
     
-    public void insert(Integer x) {
-        if (set.contains(x)) {
-            return;
+    public void insert(Integer x, E value) {
+        if (!set.contains(x)) {
+            set.add(x);
         }
         
-        set.add(x);
-        root.treeInsert(x);
+        root.treeInsert(x, value);
     }
     
     public boolean contains(Integer x) {
@@ -321,7 +333,7 @@ public class VanEmdeBoasTreeMap<E> {
             "Asking for predecessor integer key in empty VanEmdeBoasTreeMap.");
         }
         
-        root.checkIntegerWithinUniverse(x);
+        checkIntegerWithinUniverse(x, root.getUniverseSize());
         return root.getPredecessor(x);
     }
     
@@ -331,7 +343,7 @@ public class VanEmdeBoasTreeMap<E> {
             "Asking for successor integer key in empty VanEmdeBoasTreeMap.");
         }
         
-        root.checkIntegerWithinUniverse(x);
+        checkIntegerWithinUniverse(x, root.getUniverseSize());
         return root.getSuccessor(x);
     }
     
@@ -344,13 +356,15 @@ public class VanEmdeBoasTreeMap<E> {
         return root.getMaximumKey();
     }
     
-    public void delete(Integer x) {
+    public E delete(Integer x) {
+        checkIntegerWithinUniverse(x, root.getUniverseSize());
+        
         if (!set.contains(x)) {
-            return;
+            return null;
         }
         
         set.remove(x);
-        root.treeDelete(x);
+        return root.treeDelete(x);
     }
     
     public int size() {
@@ -360,6 +374,20 @@ public class VanEmdeBoasTreeMap<E> {
     public void clear() {
         root = new VEBTree<>(root.universeSize);
         set.clear();
+    }
+    
+    private void checkIntegerWithinUniverse(int x, int universeSize) {
+        if (x < 0) {
+            throw new IllegalArgumentException(
+                    "This VanEmdeBoasTreeMap supports only non-negative " +
+                    "keys. Received " + x + ".");
+        }
+
+        if (x >= universeSize) {
+            throw new IllegalArgumentException(
+                    "The input integer is too large: " + x + ". " +
+                    "Must be at most " + (universeSize - 1) + ".");
+        }
     }
     
     /**
@@ -404,13 +432,13 @@ public class VanEmdeBoasTreeMap<E> {
         
         System.out.println("yeah");*/
         VanEmdeBoasTreeMap<Integer> tree = new VanEmdeBoasTreeMap<>(9);
-        tree.insert(4);
-        tree.insert(3);
-        tree.insert(2);
-        tree.insert(5);
-        tree.insert(15);
-        tree.insert(14);
-        tree.insert(7);
+        tree.insert(4, null);
+        tree.insert(3, null);
+        tree.insert(2, null);
+        tree.insert(5, null);
+        tree.insert(15, null);
+        tree.insert(14, null);
+        tree.insert(7, null);
         System.out.println("");
     }
 }
