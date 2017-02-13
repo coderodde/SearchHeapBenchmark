@@ -1,6 +1,9 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.TreeMap;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -81,7 +84,6 @@ public class VanEmdeBoasTreeMapTest {
             assertEquals(Integer.valueOf(i), map.getMaximum());
             map.delete(i);
         }
-        
     }
 
     @Test
@@ -219,5 +221,41 @@ public class VanEmdeBoasTreeMapTest {
         assertFalse(map.contains(3));
         assertFalse(map.contains(4));
         assertEquals(0, map.size());
+    }
+    
+    @Test
+    public void bruteForceTest() {
+        final int UNIVERSE_SIZE = 10;
+        long seed = 1486977252244L; System.currentTimeMillis();
+        Random random = new Random(seed);
+        Map<Integer, Integer> treeMap = new TreeMap<>();
+        VanEmdeBoasTreeMap<Integer> map = 
+                new VanEmdeBoasTreeMap<>(UNIVERSE_SIZE);
+        
+        System.out.println("Seed = " + seed);
+        
+        for (int i = 0; i < 10; ++i) {
+            System.out.println("i = " + i);
+            float coin = random.nextFloat();
+            
+            if (coin < 0.4f) {
+                int newElement = random.nextInt(UNIVERSE_SIZE);
+                treeMap.put(newElement, newElement * 3);
+                map.insert(newElement, newElement * 3);
+            } else if (coin < 0.6f) {
+                int key = random.nextInt(i + 1);
+                assertEquals(treeMap.get(key), map.get(key));
+            } else {
+                if (treeMap.isEmpty()) {
+                    assertTrue(map.size() == 0);
+                } else {
+                    int key = random.nextInt(i);
+                    assertEquals(treeMap.remove(key), map.delete(key));
+                }
+            }
+        }
+        
+        assertEquals(treeMap.size(), map.size());
+        System.out.println("Yiihaaa!");
     }
 }
