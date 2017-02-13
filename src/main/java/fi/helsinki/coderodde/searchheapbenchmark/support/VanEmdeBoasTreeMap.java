@@ -196,6 +196,10 @@ public class VanEmdeBoasTreeMap<E> {
                 Integer tmp = x;
                 x = min;
                 min = tmp;
+                
+                E tmpValue = value;
+                value = minValue;
+                minValue = tmpValue;
             }
             
             if (universeSize != 2) {
@@ -207,24 +211,49 @@ public class VanEmdeBoasTreeMap<E> {
                 } else {
                     cluster[high(x)].treeInsert(low(x), value);
                 }
-            } else {
-                if (x == 0) {
-                    minValue = value;
-                } else if (x == 1) {
-                    maxValue = value;
-                }
             }
             
             if (max < x) {
                 max = x;
+                maxValue = value;
             }
+        }
+        
+        private void emptyTreeUpdate(E value) {
+            minValue = value;
+            maxValue = value;
+        }
+        
+        E treeUpdate(Integer x, E value) {
+            E returnValue = null;
+            
+            if (min.equals(x)) {
+                returnValue = minValue;
+                minValue = value;
+            } else if (max.equals(x)) {
+                returnValue = maxValue;
+                maxValue = value;
+            } else if (universeSize != 2) {
+                Integer minimum = cluster[high(x)].getMinimumKey();
+                
+                if (minimum == null) {
+                    cluster[high(x)].emptyTreeUpdate(value);
+                } else {
+                    cluster[high(x)].treeUpdate(low(x), value);
+                }
+            }
+            
+            return returnValue;
         }
         
         E treeDelete(Integer x) {
             if (min.equals(max)) {
+                E returnValue = minValue;
                 min = null;
                 max = null;
-                return minValue;
+                minValue = null;
+                maxValue = null;
+                return returnValue;
             }
             
             if (universeSize == 2) {
@@ -239,6 +268,7 @@ public class VanEmdeBoasTreeMap<E> {
                 }
                 
                 max = min;
+                maxValue = minValue;
                 return returnValue;
             }
             
@@ -307,11 +337,12 @@ public class VanEmdeBoasTreeMap<E> {
     }
     
     public void insert(Integer x, E value) {
-        if (!set.contains(x)) {
+        if (set.contains(x)) {
+            root.treeUpdate(x, value);
+        } else {
             set.add(x);
+            root.treeInsert(x, value);
         }
-        
-        root.treeInsert(x, value);
     }
     
     public boolean contains(Integer x) {
@@ -354,6 +385,14 @@ public class VanEmdeBoasTreeMap<E> {
         }
         
         return root.getMaximumKey();
+    }
+    
+    public E get(Integer x) {
+        if (!set.contains(x)) {
+            return null;
+        }
+        
+        return root.get(x);
     }
     
     public E delete(Integer x) {
@@ -439,6 +478,11 @@ public class VanEmdeBoasTreeMap<E> {
         tree.insert(15, null);
         tree.insert(14, null);
         tree.insert(7, null);
+//        System.out.println("");
+
+        tree = new VanEmdeBoasTreeMap<>(4);
+        tree.insert(2, 12);
+        tree.insert(2, 11);
         System.out.println("");
     }
 }

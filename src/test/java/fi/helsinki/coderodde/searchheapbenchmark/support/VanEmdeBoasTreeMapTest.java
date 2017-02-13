@@ -38,16 +38,25 @@ public class VanEmdeBoasTreeMapTest {
     public void testContains() {
         assertFalse(map.contains(2));
         assertFalse(map.contains(6));
+        assertNull(map.get(2));
+        assertNull(map.get(6));
+        assertNull(map.get(5));
         
         map.insert(6, 12);
         
         assertFalse(map.contains(2));
         assertTrue(map.contains(6));
+        assertEquals(Integer.valueOf(12), map.get(6));
         
-        map.insert(2, 12);
+        map.insert(2, 11);
         
         assertTrue(map.contains(2));
         assertTrue(map.contains(6));
+        assertEquals(Integer.valueOf(12), map.get(6));
+        assertEquals(Integer.valueOf(11), map.get(2));
+        
+        map.insert(6, 9);
+        assertEquals(Integer.valueOf(9), map.get(6));
         
         map.delete(6);
         
@@ -64,6 +73,7 @@ public class VanEmdeBoasTreeMapTest {
     public void testGetMaximum() {
         for (int i = 0; i < 8; ++i) {
             map.insert(i, 3 * i);
+            assertEquals(Integer.valueOf(3 * i), map.get(i));
             assertEquals(Integer.valueOf(i), map.getMaximum());
         }
         
@@ -71,6 +81,7 @@ public class VanEmdeBoasTreeMapTest {
             assertEquals(Integer.valueOf(i), map.getMaximum());
             map.delete(i);
         }
+        
     }
 
     @Test
