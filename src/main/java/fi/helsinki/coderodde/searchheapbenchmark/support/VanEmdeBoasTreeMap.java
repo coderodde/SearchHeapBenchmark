@@ -27,9 +27,14 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
         private final int universeSize;
         
         /**
-         * The lower square of the universe size.
+         * The mask used to compute the low index.
          */
-        private final int universeSizeLowerSquare;
+        private final int lowMask;
+        
+        /**
+         * The shift length for computing the high index.
+         */
+        private final int highShift;
         
         /**
          * The minimum integer key in this tree.
@@ -63,8 +68,11 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
         
         VEBTree(int universeSize) {
             this.universeSize = universeSize;
-            this.universeSizeLowerSquare = lowerSquare(universeSize);
-            
+            int universeSizeLowerSquare = lowerSquare(universeSize);
+            this.lowMask = universeSizeLowerSquare - 1;
+            this.highShift = 
+                    Integer.numberOfTrailingZeros(universeSizeLowerSquare);
+            System.out.println("lowMask: " + lowMask + ", highShift: " + highShift);
             if (universeSize != MINIMUM_UNIVERSE_SIZE) {
                 int upperUniverseSizeSquare = upperSquare(universeSize);
                 int lowerUniverseSizeSquare = lowerSquare(universeSize);
@@ -306,15 +314,15 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
         }
         
         private int high(int x) {
-            return x / universeSizeLowerSquare;
+            return x >>> highShift;
         }
 
         private int low(int x) {
-            return x % universeSizeLowerSquare;
+            return x & lowMask;
         }
 
         private int index(int x, int y) {
-            return x * universeSizeLowerSquare + y;
+            return (x << highShift) | (y & lowMask);
         }
     }
     
@@ -547,7 +555,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
 //        System.out.println(t.delete(3)); // fails
 //        System.out.println(t.delete(0));
         
-        System.exit(0);
+//        System.exit(0);
         
         /*for (int i = 1; i < 100; i *= 2) {
             System.out.println(i + " -> " + upperSquare(i) + " : " + lowerSquare(i));
