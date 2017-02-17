@@ -106,18 +106,6 @@ public class VanEmdeBoasTreeMap<E> {
             return cluster[high(x)].get(low(x));
         }
         
-        boolean contains(Integer x) {
-            if (x.equals(min) || x.equals(max)) {
-                return true;
-            }
-            
-            if (universeSize == 2) {
-                return false;
-            }
-            
-            return cluster[high(x)].contains(low(x));
-        }
-        
         Integer getSuccessor(Integer x) {
             if (universeSize == 2) {
                 if (x == 0 && max == 1) {
@@ -262,23 +250,29 @@ public class VanEmdeBoasTreeMap<E> {
                 if (x == 0) {
                     min = 1;
                     returnValue = minValue;
+                    minValue = maxValue;
                 } else {
-                    min = 0;
+                    max = 0;
                     returnValue = maxValue;
+                    maxValue = minValue;
                 }
                 
-                max = min;
-                maxValue = minValue;
                 return returnValue;
             }
             
+            E returnValue;
+            
             if (min.equals(x)) {
+                returnValue = minValue;
                 Integer firstCluster = summary.getMinimumKey();
                 x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
-            } 
+                minValue = cluster[firstCluster].get(x);
+            } else {
+                returnValue = cluster[high(x)].treeDelete(low(x));
+            }
             
-            E returnValue = cluster[high(x)].treeDelete(low(x));
+            /*E returnValue =*/ cluster[high(x)].treeDelete(low(x));
             
             if (cluster[high(x)].getMinimumKey() == null) {
                 summary.treeDelete(high(x));
@@ -288,6 +282,7 @@ public class VanEmdeBoasTreeMap<E> {
                     
                     if (summaryMaximum == null) {
                         max = min;
+                        //maxValue = minValue;
                     } else {
                         max = index(summaryMaximum,
                                     cluster[summaryMaximum].getMaximumKey());
@@ -463,6 +458,21 @@ public class VanEmdeBoasTreeMap<E> {
     }
     
     public static void main(String[] args) {
+        VanEmdeBoasTreeMap<Integer> t = new VanEmdeBoasTreeMap<>(4);
+        t.insert(1, 11);
+        t.insert(0, 10);
+        t.insert(2, 12);
+        t.insert(3, 13);
+        
+//        System.out.println(t.delete(3));
+//        System.out.println(t.delete(2));
+        System.out.println(t.delete(0));
+        System.out.println(t.delete(1));
+//        System.out.println(t.delete(3)); // fails
+//        System.out.println(t.delete(0));
+        
+        System.exit(0);
+        
         /*for (int i = 1; i < 100; i *= 2) {
             System.out.println(i + " -> " + upperSquare(i) + " : " + lowerSquare(i));
         }
@@ -483,6 +493,6 @@ public class VanEmdeBoasTreeMap<E> {
         tree = new VanEmdeBoasTreeMap<>(4);
         tree.insert(2, 12);
         tree.insert(2, 11);
-        System.out.println("");
+        System.out.println(tree.delete(2));
     }
 }

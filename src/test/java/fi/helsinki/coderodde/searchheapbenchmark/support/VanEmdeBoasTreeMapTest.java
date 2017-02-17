@@ -235,18 +235,22 @@ public class VanEmdeBoasTreeMapTest {
         System.out.println("Seed = " + seed);
         
         for (int i = 0; i < 10; ++i) {
-            System.out.println("i = " + i);
+            System.out.print("i = " + i + " ");
             float coin = random.nextFloat();
             
-            if (coin < 0.4f) {
+            if (coin < 0.45f) {
+                System.out.println("insert");
                 int newElement = random.nextInt(UNIVERSE_SIZE);
                 treeMap.put(newElement, newElement * 3);
                 map.insert(newElement, newElement * 3);
-            } else if (coin < 0.6f) {
+            } else if (coin < 0.65f) {
+                System.out.println("get");
                 int key = random.nextInt(i + 1);
                 assertEquals(treeMap.get(key), map.get(key));
             } else {
+                System.out.println("remove");
                 if (treeMap.isEmpty()) {
+                    System.out.println("empty!");
                     assertTrue(map.size() == 0);
                 } else {
                     int key = random.nextInt(i);
