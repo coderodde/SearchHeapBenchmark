@@ -268,11 +268,12 @@ public class VanEmdeBoasTreeMap<E> {
                 x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
                 minValue = cluster[firstCluster].get(x);
+                cluster[high(x)].treeDelete(low(x));
             } else {
                 returnValue = cluster[high(x)].treeDelete(low(x));
             }
             
-            /*E returnValue =*/ cluster[high(x)].treeDelete(low(x));
+            // cluster[high(x)].treeDelete(low(x));
             
             if (cluster[high(x)].getMinimumKey() == null) {
                 summary.treeDelete(high(x));
@@ -464,8 +465,8 @@ public class VanEmdeBoasTreeMap<E> {
         t.insert(2, 12);
         t.insert(3, 13);
         
-//        System.out.println(t.delete(3));
-//        System.out.println(t.delete(2));
+        System.out.println(t.delete(3));
+        System.out.println(t.delete(2));
         System.out.println(t.delete(0));
         System.out.println(t.delete(1));
 //        System.out.println(t.delete(3)); // fails
