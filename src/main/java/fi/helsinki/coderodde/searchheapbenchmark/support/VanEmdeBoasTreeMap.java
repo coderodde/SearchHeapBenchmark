@@ -72,7 +72,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
             this.lowMask = universeSizeLowerSquare - 1;
             this.highShift = 
                     Integer.numberOfTrailingZeros(universeSizeLowerSquare);
-            System.out.println("lowMask: " + lowMask + ", highShift: " + highShift);
+            
             if (universeSize != MINIMUM_UNIVERSE_SIZE) {
                 int upperUniverseSizeSquare = upperSquare(universeSize);
                 int lowerUniverseSizeSquare = lowerSquare(universeSize);
