@@ -1,10 +1,12 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class VanEmdeBoasTreeMap<E> {
+public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
     
     /**
      * Holds the minimum universe size.
@@ -330,6 +332,79 @@ public class VanEmdeBoasTreeMap<E> {
         checkRequestedUniverseSize(requestedUniverseSize);
         requestedUniverseSize = fixUniverseSize(requestedUniverseSize);
         root = new VEBTree<>(requestedUniverseSize);
+    }
+    
+    @Override
+    public boolean isEmpty() {
+        return set.isEmpty();
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        if (key == null) {
+            return false;
+        }
+        
+        if (!key.getClass().equals(Integer.class)) {
+            return false;
+        }
+        
+        return set.contains((Integer) key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        throw new UnsupportedOperationException(
+                "This " + getClass().getSimpleName() + 
+                " does not implement 'containsValue'.");
+    }
+
+    @Override
+    public E get(Object key) {
+        return root.get((Integer) key);    
+    }
+
+    @Override
+    public E put(Integer key, E value) {
+        if (set.contains(key)) {
+            return root.treeUpdate(key, value);
+        }
+        
+        root.treeInsert(key, value);
+        return null;
+    }
+
+    @Override
+    public E remove(Object key) {
+        return root.treeDelete((Integer) key);
+    }
+
+    @Override
+    public void putAll(Map<? extends Integer, ? extends E> m) {
+        for (Map.Entry<? extends Integer, ? extends E> entry : m.entrySet()) {
+            root.treeInsert(entry.getKey(), entry.getValue());
+        }
+    }
+
+    @Override
+    public Set<Integer> keySet() {
+        throw new UnsupportedOperationException(
+                "This " + getClass().getSimpleName() + " does not implement " +
+                "'keySet'.");
+    }
+
+    @Override
+    public Collection<E> values() {
+        throw new UnsupportedOperationException(
+                "This " + getClass().getSimpleName() + " does not implement " +
+                "'values'.");
+    }
+
+    @Override
+    public Set<Entry<Integer, E>> entrySet() {
+        throw new UnsupportedOperationException(
+                "This " + getClass().getSimpleName() + " does not implement " +
+                "'entrySet'.");
     }
     
     public void insert(Integer x, E value) {
