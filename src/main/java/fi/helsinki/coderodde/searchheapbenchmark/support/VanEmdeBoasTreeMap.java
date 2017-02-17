@@ -267,7 +267,7 @@ public class VanEmdeBoasTreeMap<E> {
                 Integer firstCluster = summary.getMinimumKey();
                 x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
-                minValue = cluster[firstCluster].get(x);
+                minValue = cluster[firstCluster].get(low(x));
                 cluster[high(x)].treeDelete(low(x));
             } else {
                 returnValue = cluster[high(x)].treeDelete(low(x));
