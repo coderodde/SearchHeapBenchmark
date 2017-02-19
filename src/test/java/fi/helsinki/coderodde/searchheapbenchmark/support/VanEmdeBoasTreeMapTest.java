@@ -21,81 +21,81 @@ public class VanEmdeBoasTreeMapTest {
     public void testInsert() {
         // Insert 0, 2, 4, 6.
         for (int i = 0; i < 8; i += 2) {
-            map.insert(i, 2 * i);
+            map.put(i, 2 * i);
         }
         
         assertEquals(4, map.size());
-        map.insert(2, -2); // vEB tree does not allow duplicates.
+        map.put(2, -2); // vEB tree does not allow duplicates.
         assertEquals(4, map.size());
 
         for (int i = 0; i < 8; i += 2) {
-            assertTrue(map.contains(i));
+            assertTrue(map.containsKey(i));
         }
         
         for (int i = 1; i < 8; i += 2) {
-            assertFalse(map.contains(i));
+            assertFalse(map.containsKey(i));
         }
     }
 
     @Test
     public void testContains() {
-        assertFalse(map.contains(2));
-        assertFalse(map.contains(6));
+        assertFalse(map.containsKey(2));
+        assertFalse(map.containsKey(6));
         assertNull(map.get(2));
         assertNull(map.get(6));
         assertNull(map.get(5));
         
-        map.insert(6, 12);
+        map.put(6, 12);
         
-        assertFalse(map.contains(2));
-        assertTrue(map.contains(6));
+        assertFalse(map.containsKey(2));
+        assertTrue(map.containsKey(6));
         assertEquals(Integer.valueOf(12), map.get(6));
         
-        map.insert(2, 11);
+        map.put(2, 11);
         
-        assertTrue(map.contains(2));
-        assertTrue(map.contains(6));
+        assertTrue(map.containsKey(2));
+        assertTrue(map.containsKey(6));
         assertEquals(Integer.valueOf(12), map.get(6));
         assertEquals(Integer.valueOf(11), map.get(2));
         
-        map.insert(6, 9);
+        map.put(6, 9);
         assertEquals(Integer.valueOf(9), map.get(6));
         
-        map.delete(6);
+        map.remove(6);
         
-        assertTrue(map.contains(2));
-        assertFalse(map.contains(6));
+        assertTrue(map.containsKey(2));
+        assertFalse(map.containsKey(6));
         
-        map.delete(2);
+        map.remove(2);
         
-        assertFalse(map.contains(2));
-        assertFalse(map.contains(6));
+        assertFalse(map.containsKey(2));
+        assertFalse(map.containsKey(6));
     }
 
     @Test
     public void testGetMaximum() {
         for (int i = 0; i < 8; ++i) {
-            map.insert(i, 3 * i);
+            map.put(i, 3 * i);
             assertEquals(Integer.valueOf(3 * i), map.get(i));
             assertEquals(Integer.valueOf(i), map.getMaximum());
         }
         
         for (int i = 7; i >= 0; --i) {
             assertEquals(Integer.valueOf(i), map.getMaximum());
-            map.delete(i);
+            map.remove(i);
         }
     }
 
     @Test
     public void testGetMinimum() {
         for (int i = 7; i >= 0; --i) {
-            map.insert(i, 3 * i);
+            map.put(i, 3 * i);
             assertEquals(Integer.valueOf(i), map.getMinimum());
         }
         
         for (int i = 0; i < 8; ++i) {
             assertEquals(Integer.valueOf(i), map.getMinimum());
-            map.delete(i);
+            map.remove(i);
         }
     }
 
@@ -111,10 +111,10 @@ public class VanEmdeBoasTreeMapTest {
     
     @Test
     public void testGetPredessor() {
-        map.insert(3, 9);
+        map.put(3, 9);
         assertNull(map.getPredessor(3));
         
-        map.insert(5, 15);
+        map.put(5, 15);
         assertEquals(Integer.valueOf(3), map.getPredessor(4));
         assertEquals(Integer.valueOf(3), map.getPredessor(5));
         assertEquals(Integer.valueOf(5), map.getPredessor(6));
@@ -128,10 +128,10 @@ public class VanEmdeBoasTreeMapTest {
     
     @Test
     public void testGetSuccessor() {
-        map.insert(5, 15);
+        map.put(5, 15);
         assertNull(map.getSuccessor(5));
         
-        map.insert(3, 9);
+        map.put(3, 9);
         assertEquals(Integer.valueOf(5), map.getSuccessor(4));
         assertEquals(Integer.valueOf(5), map.getSuccessor(3));
         assertEquals(Integer.valueOf(3), map.getSuccessor(2));
@@ -158,78 +158,77 @@ public class VanEmdeBoasTreeMapTest {
         
         for (int i : new int[] { 2, 4, 1, 3 }) {
             assertEquals(sz, map.size());
-            map.insert(i, 2 * i);
+            map.put(i, 2 * i);
             assertEquals(++sz, map.size());
         }
         
-        assertTrue(map.contains(1));
-        assertTrue(map.contains(2));
-        assertTrue(map.contains(3));
-        assertTrue(map.contains(4));
+        assertTrue(map.containsKey(1));
+        assertTrue(map.containsKey(2));
+        assertTrue(map.containsKey(3));
+        assertTrue(map.containsKey(4));
         
         assertEquals(Integer.valueOf(1), map.getMinimum());
         assertEquals(Integer.valueOf(4), map.getMaximum());
         
-        map.delete(2);
+        map.remove(2);
         
-        assertTrue(map.contains(1));
-        assertFalse(map.contains(2));
-        assertTrue(map.contains(3));
-        assertTrue(map.contains(4));
+        assertTrue(map.containsKey(1));
+        assertFalse(map.containsKey(2));
+        assertTrue(map.containsKey(3));
+        assertTrue(map.containsKey(4));
         assertEquals(3, map.size());
         
         assertEquals(Integer.valueOf(1), map.getMinimum());
         assertEquals(Integer.valueOf(4), map.getMaximum());
         
-        map.delete(4);
+        map.remove(4);
         
-        assertTrue(map.contains(1));
-        assertFalse(map.contains(2));
-        assertTrue(map.contains(3));
-        assertFalse(map.contains(4));
+        assertTrue(map.containsKey(1));
+        assertFalse(map.containsKey(2));
+        assertTrue(map.containsKey(3));
+        assertFalse(map.containsKey(4));
         assertEquals(2, map.size());
         
         assertEquals(Integer.valueOf(1), map.getMinimum());
         assertEquals(Integer.valueOf(3), map.getMaximum());
         
-        map.delete(2); // Cannot remove twice.
+        map.remove(2); // Cannot remove twice.
         
-        assertTrue(map.contains(1));
-        assertFalse(map.contains(2));
-        assertTrue(map.contains(3));
-        assertFalse(map.contains(4));
+        assertTrue(map.containsKey(1));
+        assertFalse(map.containsKey(2));
+        assertTrue(map.containsKey(3));
+        assertFalse(map.containsKey(4));
         assertEquals(2, map.size());
         
         assertEquals(Integer.valueOf(1), map.getMinimum());
         assertEquals(Integer.valueOf(3), map.getMaximum());
         
-        map.delete(1);
+        map.remove(1);
         
-        assertFalse(map.contains(1));
-        assertFalse(map.contains(2));
-        assertTrue(map.contains(3));
-        assertFalse(map.contains(4));
+        assertFalse(map.containsKey(1));
+        assertFalse(map.containsKey(2));
+        assertTrue(map.containsKey(3));
+        assertFalse(map.containsKey(4));
         assertEquals(1, map.size());
         
         assertEquals(Integer.valueOf(3), map.getMinimum());
         assertEquals(Integer.valueOf(3), map.getMaximum());
         
-        map.delete(3);
+        map.remove(3);
         
-        assertFalse(map.contains(1));
-        assertFalse(map.contains(2));
-        assertFalse(map.contains(3));
-        assertFalse(map.contains(4));
+        assertFalse(map.containsKey(1));
+        assertFalse(map.containsKey(2));
+        assertFalse(map.containsKey(3));
+        assertFalse(map.containsKey(4));
         assertEquals(0, map.size());
     }
     
     @Test
     public void bruteForceTest() {
-        final int UNIVERSE_SIZE = 1000;
-        final int ITERATIONS = 10_000;
+        final int UNIVERSE_SIZE = 10000;
+        final int ITERATIONS = 300_000;
         
-//        long seed = 1486977252244L; System.currentTimeMillis();
-        long seed = 1487513053163L; System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         Map<Integer, Integer> treeMap = new TreeMap<>();
         VanEmdeBoasTreeMap<Integer> map = 
@@ -238,31 +237,25 @@ public class VanEmdeBoasTreeMapTest {
         System.out.println("Seed = " + seed);
         
         for (int i = 0; i < ITERATIONS; ++i) {
-            System.out.print("i = " + i + " ");
             float coin = random.nextFloat();
             
             if (coin < 0.45f) {
-                System.out.println("insert");
                 int newElement = random.nextInt(UNIVERSE_SIZE);
                 treeMap.put(newElement, newElement * 3);
-                map.insert(newElement, newElement * 3);
+                map.put(newElement, newElement * 3);
             } else if (coin < 0.65f) {
-                System.out.println("get");
                 int key = random.nextInt(UNIVERSE_SIZE);
                 assertEquals(treeMap.get(key), map.get(key));
             } else {
-                System.out.println("remove");
                 if (treeMap.isEmpty()) {
-                    System.out.println("empty!");
                     assertTrue(map.isEmpty());
                 } else {
                     int key = random.nextInt(UNIVERSE_SIZE);
-                    assertEquals(treeMap.remove(key), map.delete(key));
+                    assertEquals(treeMap.remove(key), map.remove(key));
                 }
             }
         }
         
         assertEquals(treeMap.size(), map.size());
-        System.out.println("Yiihaaa!");
     }
 }
