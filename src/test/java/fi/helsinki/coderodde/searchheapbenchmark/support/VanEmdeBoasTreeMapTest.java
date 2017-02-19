@@ -225,8 +225,11 @@ public class VanEmdeBoasTreeMapTest {
     
     @Test
     public void bruteForceTest() {
-        final int UNIVERSE_SIZE = 10;
-        long seed = 1486977252244L; System.currentTimeMillis();
+        final int UNIVERSE_SIZE = 1000;
+        final int ITERATIONS = 10_000;
+        
+//        long seed = 1486977252244L; System.currentTimeMillis();
+        long seed = 1487513053163L; System.currentTimeMillis();
         Random random = new Random(seed);
         Map<Integer, Integer> treeMap = new TreeMap<>();
         VanEmdeBoasTreeMap<Integer> map = 
@@ -234,7 +237,7 @@ public class VanEmdeBoasTreeMapTest {
         
         System.out.println("Seed = " + seed);
         
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < ITERATIONS; ++i) {
             System.out.print("i = " + i + " ");
             float coin = random.nextFloat();
             
@@ -245,15 +248,15 @@ public class VanEmdeBoasTreeMapTest {
                 map.insert(newElement, newElement * 3);
             } else if (coin < 0.65f) {
                 System.out.println("get");
-                int key = random.nextInt(i + 1);
+                int key = random.nextInt(UNIVERSE_SIZE);
                 assertEquals(treeMap.get(key), map.get(key));
             } else {
                 System.out.println("remove");
                 if (treeMap.isEmpty()) {
                     System.out.println("empty!");
-                    assertTrue(map.size() == 0);
+                    assertTrue(map.isEmpty());
                 } else {
-                    int key = random.nextInt(i);
+                    int key = random.nextInt(UNIVERSE_SIZE);
                     assertEquals(treeMap.remove(key), map.delete(key));
                 }
             }

@@ -293,14 +293,18 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
                     
                     if (summaryMaximum == null) {
                         max = min;
-                        //maxValue = minValue;
+                        maxValue = minValue;
                     } else {
-                        max = index(summaryMaximum,
-                                    cluster[summaryMaximum].getMaximumKey());
+                        Integer maximumKey = 
+                                cluster[summaryMaximum].getMaximumKey();
+                        max = index(summaryMaximum, maximumKey);
+                        maxValue = cluster[summaryMaximum].get(maximumKey);
                     }
                 }
             } else if (x.equals(max)) {
-                max = index(high(x), cluster[high(x)].getMaximumKey());
+                Integer maximumKey = cluster[high(x)].getMaximumKey();
+                max = index(high(x), maximumKey);
+                maxValue = cluster[high(x)].get(maximumKey);
             }
             
             return returnValue;
