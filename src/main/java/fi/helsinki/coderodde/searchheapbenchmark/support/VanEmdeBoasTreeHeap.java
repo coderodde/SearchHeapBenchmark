@@ -1,6 +1,7 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import java.util.NoSuchElementException;
 
 public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
 
@@ -24,29 +25,23 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
     private static final class HeapNodeList<E> {
         
         /**
-         * The priority of all the elements in this list.
-         */
-        Integer priority;
-        
-        /**
          * The head node of this list.
          */
         HeapNode<E> head;
         
-        /**
-         * The tail node of this list.
-         */
-        HeapNode<E> tail;
-        
-        HeapNode<E> removeFirst() {
-            HeapNode<E> removed = head;
-            head = head.next;
-            return removed;
+        void add(HeapNode<E> node) {
+            node.next = head;
+            head = node;
         }
         
-        void addLast(HeapNode<E> node) {
-            tail.next = node;
-            tail = node;
+        HeapNode<E> remove() {
+            HeapNode<E> ret = head;
+            head = head.next;
+            return ret;
+        }
+        
+        boolean isEmpty() {
+            return head == null;
         }
     }
     
@@ -54,7 +49,7 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
      * Maps each used integer priority to the collision chain of 
      * {@code HeapNode} objects.
      */
-    private final VanEmdeBoasTreeMap<HeapNode<E>> map;
+    private final VanEmdeBoasTreeMap<HeapNodeList<E>> map;
     
     /**
      * Holds the number of elements currently in this heap.
@@ -68,13 +63,16 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
     @Override
     public void add(E element, Integer priority) {
         HeapNode<E> newNode = new HeapNode<>(element);
-//        HeapNodeList<E> collisionList = map.get(priority);
+        HeapNodeList<E> heapNodeList = map.get(priority);
         
-//        if (collisionList == null) {
-//           // map.insert(priority, collisionList = new HeapNodeList<>());
-//        }
-//        
-//        collisionList.addLast(newNode);
+        if (heapNodeList != null) {
+            heapNodeList.add(newNode);
+        } else {
+            heapNodeList = new HeapNodeList<>();
+            heapNodeList.add(newNode);
+            map.put(priority, heapNodeList);
+        }
+        
         ++size;
     }
 
@@ -86,10 +84,17 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
 
     @Override
     public E extractMinimum() {
-//        HeapNodeList<E> collisionChain = map.getMinimum();
-//        --size;
-//        return collisionChain.removeFirst().element;
-        return null;
+        checkHeapIsNotEmpty();
+        Integer minimumKey = map.getMinimum();
+        HeapNodeList<E> heapNodeList = map.get(minimumKey);
+        E returnValue = heapNodeList.remove().element;
+        
+        if (heapNodeList.isEmpty()) {
+            map.remove(minimumKey);
+        }
+        
+        --size;
+        return returnValue;
     }
 
     @Override
@@ -99,6 +104,18 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        map.clear();
+        size = 0;
+    }
+    
+    /**
+     * Makes sure that the heap is not empty, and if it is, throws an exception.
+     * 
+     * @throws NoSuchElementException if the heap is empty.
+     */
+    private void checkHeapIsNotEmpty() {
+        if (size == 0) {
+            throw new NoSuchElementException("This BinaryHeap is empty.");
+        }
     }
 }
