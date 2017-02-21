@@ -159,7 +159,6 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
             nodeMap.put(newPriority, newHeapNodeList);
         }
         
-        ++size;
         return true;
     }
 

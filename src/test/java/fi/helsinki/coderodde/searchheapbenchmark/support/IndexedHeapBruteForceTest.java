@@ -14,10 +14,7 @@ public class IndexedHeapBruteForceTest {
     // This test can fail in principle:
     // Suppose we have input element/priority tuples (1, 10), (2, 10), (3, 10)
     // inserted in that order. Now when extracting all, there is six possible
-    // sequences, and different heaps will give different results. Especially
-    // problematic heap turned to be IndexedVanEmdeBoasTreeMap. For that reason,
-    // I just check that the IndexedVanEmdeBoasTreeMap returns the same 
-    // priority sequence as IndexedDaryHeap.
+    // sequences, and different heaps will give different orders.
     @Test
     public void test() {
         long seed = System.currentTimeMillis();
@@ -37,6 +34,8 @@ public class IndexedHeapBruteForceTest {
                 new IndexedFibonacciHeap<>();
         PriorityQueue<Integer, Integer> pairingHeap = 
                 new IndexedPairingHeap<>();
+        PriorityQueue<Integer, Integer> avlTreeHeap = 
+                new IndexedAVLTreeHeap<>();
         
         List<Integer> resultListOfBinaryHeap = test(binaryHeap, 
                                                     heapTaskList,
@@ -70,6 +69,10 @@ public class IndexedHeapBruteForceTest {
                                                      heapTaskList,
                                                      new Random(seed));
         
+        List<Integer> resultListOfAVLTreeHeap = test(avlTreeHeap,
+                                                     heapTaskList,
+                                                     new Random(seed));
+        
         boolean allEqual = 
                 listsEqual(resultListOfBinaryHeap,
                            resultListOfDaryHeap2,
@@ -78,7 +81,8 @@ public class IndexedHeapBruteForceTest {
                            resultListOfDaryHeap5,
                            resultListOfBinomialHeap,
                            resultListOfFibonacciHeap,
-                           resultListOfPairingHeap);
+                           resultListOfPairingHeap,
+                           resultListOfAVLTreeHeap);
         
         assertTrue(allEqual);
     }

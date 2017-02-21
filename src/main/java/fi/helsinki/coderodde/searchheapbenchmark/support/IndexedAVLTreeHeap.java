@@ -160,7 +160,6 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
             nodeMap.put(newPriority, newHeapNodeList);
         }
         
-        ++size;
         return true;
     }
 
