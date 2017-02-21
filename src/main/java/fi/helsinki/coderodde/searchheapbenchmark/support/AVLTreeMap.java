@@ -2,6 +2,7 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -179,6 +180,34 @@ implements Map<K, V> {
         fixAfterDeletion(x);
         size--;
         return returnValue;
+    }
+    
+    public K getMinimumKey() {
+        if (size == 0) {
+            throw new NoSuchElementException("Reading from empty AVLTree.");
+        }
+        
+        Node<K, V> node = root;
+        
+        while (node.left != null) {
+            node = node.left;
+        }
+        
+        return node.key;
+    }
+    
+    public V getMinimumKeyValue() {
+        if (size == 0) {
+            throw new NoSuchElementException("Reading from empty AVLTree.");
+        }
+        
+        Node<K, V> node = root;
+        
+        while (node.left != null) {
+            node = node.left;
+        }
+        
+        return node.value;
     }
 
     @Override

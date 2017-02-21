@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public final class IndexedVanEmdeBoasTreeHeap<E> 
-        implements PriorityQueue<E, Integer> {
+public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>> 
+        implements PriorityQueue<E, P> {
 
-    private static final class HeapNode<E> {
+    private static final class HeapNode<E, P extends Comparable<? super P>> {
         
         /**
          * The actual element.
@@ -18,32 +18,33 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
         /**
          * The element priority.
          */
-        Integer priority;
+        P priority;
         
         /**
          * The next node in the collision chain.
          */
-        HeapNode<E> next;
+        HeapNode<E, P> next;
         
         /**
          * The previous node in the collision chain.
          */
-        HeapNode<E> prev;
+        HeapNode<E, P> prev;
         
-        HeapNode(E element, Integer priority) {
+        HeapNode(E element, P priority) {
             this.element = element;
             this.priority = priority;
         }
     }
     
-    private static final class HeapNodeList<E> {
+    private static final class 
+            HeapNodeList<E, P extends Comparable<? super P>> {
         
         /**
          * The head node of this list.
          */
-        HeapNode<E> head;
+        HeapNode<E, P> head;
         
-        void add(HeapNode<E> node) {
+        void add(HeapNode<E, P> node) {
             node.next = head;
             
             if (head != null) {
@@ -53,8 +54,8 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
             head = node;
         }
         
-        HeapNode<E> removeHead() {
-            HeapNode<E> ret = head;
+        HeapNode<E, P> removeHead() {
+            HeapNode<E, P> ret = head;
             head = head.next;
             
             if (head != null) {
@@ -64,7 +65,7 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
             return ret;
         }
         
-        void unlink(HeapNode<E> node) {
+        void unlink(HeapNode<E, P> node) {
             if (node.prev != null) {
                 node.prev.next = node.next;
             } else {
@@ -92,27 +93,27 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
     /**
      * Maps each present element to its respective node.
      */
-    private final Map<E, HeapNode<E>> map = new HashMap<>();
+    private final Map<E, HeapNode<E, P>> map = new HashMap<>();
     
     /**
      * Maps each integer priority key to the list of elements with that very
      * priority.
      */
-    private final VanEmdeBoasTreeMap<HeapNodeList<E>> nodeMap;
+    private final AVLTreeMap<P, HeapNodeList<E, P>> nodeMap;
     
-    public IndexedVanEmdeBoasTreeHeap(int universeSize) {
-        this.nodeMap = new VanEmdeBoasTreeMap<>(universeSize);
+    public IndexedAVLTreeHeap() {
+        this.nodeMap = new AVLTreeMap<>();
     }
     
     @Override
-    public void add(E element, Integer priority) {
+    public void add(E element, P priority) {
         if (map.containsKey(element)) {
             // This heap already holds the element.
             return;
         }
         
-        HeapNode<E> newNode = new HeapNode<>(element, priority);
-        HeapNodeList<E> heapNodeList = nodeMap.get(priority);
+        HeapNode<E, P> newNode = new HeapNode<>(element, priority);
+        HeapNodeList<E, P> heapNodeList = nodeMap.get(priority);
         
         if (heapNodeList != null) {
             heapNodeList.add(newNode);
@@ -127,8 +128,8 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
     }
 
     @Override
-    public boolean decreasePriority(E element, Integer newPriority) {
-        HeapNode<E> targetNode = map.get(element);
+    public boolean decreasePriority(E element, P newPriority) {
+        HeapNode<E, P> targetNode = map.get(element);
         
         if (targetNode == null) {
             // Element not in this heap.
@@ -140,7 +141,7 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
             return false;
         }
         
-        HeapNodeList<E> heapNodeList = nodeMap.get(targetNode.priority);
+        HeapNodeList<E, P> heapNodeList = nodeMap.get(targetNode.priority);
         heapNodeList.unlink(targetNode);
         
         if (heapNodeList.isEmpty()) {
@@ -149,7 +150,7 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
         
         targetNode.priority = newPriority;
         
-        HeapNodeList<E> newHeapNodeList = nodeMap.get(newPriority);
+        HeapNodeList<E, P> newHeapNodeList = nodeMap.get(newPriority);
         
         if (newHeapNodeList != null) {
             newHeapNodeList.add(targetNode);
@@ -166,9 +167,9 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        Integer minimumKey = nodeMap.getMinimum();
-        HeapNodeList<E> heapNodeList = nodeMap.get(minimumKey);
-        HeapNode<E> heapNode = heapNodeList.removeHead();
+        P minimumPriorityKey = nodeMap.getMinimumKey();
+        HeapNodeList<E, P> heapNodeList = nodeMap.get(minimumPriorityKey);
+        HeapNode<E, P> heapNode = heapNodeList.removeHead();
         E returnValue = heapNode.element;
         
         if (heapNodeList.isEmpty()) {
@@ -194,7 +195,7 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
     
     @Override
     public String toString() {
-        return "IndexedVanEmdeBoasTreeHeap";
+        return "IndexedAVLTreeHeap";
     }
     
     /**
