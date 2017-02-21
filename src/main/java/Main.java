@@ -19,9 +19,11 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDoubleDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedFibonacciHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedIntegerDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedPairingHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedVanEmdeBoasTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IntegerDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IntegerWeight;
 import fi.helsinki.coderodde.searchheapbenchmark.support.PairingHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.VanEmdeBoasTreeHeap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +40,7 @@ public class Main {
     private static final int SEARCH_TASKS = 30;
     private static final double MAX_WEIGHT = 10.0;
     private static final int MAX_INT_WEIGHT = 10;
+    private static final int UNIVERSE = 120_000;
     
     private final DirectedGraphWeightFunction<Double> weightFunction;
     private final Map<String, List<List<DirectedGraphNode>>> pathMap = 
@@ -491,6 +494,10 @@ public class Main {
         finder = new DijkstraPathFinder<>(heap);
         warmup(heap, finder, graphData, searchTaskList);
         
+        heap = new VanEmdeBoasTreeHeap<>(UNIVERSE);
+        finder = new DijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
         // Warmup indexed heaps:
         heap = new IndexedBinaryHeap<>();
         finder = new IndexedDijkstraPathFinder<>(heap);
@@ -516,6 +523,10 @@ public class Main {
         warmup(heap, finder, graphData, searchTaskList);
         
         heap = new IndexedIntegerDialsHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
         finder = new IndexedDijkstraPathFinder<>(heap);
         warmup(heap, finder, graphData, searchTaskList);
         
@@ -552,6 +563,10 @@ public class Main {
         finder = new DijkstraPathFinder<>(heap);
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
+        heap = new VanEmdeBoasTreeHeap<>(UNIVERSE);
+        finder = new DijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
         // Indexed benchmarks:
         heap = new IndexedBinaryHeap<>();
         finder = new IndexedDijkstraPathFinder<>(heap);
@@ -576,6 +591,10 @@ public class Main {
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
         heap = new IndexedIntegerDialsHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
         finder = new IndexedDijkstraPathFinder<>(heap);
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         

@@ -1,6 +1,8 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
@@ -56,6 +58,12 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
      */
     private int size;
     
+    private final List<Integer> priorityList = new ArrayList<>();
+    
+    public List<Integer> getPriorityList() {
+        return priorityList;
+    }
+    
     public VanEmdeBoasTreeHeap(int universe) {
         this.map = new VanEmdeBoasTreeMap<>(universe);
     }
@@ -106,6 +114,11 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
     public void clear() {
         map.clear();
         size = 0;
+    }
+    
+    @Override
+    public String toString() {
+        return "VanEmdeBoasTreeHeap";
     }
     
     /**

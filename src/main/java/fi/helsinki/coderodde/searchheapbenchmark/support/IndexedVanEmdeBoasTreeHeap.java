@@ -1,7 +1,9 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -191,7 +193,12 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
         nodeMap.clear();
         size = 0;
     }
-
+    
+    @Override
+    public String toString() {
+        return "IndexedVanEmdeBoasTreeHeap";
+    }
+    
     /**
      * Makes sure that the heap is not empty, and if it is, throws an exception.
      * 

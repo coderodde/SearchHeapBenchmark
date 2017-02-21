@@ -9,8 +9,15 @@ import org.junit.Test;
 
 public class IndexedHeapBruteForceTest {
     
-    private static final int OPERATIONS_PER_HEAP = 1_000_000;
+    private static final int OPERATIONS_PER_HEAP = 2_000_000;
     
+    // This test can fail in principle:
+    // Suppose we have input element/priority tuples (1, 10), (2, 10), (3, 10)
+    // inserted in that order. Now when extracting all, there is six possible
+    // sequences, and different heaps will give different results. Especially
+    // problematic heap turned to be IndexedVanEmdeBoasTreeMap. For that reason,
+    // I just check that the IndexedVanEmdeBoasTreeMap returns the same 
+    // priority sequence as IndexedDaryHeap.
     @Test
     public void test() {
         long seed = System.currentTimeMillis();
@@ -87,6 +94,31 @@ public class IndexedHeapBruteForceTest {
     }
     
     private static List<HeapTask> getRandomHeapTaskList(int length, 
+                                                        int universeSize,
+                                                        Random random) {
+        List<HeapTask> heapTaskList = new ArrayList<>(length);
+        
+        for (int i = 0; i < length; ++i) {
+            float f = random.nextFloat();
+            Operation operation;
+            
+            if (f < 0.3f) {
+                operation = Operation.EXTRACT;
+            } else if (f < 0.6f) {
+                operation = Operation.DECREASE_KEY;
+            } else {
+                operation = Operation.ADD;
+            }
+            
+            heapTaskList.add(new HeapTask(operation, 
+                                          random.nextInt(),
+                                          random.nextInt(universeSize)));
+        }
+        
+        return heapTaskList;
+    }
+    
+    private static List<HeapTask> getRandomHeapTaskList(int length, 
                                                         Random random) {
         List<HeapTask> heapTaskList = new ArrayList<>(length);
         
@@ -119,9 +151,7 @@ public class IndexedHeapBruteForceTest {
         for (HeapTask task : heapTaskList) {
             switch (task.operation) {
                 case ADD:
-                    Integer element = random.nextInt();
-                    Integer priority = random.nextInt();
-                    queue.add(element, priority);
+                    queue.add(task.element, task.priority);
                     break;
                     
                 case EXTRACT:
@@ -134,9 +164,7 @@ public class IndexedHeapBruteForceTest {
                     break;
                     
                 case DECREASE_KEY:
-                    element = random.nextInt();
-                    priority = random.nextInt();
-                    queue.decreasePriority(element, priority);
+                    queue.decreasePriority(task.element, task.priority);
                     break;
             }
         }
