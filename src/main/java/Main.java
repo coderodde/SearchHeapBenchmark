@@ -4,6 +4,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.Weight;
+import fi.helsinki.coderodde.searchheapbenchmark.support.AVLTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
@@ -11,6 +12,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.DijkstraPathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DoubleDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DoubleWeight;
 import fi.helsinki.coderodde.searchheapbenchmark.support.FibonacciHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedAVLTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDaryHeap;
@@ -498,6 +500,10 @@ public class Main {
         finder = new DijkstraPathFinder<>(heap);
         warmup(heap, finder, graphData, searchTaskList);
         
+        heap = new AVLTreeHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
         // Warmup indexed heaps:
         heap = new IndexedBinaryHeap<>();
         finder = new IndexedDijkstraPathFinder<>(heap);
@@ -526,9 +532,13 @@ public class Main {
         finder = new IndexedDijkstraPathFinder<>(heap);
         warmup(heap, finder, graphData, searchTaskList);
         
-        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
-        finder = new IndexedDijkstraPathFinder<>(heap);
-        warmup(heap, finder, graphData, searchTaskList);
+//        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
+//        finder = new IndexedDijkstraPathFinder<>(heap);
+//        warmup(heap, finder, graphData, searchTaskList);
+//        
+//        heap = new IndexedAVLTreeHeap<>();
+//        finder = new IndexedDijkstraPathFinder<>(heap);
+//        warmup(heap, finder, graphData, searchTaskList);
         
           ///////////////
          // BENCHMARK //
@@ -567,6 +577,10 @@ public class Main {
         finder = new DijkstraPathFinder<>(heap);
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
+        heap = new AVLTreeHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
         // Indexed benchmarks:
         heap = new IndexedBinaryHeap<>();
         finder = new IndexedDijkstraPathFinder<>(heap);
@@ -594,9 +608,13 @@ public class Main {
         finder = new IndexedDijkstraPathFinder<>(heap);
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
-        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
-        finder = new IndexedDijkstraPathFinder<>(heap);
-        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+//        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
+//        finder = new IndexedDijkstraPathFinder<>(heap);
+//        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+//        
+//        heap = new IndexedAVLTreeHeap<>();
+//        finder = new IndexedDijkstraPathFinder<>(heap);
+//        paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
         System.out.println("Integer weight algorithms/heaps agree: " + 
                 eq(paths, graphData.weightFunction, searchTaskList));

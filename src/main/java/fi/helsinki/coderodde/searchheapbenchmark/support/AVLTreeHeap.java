@@ -23,52 +23,27 @@ public final class AVLTreeHeap<E, P extends Comparable<? super P>>
         }
     }
     
-    private static final class HeapNodeList<E> {
-        
-        /**
-         * The head node of this list.
-         */
-        HeapNode<E> head;
-        
-        void add(HeapNode<E> node) {
-            node.next = head;
-            head = node;
-        }
-        
-        HeapNode<E> remove() {
-            HeapNode<E> ret = head;
-            head = head.next;
-            return ret;
-        }
-        
-        boolean isEmpty() {
-            return head == null;
-        }
-    }
-    
     /**
      * Maps each used integer priority to the collision chain of 
      * {@code HeapNode} objects.
      */
-    private final AVLTreeMap<P, HeapNodeList<E>> map = new AVLTreeMap<>();
+    private final AVLTreeMap<P, HeapNode<E>> map = new AVLTreeMap<>();
     
     /**
      * Holds the number of elements currently in this heap.
      */
     private int size;
     
-    
     @Override
     public void add(E element, P priority) {
         HeapNode<E> newNode = new HeapNode<>(element);
-        HeapNodeList<E> heapNodeList = map.get(priority);
+        HeapNode<E> neighborNode = map.get(priority);
         
-        if (heapNodeList != null) {
-            heapNodeList.add(newNode);
+        if (neighborNode != null) {
+            newNode.next = neighborNode.next;
+            neighborNode.next = newNode;
         } else {
-            heapNodeList = new HeapNodeList<>();
-            heapNodeList.add(newNode);
-            map.put(priority, heapNodeList);
+            map.put(priority, newNode);
         }
         
         ++size;
@@ -83,10 +58,14 @@ public final class AVLTreeHeap<E, P extends Comparable<? super P>>
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        HeapNodeList<E> heapNodeList = map.getMinimumKeyValue();
-        E returnValue = heapNodeList.remove().element;
+        HeapNode<E> heapNodeChainHead = map.getMinimumKeyValue();
+        E returnValue;
         
-        if (heapNodeList.isEmpty()) {
+        if (heapNodeChainHead.next != null) {
+            returnValue = heapNodeChainHead.next.element;
+            heapNodeChainHead.next = heapNodeChainHead.next.next;
+        } else {
+            returnValue = heapNodeChainHead.element;
             map.remove(map.getMinimumKey());
         }
         
