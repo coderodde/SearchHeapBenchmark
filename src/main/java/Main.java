@@ -470,7 +470,6 @@ public class Main {
         PriorityQueue<DirectedGraphNode, Integer> heap = new BinaryHeap<>();
         PathFinder<Integer> finder = new DijkstraPathFinder<>(heap);
         
-        /*
         System.out.println("Warming up...");
         
         warmup(heap, finder, graphData, searchTaskList);
@@ -533,14 +532,13 @@ public class Main {
         finder = new IndexedDijkstraPathFinder<>(heap);
         warmup(heap, finder, graphData, searchTaskList);
         
-//        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
-//        finder = new IndexedDijkstraPathFinder<>(heap);
-//        warmup(heap, finder, graphData, searchTaskList);
-//        
-//        heap = new IndexedAVLTreeHeap<>();
-//        finder = new IndexedDijkstraPathFinder<>(heap);
-//        warmup(heap, finder, graphData, searchTaskList);
-*/
+        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
+        
+        heap = new IndexedAVLTreeHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        warmup(heap, finder, graphData, searchTaskList);
         
           ///////////////
          // BENCHMARK //
@@ -610,9 +608,9 @@ public class Main {
         finder = new IndexedDijkstraPathFinder<>(heap);
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
-//        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
-//        finder = new IndexedDijkstraPathFinder<>(heap);
-//        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
         heap = new IndexedAVLTreeHeap<>();
         finder = new IndexedDijkstraPathFinder<>(heap);
