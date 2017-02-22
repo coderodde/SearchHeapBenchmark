@@ -575,13 +575,13 @@ public class Main {
         finder = new DijkstraPathFinder<>(heap);
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
-//        heap = new VanEmdeBoasTreeHeap<>(UNIVERSE);
-//        finder = new DijkstraPathFinder<>(heap);
-//        paths.add(benchmark(heap, finder, graphData, searchTaskList));
-//        
-//        heap = new AVLTreeHeap<>();
-//        finder = new DijkstraPathFinder<>(heap);
-//        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        heap = new VanEmdeBoasTreeHeap<>(UNIVERSE);
+        finder = new DijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        
+        heap = new AVLTreeHeap<>();
+        finder = new DijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
         // Indexed benchmarks:
         heap = new IndexedBinaryHeap<>();
@@ -614,9 +614,9 @@ public class Main {
 //        finder = new IndexedDijkstraPathFinder<>(heap);
 //        paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
-//        heap = new IndexedAVLTreeHeap<>();
-//        finder = new IndexedDijkstraPathFinder<>(heap);
-//        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+        heap = new IndexedAVLTreeHeap<>();
+        finder = new IndexedDijkstraPathFinder<>(heap);
+        paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
         System.out.println("Integer weight algorithms/heaps agree: " + 
                 eq(paths, graphData.weightFunction, searchTaskList));

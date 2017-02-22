@@ -306,29 +306,53 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
             return false;
         }
         
-        if (targetNode.next == null) {
-            // targetNode is the only node in its chain, remove the chain from
-            // the node map.
-            nodeMap.remove(targetNodePriority);
-        } else if (targetNode.prev == null) {
-            // targetNode is not the only node in its heap node chain + it is 
-            // the actual head of the chain.
-            nodeMap.put(targetNodePriority, targetNode.next);
-            targetNode.next.prev = null;
-            targetNode.next = null;
-        } else {
-            // targetNode is not the only node in its heap node chain + it is 
-            // not the head of the chain.
-            targetNode.prev.next = targetNode.next;
+        // Unlink the targetNode from its current chain.
+        if (targetNode.prev == null) {
+            // targetNode is the head of its chain.
+            HeapNode<E, P> newHead = targetNode.next;
             
-            if (targetNode.next != null) {
-                targetNode.next.prev = targetNode.prev;
+            if (newHead == null) {
+                // targetNode is the ONLY node in its chain.
+                nodeMap.remove(targetNodePriority);
+            } else {
+                newHead.prev = null;
+                nodeMap.put(targetNodePriority, newHead);
             }
+        } else {
+            HeapNode<E, P> nextNode = targetNode.next;
+            HeapNode<E, P> previousNode = targetNode.prev;
             
-            targetNode.next = null;
-            targetNode.prev = null;
+            previousNode.next = nextNode;
+            
+            if (nextNode != null) {
+                nextNode.prev = previousNode;
+            }
         }
         
+//        if (targetNode.next == null) {
+//            // targetNode is the only node in its chain, remove the chain from
+//            // the node map.
+//            nodeMap.remove(targetNodePriority);
+//        } else if (targetNode.prev == null) {
+//            // targetNode is not the only node in its heap node chain + it is 
+//            // the actual head of the chain.
+//            nodeMap.put(targetNodePriority, targetNode.next);
+//            targetNode.next.prev = null;
+//            targetNode.next = null;
+//        } else {
+//            // targetNode is not the only node in its heap node chain + it is 
+//            // not the head of the chain.
+//            targetNode.prev.next = targetNode.next;
+//            
+//            if (targetNode.next != null) {
+//                targetNode.next.prev = targetNode.prev;
+//            }
+//            
+//            targetNode.next = null;
+//            targetNode.prev = null;
+//        }
+        
+        // Link the targetNode to its new chain.
         targetNode.priority = newPriority;
         
         HeapNode<E, P> heapNodeChainHead = nodeMap.get(newPriority);
@@ -389,7 +413,7 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
     
     @Override
     public String toString() {
-        return "IndexedVanEmdeBoasTreeHeap";
+        return "IndexedAVLTreeHeap";
     }
     
     /**
