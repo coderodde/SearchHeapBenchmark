@@ -1,6 +1,7 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -87,6 +88,36 @@ public class IndexedVanEmdeBoasTreeHeapTest {
         
         for (int i = 100; i < 150; ++i) {
             assertEquals(Integer.valueOf(i), heap.extractMinimum());
+        }
+    }
+    
+    @Test
+    public void bruteForceCorrectnessTest() {
+        final int NUMBER_OF_ADDS = 8_000;
+        final int NUMBER_OF_DECREASES = 4_000;
+        final int UNIVERSE = 30_000;
+        
+        PriorityQueue<Integer, Integer> referenceHeap =
+                new IndexedBinaryHeap<>();
+        PriorityQueue<Integer, Integer> heap = 
+                new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
+        
+        // (10000, 10000), (10001, 10001), ..., (17999, 17999).
+        for (int i = 0; i < NUMBER_OF_ADDS; ++i) {
+            int key = 10_000 + i;
+            referenceHeap.add(key, key);
+            heap.add(key, key);
+        }
+        
+        for (int i = 0; i < NUMBER_OF_DECREASES; ++i) {
+            int key = 14_000 + i;
+            int priority = key - 10_000;
+            referenceHeap.decreasePriority(key, priority);
+            heap.decreasePriority(key, priority);
+        }
+        
+        for (int i = 0; i < NUMBER_OF_ADDS; ++i) {
+            assertEquals(referenceHeap.extractMinimum(), heap.extractMinimum());
         }
     }
 }

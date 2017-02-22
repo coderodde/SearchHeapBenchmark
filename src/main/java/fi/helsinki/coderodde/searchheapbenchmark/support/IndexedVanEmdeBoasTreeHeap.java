@@ -36,54 +36,6 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
         }
     }
     
-    private static final class HeapNodeList<E> {
-        
-        /**
-         * The head node of this list.
-         */
-        HeapNode<E> head;
-        
-        void add(HeapNode<E> node) {
-            node.next = head;
-            
-            if (head != null) {
-                head.prev = node;
-            }
-            
-            head = node;
-        }
-        
-        HeapNode<E> removeHead() {
-            HeapNode<E> ret = head;
-            head = head.next;
-            
-            if (head != null) {
-                head.prev = null;
-            }
-            
-            return ret;
-        }
-        
-        void unlink(HeapNode<E> node) {
-            if (node.prev != null) {
-                node.prev.next = node.next;
-            } else {
-                head = node.next;
-            }
-            
-            if (node.next != null) {
-                node.next.prev = node.prev;
-            }
-            
-            node.next = null;
-            node.prev = null;
-        }
-        
-        boolean isEmpty() {
-            return head == null;
-        }
-    }
-    
     /**
      * Caches the number of elements in this heap.
      */
@@ -98,7 +50,7 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
      * Maps each integer priority key to the list of elements with that very
      * priority.
      */
-    private final VanEmdeBoasTreeMap<HeapNodeList<E>> nodeMap;
+    private final VanEmdeBoasTreeMap<HeapNode<E>> nodeMap;
     
     public IndexedVanEmdeBoasTreeHeap(int universeSize) {
         this.nodeMap = new VanEmdeBoasTreeMap<>(universeSize);
@@ -112,14 +64,18 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
         }
         
         HeapNode<E> newNode = new HeapNode<>(element, priority);
-        HeapNodeList<E> heapNodeList = nodeMap.get(priority);
+        HeapNode<E> heapNodeChainHead = nodeMap.get(priority);
         
-        if (heapNodeList != null) {
-            heapNodeList.add(newNode);
+        if (heapNodeChainHead == null) {
+            nodeMap.put(priority, newNode);
+        } else if (heapNodeChainHead.next != null) {
+            newNode.prev = heapNodeChainHead;
+            newNode.next = heapNodeChainHead.next;
+            heapNodeChainHead.next = newNode;
+            newNode.next.prev = newNode;
         } else {
-            heapNodeList = new HeapNodeList<>();
-            heapNodeList.add(newNode);
-            nodeMap.put(priority, heapNodeList);
+            heapNodeChainHead.next = newNode;
+            newNode.prev = heapNodeChainHead;
         }
         
         map.put(element, newNode);
@@ -135,28 +91,52 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
             return false;
         }
         
-        if (targetNode.priority.compareTo(newPriority) <= 0) {
+        Integer targetNodePriority = targetNode.priority;
+        
+        if (targetNodePriority.compareTo(newPriority) <= 0) {
             // Cannot improve the priority of the element.
             return false;
         }
         
-        HeapNodeList<E> heapNodeList = nodeMap.get(targetNode.priority);
-        heapNodeList.unlink(targetNode);
-        
-        if (heapNodeList.isEmpty()) {
-            nodeMap.remove(targetNode.priority);
+        if (targetNode.next == null) {
+            // targetNode is the only node in its chain, remove the chain from
+            // the node map.
+            nodeMap.remove(targetNodePriority);
+        } else if (targetNode.prev == null) {
+            // targetNode is not the only node in its heap node chain + it is 
+            // the actual head of the chain.
+            nodeMap.put(targetNodePriority, targetNode.next);
+            targetNode.next.prev = null;
+            targetNode.next = null;
+        } else {
+            // targetNode is not the only node in its heap node chain + it is 
+            // not the head of the chain.
+            targetNode.prev.next = targetNode.next;
+            
+            if (targetNode.next != null) {
+                targetNode.next.prev = targetNode.prev;
+            }
+            
+            targetNode.next = null;
+            targetNode.prev = null;
         }
         
         targetNode.priority = newPriority;
         
-        HeapNodeList<E> newHeapNodeList = nodeMap.get(newPriority);
+        HeapNode<E> heapNodeChainHead = nodeMap.get(newPriority);
+        targetNode.prev = targetNode.next = null;
         
-        if (newHeapNodeList != null) {
-            newHeapNodeList.add(targetNode);
+        if (heapNodeChainHead == null) {
+            nodeMap.put(newPriority, targetNode);
         } else {
-            newHeapNodeList = new HeapNodeList<>();
-            newHeapNodeList.add(targetNode);
-            nodeMap.put(newPriority, newHeapNodeList);
+            targetNode.prev = heapNodeChainHead;
+            targetNode.next = heapNodeChainHead.next;
+            
+            if (heapNodeChainHead.next != null) {
+                heapNodeChainHead.next.prev = targetNode;
+            }
+            
+            heapNodeChainHead.next = targetNode;
         }
         
         return true;
@@ -165,13 +145,21 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        Integer minimumKey = nodeMap.getMinimum();
-        HeapNodeList<E> heapNodeList = nodeMap.get(minimumKey);
-        HeapNode<E> heapNode = heapNodeList.removeHead();
-        E returnValue = heapNode.element;
+        Integer minimumPriorityKey = nodeMap.getMinimum();
+        HeapNode<E> heapNodeChainHead = nodeMap.get(minimumPriorityKey);
+        E returnValue;
         
-        if (heapNodeList.isEmpty()) {
-            nodeMap.remove(heapNode.priority);
+        if (heapNodeChainHead.next == null) {
+            returnValue = heapNodeChainHead.element;
+            nodeMap.remove(heapNodeChainHead.priority);
+        } else {
+            HeapNode<E> removedNode = heapNodeChainHead.next;
+            returnValue = removedNode.element;
+            heapNodeChainHead.next = removedNode.next;
+            
+            if (heapNodeChainHead.next != null) {
+                heapNodeChainHead.next.prev = heapNodeChainHead;
+            }
         }
         
         map.remove(returnValue);

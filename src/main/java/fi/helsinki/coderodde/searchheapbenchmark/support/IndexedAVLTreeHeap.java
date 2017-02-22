@@ -1,3 +1,215 @@
+//package fi.helsinki.coderodde.searchheapbenchmark.support;
+//
+//import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
+//import java.util.HashMap;
+//import java.util.Map;
+//import java.util.NoSuchElementException;
+//
+//public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>> 
+//        implements PriorityQueue<E, P> {
+//
+//    private static final class HeapNode<E, P extends Comparable<? super P>> {
+//        
+//        /**
+//         * The actual element.
+//         */
+//        E element;
+//        
+//        /**
+//         * The element priority.
+//         */
+//        P priority;
+//        
+//        /**
+//         * The next node in the collision chain.
+//         */
+//        HeapNode<E, P> next;
+//        
+//        /**
+//         * The previous node in the collision chain.
+//         */
+//        HeapNode<E, P> prev;
+//        
+//        HeapNode(E element, P priority) {
+//            this.element = element;
+//            this.priority = priority;
+//        }
+//    }
+//    
+//    private static final class 
+//            HeapNodeList<E, P extends Comparable<? super P>> {
+//        
+//        /**
+//         * The head node of this list.
+//         */
+//        HeapNode<E, P> head;
+//        
+//        void add(HeapNode<E, P> node) {
+//            node.next = head;
+//            
+//            if (head != null) {
+//                head.prev = node;
+//            }
+//            
+//            head = node;
+//        }
+//        
+//        HeapNode<E, P> removeHead() {
+//            HeapNode<E, P> ret = head;
+//            head = head.next;
+//            
+//            if (head != null) {
+//                head.prev = null;
+//            }
+//            
+//            return ret;
+//        }
+//        
+//        void unlink(HeapNode<E, P> node) {
+//            if (node.prev != null) {
+//                node.prev.next = node.next;
+//            } else {
+//                head = node.next;
+//            }
+//            
+//            if (node.next != null) {
+//                node.next.prev = node.prev;
+//            }
+//            
+//            node.next = null;
+//            node.prev = null;
+//        }
+//        
+//        boolean isEmpty() {
+//            return head == null;
+//        }
+//    }
+//    
+//    /**
+//     * Caches the number of elements in this heap.
+//     */
+//    private int size;
+//    
+//    /**
+//     * Maps each present element to its respective node.
+//     */
+//    private final Map<E, HeapNode<E, P>> map = new HashMap<>();
+//    
+//    /**
+//     * Maps each integer priority key to the list of elements with that very
+//     * priority.
+//     */
+//    private final AVLTreeMap<P, HeapNodeList<E, P>> nodeMap;
+//    
+//    public IndexedAVLTreeHeap() {
+//        this.nodeMap = new AVLTreeMap<>();
+//    }
+//    
+//    @Override
+//    public void add(E element, P priority) {
+//        if (map.containsKey(element)) {
+//            // This heap already holds the element.
+//            return;
+//        }
+//        
+//        HeapNode<E, P> newNode = new HeapNode<>(element, priority);
+//        HeapNodeList<E, P> heapNodeList = nodeMap.get(priority);
+//        
+//        if (heapNodeList != null) {
+//            heapNodeList.add(newNode);
+//        } else {
+//            heapNodeList = new HeapNodeList<>();
+//            heapNodeList.add(newNode);
+//            nodeMap.put(priority, heapNodeList);
+//        }
+//        
+//        map.put(element, newNode);
+//        ++size;
+//    }
+//
+//    @Override
+//    public boolean decreasePriority(E element, P newPriority) {
+//        HeapNode<E, P> targetNode = map.get(element);
+//        
+//        if (targetNode == null) {
+//            // Element not in this heap.
+//            return false;
+//        }
+//        
+//        if (targetNode.priority.compareTo(newPriority) <= 0) {
+//            // Cannot improve the priority of the element.
+//            return false;
+//        }
+//        
+//        HeapNodeList<E, P> heapNodeList = nodeMap.get(targetNode.priority);
+//        heapNodeList.unlink(targetNode);
+//        
+//        if (heapNodeList.isEmpty()) {
+//            nodeMap.remove(targetNode.priority);
+//        }
+//        
+//        targetNode.priority = newPriority;
+//        
+//        HeapNodeList<E, P> newHeapNodeList = nodeMap.get(newPriority);
+//        
+//        if (newHeapNodeList != null) {
+//            newHeapNodeList.add(targetNode);
+//        } else {
+//            newHeapNodeList = new HeapNodeList<>();
+//            newHeapNodeList.add(targetNode);
+//            nodeMap.put(newPriority, newHeapNodeList);
+//        }
+//        
+//        return true;
+//    }
+//
+//    @Override
+//    public E extractMinimum() {
+//        checkHeapIsNotEmpty();
+//        P minimumPriorityKey = nodeMap.getMinimumKey();
+//        HeapNodeList<E, P> heapNodeList = nodeMap.get(minimumPriorityKey);
+//        HeapNode<E, P> heapNode = heapNodeList.removeHead();
+//        E returnValue = heapNode.element;
+//        
+//        if (heapNodeList.isEmpty()) {
+//            nodeMap.remove(heapNode.priority);
+//        }
+//        
+//        map.remove(returnValue);
+//        --size;
+//        return returnValue;
+//    }
+//
+//    @Override
+//    public int size() {
+//        return size;
+//    }
+//
+//    @Override
+//    public void clear() {
+//        map.clear();
+//        nodeMap.clear();
+//        size = 0;
+//    }
+//    
+//    @Override
+//    public String toString() {
+//        return "IndexedAVLTreeHeap";
+//    }
+//    
+//    /**
+//     * Makes sure that the heap is not empty, and if it is, throws an exception.
+//     * 
+//     * @throws NoSuchElementException if the heap is empty.
+//     */
+//    private void checkHeapIsNotEmpty() {
+//        if (size == 0) {
+//            throw new NoSuchElementException("This BinaryHeap is empty.");
+//        }
+//    }
+//}
+
+
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
@@ -8,7 +220,7 @@ import java.util.NoSuchElementException;
 public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>> 
         implements PriorityQueue<E, P> {
 
-    private static final class HeapNode<E, P extends Comparable<? super P>> {
+    private static final class HeapNode<E, P> {
         
         /**
          * The actual element.
@@ -36,55 +248,6 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
         }
     }
     
-    private static final class 
-            HeapNodeList<E, P extends Comparable<? super P>> {
-        
-        /**
-         * The head node of this list.
-         */
-        HeapNode<E, P> head;
-        
-        void add(HeapNode<E, P> node) {
-            node.next = head;
-            
-            if (head != null) {
-                head.prev = node;
-            }
-            
-            head = node;
-        }
-        
-        HeapNode<E, P> removeHead() {
-            HeapNode<E, P> ret = head;
-            head = head.next;
-            
-            if (head != null) {
-                head.prev = null;
-            }
-            
-            return ret;
-        }
-        
-        void unlink(HeapNode<E, P> node) {
-            if (node.prev != null) {
-                node.prev.next = node.next;
-            } else {
-                head = node.next;
-            }
-            
-            if (node.next != null) {
-                node.next.prev = node.prev;
-            }
-            
-            node.next = null;
-            node.prev = null;
-        }
-        
-        boolean isEmpty() {
-            return head == null;
-        }
-    }
-    
     /**
      * Caches the number of elements in this heap.
      */
@@ -99,11 +262,7 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
      * Maps each integer priority key to the list of elements with that very
      * priority.
      */
-    private final AVLTreeMap<P, HeapNodeList<E, P>> nodeMap;
-    
-    public IndexedAVLTreeHeap() {
-        this.nodeMap = new AVLTreeMap<>();
-    }
+    private final AVLTreeMap<P, HeapNode<E, P>> nodeMap = new AVLTreeMap<>();
     
     @Override
     public void add(E element, P priority) {
@@ -113,14 +272,18 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
         }
         
         HeapNode<E, P> newNode = new HeapNode<>(element, priority);
-        HeapNodeList<E, P> heapNodeList = nodeMap.get(priority);
+        HeapNode<E, P> heapNodeChainHead = nodeMap.get(priority);
         
-        if (heapNodeList != null) {
-            heapNodeList.add(newNode);
+        if (heapNodeChainHead == null) {
+            nodeMap.put(priority, newNode);
+        } else if (heapNodeChainHead.next != null) {
+            newNode.prev = heapNodeChainHead;
+            newNode.next = heapNodeChainHead.next;
+            heapNodeChainHead.next = newNode;
+            newNode.next.prev = newNode;
         } else {
-            heapNodeList = new HeapNodeList<>();
-            heapNodeList.add(newNode);
-            nodeMap.put(priority, heapNodeList);
+            heapNodeChainHead.next = newNode;
+            newNode.prev = heapNodeChainHead;
         }
         
         map.put(element, newNode);
@@ -136,28 +299,52 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
             return false;
         }
         
-        if (targetNode.priority.compareTo(newPriority) <= 0) {
+        P targetNodePriority = targetNode.priority;
+        
+        if (targetNodePriority.compareTo(newPriority) <= 0) {
             // Cannot improve the priority of the element.
             return false;
         }
         
-        HeapNodeList<E, P> heapNodeList = nodeMap.get(targetNode.priority);
-        heapNodeList.unlink(targetNode);
-        
-        if (heapNodeList.isEmpty()) {
-            nodeMap.remove(targetNode.priority);
+        if (targetNode.next == null) {
+            // targetNode is the only node in its chain, remove the chain from
+            // the node map.
+            nodeMap.remove(targetNodePriority);
+        } else if (targetNode.prev == null) {
+            // targetNode is not the only node in its heap node chain + it is 
+            // the actual head of the chain.
+            nodeMap.put(targetNodePriority, targetNode.next);
+            targetNode.next.prev = null;
+            targetNode.next = null;
+        } else {
+            // targetNode is not the only node in its heap node chain + it is 
+            // not the head of the chain.
+            targetNode.prev.next = targetNode.next;
+            
+            if (targetNode.next != null) {
+                targetNode.next.prev = targetNode.prev;
+            }
+            
+            targetNode.next = null;
+            targetNode.prev = null;
         }
         
         targetNode.priority = newPriority;
         
-        HeapNodeList<E, P> newHeapNodeList = nodeMap.get(newPriority);
+        HeapNode<E, P> heapNodeChainHead = nodeMap.get(newPriority);
+        targetNode.prev = targetNode.next = null;
         
-        if (newHeapNodeList != null) {
-            newHeapNodeList.add(targetNode);
+        if (heapNodeChainHead == null) {
+            nodeMap.put(newPriority, targetNode);
         } else {
-            newHeapNodeList = new HeapNodeList<>();
-            newHeapNodeList.add(targetNode);
-            nodeMap.put(newPriority, newHeapNodeList);
+            targetNode.prev = heapNodeChainHead;
+            targetNode.next = heapNodeChainHead.next;
+            
+            if (heapNodeChainHead.next != null) {
+                heapNodeChainHead.next.prev = targetNode;
+            }
+            
+            heapNodeChainHead.next = targetNode;
         }
         
         return true;
@@ -167,12 +354,20 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
     public E extractMinimum() {
         checkHeapIsNotEmpty();
         P minimumPriorityKey = nodeMap.getMinimumKey();
-        HeapNodeList<E, P> heapNodeList = nodeMap.get(minimumPriorityKey);
-        HeapNode<E, P> heapNode = heapNodeList.removeHead();
-        E returnValue = heapNode.element;
+        HeapNode<E, P> heapNodeChainHead = nodeMap.get(minimumPriorityKey);
+        E returnValue;
         
-        if (heapNodeList.isEmpty()) {
-            nodeMap.remove(heapNode.priority);
+        if (heapNodeChainHead.next == null) {
+            returnValue = heapNodeChainHead.element;
+            nodeMap.remove(heapNodeChainHead.priority);
+        } else {
+            HeapNode<E, P> removedNode = heapNodeChainHead.next;
+            returnValue = removedNode.element;
+            heapNodeChainHead.next = removedNode.next;
+            
+            if (heapNodeChainHead.next != null) {
+                heapNodeChainHead.next.prev = heapNodeChainHead;
+            }
         }
         
         map.remove(returnValue);
@@ -194,7 +389,7 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
     
     @Override
     public String toString() {
-        return "IndexedAVLTreeHeap";
+        return "IndexedVanEmdeBoasTreeHeap";
     }
     
     /**

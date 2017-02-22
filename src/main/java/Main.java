@@ -470,6 +470,7 @@ public class Main {
         PriorityQueue<DirectedGraphNode, Integer> heap = new BinaryHeap<>();
         PathFinder<Integer> finder = new DijkstraPathFinder<>(heap);
         
+        /*
         System.out.println("Warming up...");
         
         warmup(heap, finder, graphData, searchTaskList);
@@ -539,6 +540,7 @@ public class Main {
 //        heap = new IndexedAVLTreeHeap<>();
 //        finder = new IndexedDijkstraPathFinder<>(heap);
 //        warmup(heap, finder, graphData, searchTaskList);
+*/
         
           ///////////////
          // BENCHMARK //
@@ -573,13 +575,13 @@ public class Main {
         finder = new DijkstraPathFinder<>(heap);
         paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
-        heap = new VanEmdeBoasTreeHeap<>(UNIVERSE);
-        finder = new DijkstraPathFinder<>(heap);
-        paths.add(benchmark(heap, finder, graphData, searchTaskList));
-        
-        heap = new AVLTreeHeap<>();
-        finder = new DijkstraPathFinder<>(heap);
-        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+//        heap = new VanEmdeBoasTreeHeap<>(UNIVERSE);
+//        finder = new DijkstraPathFinder<>(heap);
+//        paths.add(benchmark(heap, finder, graphData, searchTaskList));
+//        
+//        heap = new AVLTreeHeap<>();
+//        finder = new DijkstraPathFinder<>(heap);
+//        paths.add(benchmark(heap, finder, graphData, searchTaskList));
         
         // Indexed benchmarks:
         heap = new IndexedBinaryHeap<>();
@@ -611,7 +613,7 @@ public class Main {
 //        heap = new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE);
 //        finder = new IndexedDijkstraPathFinder<>(heap);
 //        paths.add(benchmark(heap, finder, graphData, searchTaskList));
-//        
+        
 //        heap = new IndexedAVLTreeHeap<>();
 //        finder = new IndexedDijkstraPathFinder<>(heap);
 //        paths.add(benchmark(heap, finder, graphData, searchTaskList));
@@ -659,6 +661,14 @@ public class Main {
             
             if (path1.isEmpty() && path2.isEmpty()) {
                 continue;
+            }
+            
+            if (path1.isEmpty()) {
+                return false;
+            }
+            
+            if (path2.isEmpty()) {
+                return false;
             }
             
             if (!path1.get(0).equals(source)) {
