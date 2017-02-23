@@ -39,7 +39,7 @@ public class Main {
     private static final int SPARSE_GRAPH_ARCS = 30_000;
     private static final int MEDIUM_GRAPH_ARCS = 100_000;
     private static final int DENSE_GRAPH_ARCS =  400_000;
-    private static final int SEARCH_TASKS = 30;
+    private static final int SEARCH_TASKS = 1;
     private static final double MAX_WEIGHT = 10.0;
     private static final double MAX_ARC_WEIGHT = 10.0;
     private static final int MAX_INT_WEIGHT = 10;

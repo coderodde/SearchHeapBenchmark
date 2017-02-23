@@ -411,6 +411,7 @@ implements Map<K, V> {
         K tmpKey = node.key;
         Node<K, V> successor = minimumNode(node.right);
         node.key = successor.key;
+        node.value = successor.value;
         
         Node<K, V> child = successor.right;
         Node<K, V> parent = successor.parent;
@@ -425,7 +426,7 @@ implements Map<K, V> {
             child.parent = parent;
         }
         
-        successor.key = tmpKey;
+//        successor.key = tmpKey;
         return successor;
     }
     
@@ -465,7 +466,7 @@ implements Map<K, V> {
         }
         
         node1.height = Math.max(height(node1.left), height(node1.right)) + 1;
-        node1.height = Math.max(height(node2.left), height(node2.right)) + 1;
+        node2.height = Math.max(height(node2.left), height(node2.right)) + 1;
         return node2;
     }
     

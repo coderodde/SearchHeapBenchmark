@@ -1,7 +1,6 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.TreeMap;
 import org.junit.Before;
@@ -129,15 +128,23 @@ public class AVLTreeMapTest {
     }
     
     @Test
+    public void testDeleteNodeWithTwoChildren() {
+        map.put(2, 4);
+        map.put(1, 2);
+        map.put(3, 6);
+        assertEquals(Integer.valueOf(4), map.remove(2));
+        assertEquals(Integer.valueOf(6), map.remove(3));
+    }
+    
+    @Test
     public void bruteForceTest() {
-        final int UNIVERSE_SIZE = 10000;
-        final int ITERATIONS = 300_000;
+        final int UNIVERSE_SIZE = 1000;
+        final int ITERATIONS = 20_000;
         
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         Map<Integer, Integer> treeMap = new TreeMap<>();
-        VanEmdeBoasTreeMap<Integer> map = 
-                new VanEmdeBoasTreeMap<>(UNIVERSE_SIZE);
+        AVLTreeMap<Integer, Integer> map = new AVLTreeMap<>();
         
         System.out.println("Seed = " + seed);
         

@@ -119,9 +119,10 @@ public final class IndexedAVLTreeHeap<E, P extends Comparable<? super P>>
         
         // Link the targetNode to its new chain.
         targetNode.priority = newPriority;
+        targetNode.prev = null;
+        targetNode.next = null;
         
         HeapNode<E, P> heapNodeChainHead = nodeMap.get(newPriority);
-        targetNode.prev = targetNode.next = null;
         
         if (heapNodeChainHead == null) {
             nodeMap.put(newPriority, targetNode);
