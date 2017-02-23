@@ -225,8 +225,8 @@ public class VanEmdeBoasTreeMapTest {
     
     @Test
     public void bruteForceTest() {
-        final int UNIVERSE_SIZE = 100_000;
-        final int ITERATIONS = 1_000_000;
+        final int UNIVERSE_SIZE = 32;
+        final int ITERATIONS = 10;
         
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
@@ -239,11 +239,11 @@ public class VanEmdeBoasTreeMapTest {
         for (int i = 0; i < ITERATIONS; ++i) {
             float coin = random.nextFloat();
             
-            if (coin < 0.4f) {
+            if (coin < 0.3f) {
                 int newElement = random.nextInt(UNIVERSE_SIZE);
                 treeMap.put(newElement, newElement * 3);
                 vanMap.put(newElement, newElement * 3);
-            } else if (coin < 0.65f) {
+            } else if (coin < 0.6f) {
                 int key = random.nextInt(UNIVERSE_SIZE);
                 assertEquals(treeMap.get(key), vanMap.get(key));
             } else {
@@ -255,8 +255,7 @@ public class VanEmdeBoasTreeMapTest {
                 }
             }
         }
-        
-        System.out.println("heollo");
+        System.out.println("yeah");
         assertEquals(treeMap.size(), vanMap.size());
     }
 }
