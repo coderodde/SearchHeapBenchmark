@@ -44,4 +44,9 @@ public final class DirectedGraphNode {
         
         return id == ((DirectedGraphNode) o).id;
     }
+    
+    @Override
+    public String toString() {
+        return "[" + id + "]";
+    }
 }

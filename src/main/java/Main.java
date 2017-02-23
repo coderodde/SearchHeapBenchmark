@@ -54,9 +54,9 @@ public class Main {
                                            intGraphData.weightFunction,
                                            KEY_UNIVERSE);
         
-//        benchmarkInt.run();
+        benchmarkInt.run();
         System.out.println("***************************************");
-//        System.exit(0);
+        System.exit(0);
         System.out.println();
         System.out.println("*** Double weight search benchmark ****");
         
@@ -174,7 +174,7 @@ public class Main {
             tail.addChildNode(head);
             weightFunction.addWeight(tail, 
                                      head, 
-                                     random.nextInt(maxArcWeight + 1));
+                                     random.nextInt(maxArcWeight) + 1);
         }
         
         return new GraphData(nodeList, weightFunction);

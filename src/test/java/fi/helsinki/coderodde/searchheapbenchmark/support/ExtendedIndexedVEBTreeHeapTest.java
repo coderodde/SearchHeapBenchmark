@@ -68,8 +68,7 @@ public class ExtendedIndexedVEBTreeHeapTest {
         Weight<Integer> weight = new IntegerWeight();
         
         while (true) {
-            System.out.println("yeah");
-            long seed = 1487852109779L; //System.currentTimeMillis();
+            long seed = 1487852368776L; //System.currentTimeMillis();
             Random random = new Random(seed);
             GraphData graphData = 
                     createRandomIntegerWeightGraph(SEARCH_GRAPH_NODES,
@@ -96,9 +95,18 @@ public class ExtendedIndexedVEBTreeHeapTest {
             List<DirectedGraphNode> targetPath =
                     finder.search(source, target, weightFunction, weight);
             
-            if (!referencePath.equals(targetPath)) {
+            int referencePathLength = getPathCost(referencePath, 
+                                                  weightFunction);
+            
+            int targetPathLength = getPathCost(targetPath, weightFunction);
+            
+            if (referencePathLength != targetPathLength) {
                 System.out.println("Seed = " + seed + "!");
-                System.out.println("stop");
+                System.out.println(
+                        referencePath + ": cost = " + referencePathLength);
+                
+                System.out.println(
+                        targetPath + ": cost = " + targetPathLength);
                 return;
             }
         }
