@@ -190,7 +190,7 @@ implements PriorityQueue<E, P> {
     private void checkHeapNotEmpty() {
         if (size == 0) {
             throw new NoSuchElementException(
-                    "This IndexedPairingHeap is empty.");
+                    "This PairingHeap is empty.");
         }
     }
 }

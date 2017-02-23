@@ -100,7 +100,8 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
      */
     private void checkHeapIsNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This BinaryHeap is empty.");
+            throw new NoSuchElementException(
+                    "This VanEmdeBoasTreeHeap is empty.");
         }
     }
 }

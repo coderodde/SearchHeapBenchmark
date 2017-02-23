@@ -362,7 +362,8 @@ implements PriorityQueue<E, P> {
     
     private void checkHeapIsNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This BinaryHeap is empty.");
+            throw new NoSuchElementException(
+                    "This IndexedBinomialHeap is empty.");
         }
     }
 }

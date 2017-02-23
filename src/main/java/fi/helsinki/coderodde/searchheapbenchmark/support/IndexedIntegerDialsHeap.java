@@ -185,7 +185,8 @@ public final class IndexedIntegerDialsHeap<E> implements PriorityQueue<E, Intege
     
     private void checkHeapNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This DialsHeap is empty.");
+            throw new NoSuchElementException(
+                    "This IndexedIntegerDialsHeap is empty.");
         }
     }
     

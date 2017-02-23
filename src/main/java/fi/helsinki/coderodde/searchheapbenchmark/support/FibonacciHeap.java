@@ -297,7 +297,7 @@ implements PriorityQueue<E, P> {
      */
     private void checkHeapIsNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This DaryHeap is empty.");
+            throw new NoSuchElementException("This FibonacciHeap is empty.");
         }
     }
 }

@@ -140,7 +140,7 @@ public final class IntegerDialsHeap<E> implements PriorityQueue<E, Integer> {
     
     private void checkHeapNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This DialsHeap is empty.");
+            throw new NoSuchElementException("This IntegerDialsHeap is empty.");
         }
     }
 }

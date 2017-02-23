@@ -300,7 +300,7 @@ public final class IndexedDaryHeap<E, P extends Comparable<? super P>>
      */
     private void checkHeapIsNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This DaryHeap is empty.");
+            throw new NoSuchElementException("This IndexedDaryHeap is empty.");
         }
     }
     

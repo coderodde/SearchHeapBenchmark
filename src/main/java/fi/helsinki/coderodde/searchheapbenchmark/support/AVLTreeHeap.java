@@ -96,7 +96,7 @@ public final class AVLTreeHeap<E, P extends Comparable<? super P>>
      */
     private void checkHeapIsNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This BinaryHeap is empty.");
+            throw new NoSuchElementException("This AVLTreeHeap is empty.");
         }
     }
 }

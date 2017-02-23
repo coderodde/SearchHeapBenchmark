@@ -192,7 +192,8 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
      */
     private void checkHeapIsNotEmpty() {
         if (size == 0) {
-            throw new NoSuchElementException("This BinaryHeap is empty.");
+            throw new NoSuchElementException(
+                    "This IndexedVanEmdeBoasTreeHeap is empty.");
         }
     }
 }
