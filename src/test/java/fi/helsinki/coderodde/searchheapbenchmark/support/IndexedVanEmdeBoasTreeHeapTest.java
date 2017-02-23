@@ -121,7 +121,7 @@ public class IndexedVanEmdeBoasTreeHeapTest {
         }
     }
     
-    @Test
+//    @Test
     public void smallTest() {
         System.out.println("Small test");
         final int NUMBER_OF_ADDS = 10;
@@ -157,18 +157,19 @@ public class IndexedVanEmdeBoasTreeHeapTest {
         
         while (referenceHeap.size() > 0) {
             System.out.println(referenceHeap.size());
-            assertEquals(referenceHeap.extractMinimum(), heap.extractMinimum());
+            assertEquals(referenceHeap.extractMinimum(), 
+                         vanHeap.extractMinimum());
         }
         
         assertEquals(0, vanHeap.size());
     }
     
-//    @Test
+    @Test
     public void bruteForceTest() {
-        final int NUMBER_OF_ADDS = 100_000;
-        final int NUMBER_OF_DECREASE_KEYS = 200_000;
-        final int UNIVERSE_SIZE = 100_000;
-        final int MAX_PRIORITY = 100_000;
+        final int NUMBER_OF_ADDS = 100;
+        final int NUMBER_OF_DECREASE_KEYS = 50_000;
+        final int UNIVERSE_SIZE = 1_000_000;
+        final int MAX_PRIORITY = 1_000_000;
         
         PriorityQueue<Integer, Integer> referenceHeap = 
                 new IndexedBinaryHeap<>();
@@ -198,7 +199,8 @@ public class IndexedVanEmdeBoasTreeHeapTest {
         
         while (referenceHeap.size() > 0) {
 //            System.out.println(referenceHeap.size());
-            assertEquals(referenceHeap.extractMinimum(), heap.extractMinimum());
+            assertEquals(referenceHeap.extractMinimum(), 
+                         vanHeap.extractMinimum());
         }
         
         assertEquals(0, vanHeap.size());

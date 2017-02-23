@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public final class IndexedVanEmdeBoasTreeHeap<E> 
+public final class IndexedVanEmdeBoasTreeHeap<E>
         implements PriorityQueue<E, Integer> {
 
     private static final class HeapNode<E> {
@@ -52,8 +52,8 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
      */
     private final VanEmdeBoasTreeMap<HeapNode<E>> nodeMap;
     
-    public IndexedVanEmdeBoasTreeHeap(int universeSize) {
-        this.nodeMap = new VanEmdeBoasTreeMap<>(universeSize);
+    public IndexedVanEmdeBoasTreeHeap(int universe) {
+        this.nodeMap = new VanEmdeBoasTreeMap<>(universe);
     }
     
     @Override
@@ -123,9 +123,10 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
         
         // Link the targetNode to its new chain.
         targetNode.priority = newPriority;
+        targetNode.prev = null;
+        targetNode.next = null;
         
         HeapNode<E> heapNodeChainHead = nodeMap.get(newPriority);
-        targetNode.prev = targetNode.next = null;
         
         if (heapNodeChainHead == null) {
             nodeMap.put(newPriority, targetNode);

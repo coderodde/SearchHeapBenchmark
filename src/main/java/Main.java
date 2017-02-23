@@ -17,13 +17,14 @@ public class Main {
     
     private static final int WARMUP_GRAPH_NODES = 4_000;
     private static final int WARMUP_GRAPH_ARCS = 40_000;
-    private static final int WARMUP_SEARCH_TASKS = 100;
+    private static final int WARMUP_SEARCH_TASKS = 50;
     private static final int KEY_UNIVERSE = MAX_INT_ARC_WEIGHT *
              (WARMUP_GRAPH_NODES + 1);
     
     public static void main(String[] args) {
-        long seed = System.currentTimeMillis();
+        long seed = 1487849447577L; System.currentTimeMillis();
         Random random = new Random(seed);
+        System.out.println("Seed = " + seed);
         
         GraphData<Integer> intGraphData = 
                 createRandomIntGraph(WARMUP_GRAPH_NODES, 
@@ -53,9 +54,9 @@ public class Main {
                                            intGraphData.weightFunction,
                                            KEY_UNIVERSE);
         
-        benchmarkInt.run();
+//        benchmarkInt.run();
         System.out.println("***************************************");
-        System.exit(0);
+//        System.exit(0);
         System.out.println();
         System.out.println("*** Double weight search benchmark ****");
         
@@ -236,13 +237,13 @@ public class Main {
                 continue;
             }
             
-            if (path1.isEmpty()) {
-                return false;
-            }
-            
-            if (path2.isEmpty()) {
-                return false;
-            }
+//            if (path1.isEmpty()) {
+//                return false;
+//            }
+//            
+//            if (path2.isEmpty()) {
+//                return false;
+//            }
             
             if (!path1.get(0).equals(source)) {
                 return false;

@@ -27,8 +27,6 @@ import java.util.List;
 
 
 public final class IntegerWeightBenchmark {
-
-    
     
     private final List<SearchTask> searchTaskList;
     private final List<List<List<DirectedGraphNode>>> resultCollectorList =
@@ -49,11 +47,11 @@ public final class IntegerWeightBenchmark {
     
     public void run() {
         //// Unindexed heaps ////
-        benchmarkUnindexed(new BinaryHeap<>());
-        
-        for (int degree = 2; degree <= 10; ++degree) {
-            benchmarkUnindexed(new DaryHeap<>(degree));
-        }
+//        benchmarkUnindexed(new BinaryHeap<>());
+//        
+//        for (int degree = 2; degree <= 10; ++degree) {
+//            benchmarkUnindexed(new DaryHeap<>(degree));
+//        }
         
         benchmarkUnindexed(new BinomialHeap<>());
         benchmarkUnindexed(new FibonacciHeap<>());
@@ -63,11 +61,11 @@ public final class IntegerWeightBenchmark {
         benchmarkUnindexed(new VanEmdeBoasTreeHeap<>(keyUniverse));
         
         //// Indexed heaps ////
-        benchmarkIndexed(new IndexedBinaryHeap<>());
-        
-        for (int degree = 2; degree <= 10; ++degree) {
-            benchmarkIndexed(new IndexedDaryHeap<>(degree));
-        }
+//        benchmarkIndexed(new IndexedBinaryHeap<>());
+//        
+//        for (int degree = 2; degree <= 10; ++degree) {
+//            benchmarkIndexed(new IndexedDaryHeap<>(degree));
+//        }
         
         benchmarkIndexed(new IndexedBinomialHeap<>());
         benchmarkIndexed(new IndexedFibonacciHeap<>());
