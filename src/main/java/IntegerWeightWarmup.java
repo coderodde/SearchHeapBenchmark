@@ -17,56 +17,64 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDijkstraPathFind
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedFibonacciHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedIntegerDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedPairingHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedVanEmdeBoasTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IntegerDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IntegerWeight;
 import fi.helsinki.coderodde.searchheapbenchmark.support.PairingHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.VanEmdeBoasTreeHeap;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public final class IntegerWeightWarmup {
 
+    
+    
     private final List<SearchTask> searchTaskList;
     private final DirectedGraphWeightFunction<Integer> weightFunction;
     private final IntegerWeight weight = new IntegerWeight();
+    private final int keyUniverse;
     
     public IntegerWeightWarmup
         (List<SearchTask> searchTaskList,
-         DirectedGraphWeightFunction<Integer> weightFunction) {
+         DirectedGraphWeightFunction<Integer> weightFunction,
+         int keyUniverse) {
         this.searchTaskList = searchTaskList;
         this.weightFunction = weightFunction;
+        this.keyUniverse = keyUniverse;
     }
     
     public void run() {
         //// Unindexed heaps ////
-        benchmarkUnindexed(new BinaryHeap<>());
+        warmupUnindexed(new BinaryHeap<>());
         
         for (int degree = 2; degree <= 10; ++degree) {
-            benchmarkUnindexed(new DaryHeap<>(degree));
+            warmupUnindexed(new DaryHeap<>(degree));
         }
         
-        benchmarkUnindexed(new BinomialHeap<>());
-        benchmarkUnindexed(new FibonacciHeap<>());
-        benchmarkUnindexed(new PairingHeap<>());
-        benchmarkUnindexed(new IntegerDialsHeap<>());
-        benchmarkUnindexed(new AVLTreeHeap<>());
+        warmupUnindexed(new BinomialHeap<>());
+        warmupUnindexed(new FibonacciHeap<>());
+        warmupUnindexed(new PairingHeap<>());
+        warmupUnindexed(new IntegerDialsHeap<>());
+        warmupUnindexed(new AVLTreeHeap<>());
+        warmupUnindexed(new VanEmdeBoasTreeHeap<>(keyUniverse));
         
         //// Indexed heaps ////
-        benchmarkIndexed(new IndexedBinaryHeap<>());
+        warmupIndexed(new IndexedBinaryHeap<>());
         
         for (int degree = 2; degree <= 10; ++degree) {
-            benchmarkIndexed(new IndexedDaryHeap<>(degree));
+            warmupIndexed(new IndexedDaryHeap<>(degree));
         }
         
-        benchmarkIndexed(new IndexedBinomialHeap<>());
-        benchmarkIndexed(new IndexedFibonacciHeap<>());
-        benchmarkIndexed(new IndexedPairingHeap<>());
-        benchmarkUnindexed(new IntegerDialsHeap<>());
-        benchmarkUnindexed(new IndexedIntegerDialsHeap<>());
-        benchmarkIndexed(new IndexedAVLTreeHeap<>());
+        warmupIndexed(new IndexedBinomialHeap<>());
+        warmupIndexed(new IndexedFibonacciHeap<>());
+        warmupIndexed(new IndexedPairingHeap<>());
+        warmupIndexed(new IndexedIntegerDialsHeap<>());
+        warmupIndexed(new IndexedAVLTreeHeap<>());
+        warmupIndexed(new IndexedVanEmdeBoasTreeHeap<>(keyUniverse));
     }
     
-    private void benchmarkUnindexed
+    private void warmupUnindexed
         (PriorityQueue<DirectedGraphNode, Integer> heap) {
         List<List<DirectedGraphNode>> shortestPathList = 
                 new ArrayList<>(searchTaskList.size());
@@ -81,7 +89,7 @@ public final class IntegerWeightWarmup {
         }
     }
     
-    private void benchmarkIndexed
+    private void warmupIndexed
         (PriorityQueue<DirectedGraphNode, Integer> heap) {
         List<List<DirectedGraphNode>> shortestPathList = 
                 new ArrayList<>(searchTaskList.size());

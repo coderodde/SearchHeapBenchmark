@@ -18,6 +18,8 @@ public class Main {
     private static final int WARMUP_GRAPH_NODES = 4_000;
     private static final int WARMUP_GRAPH_ARCS = 40_000;
     private static final int WARMUP_SEARCH_TASKS = 100;
+    private static final int KEY_UNIVERSE = MAX_INT_ARC_WEIGHT *
+             (WARMUP_GRAPH_NODES + 1);
     
     public static void main(String[] args) {
         long seed = System.currentTimeMillis();
@@ -38,16 +40,18 @@ public class Main {
         
         IntegerWeightWarmup warmupInt = 
                 new IntegerWeightWarmup(searchTaskListInt,
-                                        intGraphData.weightFunction);
+                                        intGraphData.weightFunction,
+                                        KEY_UNIVERSE);
         
         System.out.println("*** Integer weight search benchmark ***");
         System.out.println("Warming up integer weight search...");
-        warmupInt.run();
+//        warmupInt.run();
         System.out.println("Warming up integer weight search complete!");
         
         IntegerWeightBenchmark benchmarkInt = 
                 new IntegerWeightBenchmark(searchTaskListInt,
-                                           intGraphData.weightFunction);
+                                           intGraphData.weightFunction,
+                                           KEY_UNIVERSE);
         
         benchmarkInt.run();
         System.out.println("***************************************");

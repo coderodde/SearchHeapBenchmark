@@ -17,27 +17,34 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDijkstraPathFind
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedFibonacciHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedIntegerDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedPairingHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedVanEmdeBoasTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IntegerDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IntegerWeight;
 import fi.helsinki.coderodde.searchheapbenchmark.support.PairingHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.VanEmdeBoasTreeHeap;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public final class IntegerWeightBenchmark {
 
+    
+    
     private final List<SearchTask> searchTaskList;
     private final List<List<List<DirectedGraphNode>>> resultCollectorList =
             new ArrayList<>();
     
     private final DirectedGraphWeightFunction<Integer> weightFunction;
     private final IntegerWeight weight = new IntegerWeight();
+    private final int keyUniverse;
     
     public IntegerWeightBenchmark
         (List<SearchTask> searchTaskList,
-         DirectedGraphWeightFunction<Integer> weightFunction) {
+         DirectedGraphWeightFunction<Integer> weightFunction,
+         int keyUniverse) {
         this.searchTaskList = searchTaskList;
         this.weightFunction = weightFunction;
+        this.keyUniverse = keyUniverse;
     }
     
     public void run() {
@@ -53,6 +60,7 @@ public final class IntegerWeightBenchmark {
         benchmarkUnindexed(new PairingHeap<>());
         benchmarkUnindexed(new IntegerDialsHeap<>());
         benchmarkUnindexed(new AVLTreeHeap<>());
+        benchmarkUnindexed(new VanEmdeBoasTreeHeap<>(keyUniverse));
         
         //// Indexed heaps ////
         benchmarkIndexed(new IndexedBinaryHeap<>());
@@ -66,6 +74,7 @@ public final class IntegerWeightBenchmark {
         benchmarkIndexed(new IndexedPairingHeap<>());
         benchmarkIndexed(new IndexedIntegerDialsHeap<>());
         benchmarkIndexed(new IndexedAVLTreeHeap<>());
+        benchmarkIndexed(new IndexedVanEmdeBoasTreeHeap<>(keyUniverse));
         
         System.out.println("Algorithms/heaps agree: " + samePaths());
     }
