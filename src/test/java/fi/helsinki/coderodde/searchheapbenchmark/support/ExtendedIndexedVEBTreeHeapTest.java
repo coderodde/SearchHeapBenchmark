@@ -55,7 +55,7 @@ public class ExtendedIndexedVEBTreeHeapTest {
     }
     
     private static final int SEARCH_GRAPH_NODES = 6;
-    private static final int SEARCH_GRAPH_ARCS = 15;
+    private static final int SEARCH_GRAPH_ARCS = 10;
     private static final int SEARCH_GRAPH_MAX_WEIGHT = 4;
     
     @Test
@@ -68,7 +68,8 @@ public class ExtendedIndexedVEBTreeHeapTest {
         Weight<Integer> weight = new IntegerWeight();
         
         while (true) {
-            long seed = 1487852368776L; //System.currentTimeMillis();
+//            long seed = 1487852368776L; //System.currentTimeMillis();
+            long seed = 1487856892778L; //System.currentTimeMillis();
             Random random = new Random(seed);
             GraphData graphData = 
                     createRandomIntegerWeightGraph(SEARCH_GRAPH_NODES,

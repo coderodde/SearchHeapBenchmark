@@ -303,7 +303,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
                     Integer summaryMaximum = summary.getMaximumKey();
 
                     if (summaryMaximum == null) {
-                        max = min;
+                        max = min; // Here is the shit!
                         maxValue = minValue;
                     } else {
                         Integer maximumKey = 
