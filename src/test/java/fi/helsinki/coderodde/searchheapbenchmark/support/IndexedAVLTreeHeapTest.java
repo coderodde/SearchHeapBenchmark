@@ -95,12 +95,16 @@ public class IndexedAVLTreeHeapTest {
     public void bruteForceTest() {
         final int NUMBER_OF_ADDS = 10;
         final int NUMBER_OF_DECREASE_KEYS = 20;
-        final int UNIVERSE_SIZE = 10;
-        final int MAX_PRIORITY = 100_000;
+        final int UNIVERSE_SIZE = 64;
+        final int MAX_PRIORITY = 10;
+//        final int NUMBER_OF_ADDS = 100_000;
+//        final int NUMBER_OF_DECREASE_KEYS = 200_000;
+//        final int UNIVERSE_SIZE = 100_000;
+//        final int MAX_PRIORITY = 100_000;
         
         PriorityQueue<Integer, Integer> referenceHeap = 
                 new IndexedBinaryHeap<>();
-        long seed = 1487833140298L; // System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         
         System.out.println("Seed = " + seed);
