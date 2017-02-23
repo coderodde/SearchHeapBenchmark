@@ -13,19 +13,52 @@ public class Main {
     private static final int DENSE_GRAPH_ARCS =  600_000;
     private static final int SEARCH_TASKS = 20;
     private static final double MAX_ARC_WEIGHT = 10.0;
+    private static final int MAX_INT_ARC_WEIGHT = 10;
     
-    private static final int WARMUP_GRAPH_NODES = 3_000;
-    private static final int WARMUP_GRAPH_ARCS = 60_000;
-    private static final int WARMUP_SEARCH_TASKS = 50;
+    private static final int WARMUP_GRAPH_NODES = 4_000;
+    private static final int WARMUP_GRAPH_ARCS = 40_000;
+    private static final int WARMUP_SEARCH_TASKS = 100;
     
     public static void main(String[] args) {
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         
-        GraphData graphData1 = createRandomGraph(WARMUP_GRAPH_NODES,
-                                                 WARMUP_GRAPH_ARCS,
-                                                 MAX_ARC_WEIGHT,
-                                                 random);
+        GraphData<Integer> intGraphData = 
+                createRandomIntGraph(WARMUP_GRAPH_NODES, 
+                                     WARMUP_GRAPH_ARCS, 
+                                     MAX_INT_ARC_WEIGHT, 
+                                     random);
+        
+        SearchTaskCreator stcInt = 
+                new SearchTaskCreator(intGraphData.nodeList,
+                                      WARMUP_SEARCH_TASKS,
+                                      random);
+        
+        List<SearchTask> searchTaskListInt = stcInt.getSearchTaskList();
+        
+        IntegerWeightWarmup warmupInt = 
+                new IntegerWeightWarmup(searchTaskListInt,
+                                        intGraphData.weightFunction);
+        
+        System.out.println("*** Integer weight search benchmark ***");
+        System.out.println("Warming up integer weight search...");
+        warmupInt.run();
+        System.out.println("Warming up integer weight search complete!");
+        
+        IntegerWeightBenchmark benchmarkInt = 
+                new IntegerWeightBenchmark(searchTaskListInt,
+                                           intGraphData.weightFunction);
+        
+        benchmarkInt.run();
+        System.out.println("***************************************");
+        System.exit(0);
+        System.out.println();
+        System.out.println("*** Double weight search benchmark ****");
+        
+        GraphData<Double> graphData1 = createRandomGraph(WARMUP_GRAPH_NODES,
+                                                         WARMUP_GRAPH_ARCS,
+                                                         MAX_ARC_WEIGHT,
+                                                         random);
         
         SearchTaskCreator stc1 = new SearchTaskCreator(graphData1.nodeList,
                                                        WARMUP_SEARCH_TASKS,
@@ -41,10 +74,10 @@ public class Main {
         warmup.run();
         System.out.println("Warming up done!");
         
-        GraphData graphData2 = createRandomGraph(GRAPH_NODES,
-                                                 SPARSE_GRAPH_ARCS,
-                                                 MAX_ARC_WEIGHT,
-                                                 random);
+        GraphData<Double> graphData2 = createRandomGraph(GRAPH_NODES,
+                                                         SPARSE_GRAPH_ARCS,
+                                                         MAX_ARC_WEIGHT,
+                                                         random);
         
         SearchTaskCreator stc2 = new SearchTaskCreator(graphData2.nodeList,
                                                        SEARCH_TASKS,
@@ -57,10 +90,10 @@ public class Main {
                                           graphData2.weightFunction);
         sparseBenchmarkSparse.run();
         
-        GraphData graphData3 = createRandomGraph(GRAPH_NODES,
-                                                 MEDIUM_GRAPH_ARCS,
-                                                 MAX_ARC_WEIGHT,
-                                                 random);
+        GraphData<Double> graphData3 = createRandomGraph(GRAPH_NODES,
+                                                         MEDIUM_GRAPH_ARCS,
+                                                         MAX_ARC_WEIGHT,
+                                                         random);
         
         SearchTaskCreator stc3 = new SearchTaskCreator(graphData3.nodeList,
                                                        SEARCH_TASKS,
@@ -73,10 +106,10 @@ public class Main {
                                           graphData3.weightFunction);
         sparseBenchmarkMedium.run();
         
-        GraphData graphData4 = createRandomGraph(GRAPH_NODES,
-                                                 DENSE_GRAPH_ARCS,
-                                                 MAX_ARC_WEIGHT,
-                                                 random);
+        GraphData<Double> graphData4 = createRandomGraph(GRAPH_NODES,
+                                                         DENSE_GRAPH_ARCS,
+                                                         MAX_ARC_WEIGHT,
+                                                         random);
         
         SearchTaskCreator stc4 = new SearchTaskCreator(graphData4.nodeList,
                                                        SEARCH_TASKS,
@@ -88,6 +121,8 @@ public class Main {
                 new DoubleWeightBenchmark(searchTaskList4, 
                                           graphData4.weightFunction);
         sparseBenchmarkDense.run();
+        
+        System.out.println("***************************************");
     }
     
     private static GraphData<Double> createRandomGraph(int nodes,
