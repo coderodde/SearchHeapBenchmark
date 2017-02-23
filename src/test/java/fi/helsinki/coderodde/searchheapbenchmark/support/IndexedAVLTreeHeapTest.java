@@ -92,6 +92,48 @@ public class IndexedAVLTreeHeapTest {
     }
     
     @Test
+    public void smallTest() {
+        System.out.println("Small test");
+        final int NUMBER_OF_ADDS = 10;
+        final int NUMBER_OF_DECREASE_KEYS = 20;
+        final int UNIVERSE_SIZE = 10;
+        final int MAX_PRIORITY = 10;
+        
+        PriorityQueue<Integer, Integer> referenceHeap = 
+                new IndexedBinaryHeap<>();
+        
+        PriorityQueue<Integer, Integer> vanHeap = 
+                new IndexedVanEmdeBoasTreeHeap<>(UNIVERSE_SIZE);
+        
+        long seed = 1487844866672L; System.currentTimeMillis();
+        Random random = new Random(seed);
+        
+        System.out.println("Seed = " + seed);
+        
+        for (int i = 0; i < NUMBER_OF_ADDS; ++i) {
+            int key = random.nextInt(UNIVERSE_SIZE);
+            int priority = random.nextInt(MAX_PRIORITY);
+            
+            referenceHeap.add(key, priority);
+            vanHeap.add(key, priority);
+        }
+        
+        for (int i = 0; i < NUMBER_OF_DECREASE_KEYS; ++i) {
+            int key= random.nextInt(UNIVERSE_SIZE);
+            int priority = random.nextInt(MAX_PRIORITY);
+            vanHeap.decreasePriority(key, priority);
+            referenceHeap.decreasePriority(key, priority);
+        }
+        
+        while (referenceHeap.size() > 0) {
+            System.out.println(referenceHeap.size());
+            assertEquals(referenceHeap.extractMinimum(), heap.extractMinimum());
+        }
+        
+        assertEquals(0, vanHeap.size());
+    }
+    
+//    @Test
     public void bruteForceTest() {
         final int NUMBER_OF_ADDS = 10;
         final int NUMBER_OF_DECREASE_KEYS = 20;
