@@ -138,6 +138,20 @@ public class ExtendedIndexedVEBTreeHeapTest {
         System.out.println("Removed: " + heap.extractMinimum());
     }
     
+    @Test
+    public void testFindBadCase2() {
+        IndexedVanEmdeBoasTreeHeap<Integer> heap = 
+                new IndexedVanEmdeBoasTreeHeap<>(32);
+        
+        heap.add(4, 0);
+        heap.extractMinimum();
+        heap.add(1, 4);
+        heap.add(2, 3);
+        heap.add(5, 0);
+        
+        heap.extractMinimum();
+    }
+    
     private static GraphData createRandomIntegerWeightGraph(int nodes,
                                                             int arcs,
                                                             int maxArcWeight,

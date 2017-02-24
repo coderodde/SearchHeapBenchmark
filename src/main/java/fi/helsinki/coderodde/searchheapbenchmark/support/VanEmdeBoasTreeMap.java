@@ -2,7 +2,7 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -10,6 +10,8 @@ import java.util.Set;
 /**
  * This class implements a van Emde Boas tree -based map that maps integer keys
  * to arbitrary satellite data.
+ * 
+ * This class is not bug-free! (Feb 24, 2017).
  * 
  * @author Rodion "rodde" Efremov
  * @version 1.6 (Feb 19, 2017)
@@ -57,16 +59,6 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
         private Integer max;
 
         /**
-         * The element associated with the minimum key.
-         */
-        private E minValue;
-
-        /**
-         * The element associated with the maximum key.
-         */
-        private E maxValue;
-
-        /**
          * The summary vEB-tree.
          */
         private final VEBTree<E> summary;
@@ -108,22 +100,6 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
 
         Integer getMaximumKey() {
             return max;
-        }
-
-        E get(Integer x) {
-            if (x.equals(min)) {
-                return minValue;
-            }
-
-            if (x.equals(max)) {
-                return maxValue;
-            }
-
-            if (universeSize == 2) {
-                return null;
-            }
-
-            return cluster[high(x)].get(low(x));
         }
 
         Integer getSuccessor(Integer x) {
@@ -193,10 +169,10 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
             int offset = cluster[predecessorCluster].getMaximumKey();
             return index(predecessorCluster, offset);
         }
-
-        void treeInsert(Integer x, E value) {
+        
+        void treeInsert(Integer x) {
             if (min == null) {
-                emptyTreeInsert(x, value);
+                emptyTreeInsert(x);
                 return;
             }
 
@@ -204,100 +180,49 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
                 Integer tmp = x;
                 x = min;
                 min = tmp;
-
-                E tmpValue = value;
-                value = minValue;
-                minValue = tmpValue;
             }
 
             if (universeSize != 2) {
                 Integer minimum = cluster[high(x)].getMinimumKey();
 
                 if (minimum == null) {
-                    summary.treeInsert(high(x), value);
-                    cluster[high(x)].emptyTreeInsert(low(x), value);
+                    summary.treeInsert(high(x));
+                    cluster[high(x)].emptyTreeInsert(low(x));
                 } else {
-                    cluster[high(x)].treeInsert(low(x), value);
+                    cluster[high(x)].treeInsert(low(x));
                 }
             }
 
             if (max < x) {
                 max = x;
-                maxValue = value;
             }
         }
 
-        private void emptyTreeUpdate(E value) {
-            minValue = value;
-            maxValue = value;
-        }
-
-        E treeUpdate(Integer x, E value) {
-            E returnValue = null;
-
-            if (min.equals(x)) {
-                returnValue = minValue;
-                minValue = value;
-            } else if (max.equals(x)) {
-                returnValue = maxValue;
-                maxValue = value;
-            } else if (universeSize != 2) {
-                Integer minimum = cluster[high(x)].getMinimumKey();
-
-                if (minimum == null) {
-                    cluster[high(x)].emptyTreeUpdate(value);
-                } else {
-                    cluster[high(x)].treeUpdate(low(x), value);
-                }
-            }
-
-            return returnValue;
-        }
-
-        E treeDelete(Integer x) {
+        void treeDelete(Integer x) {
             if (min.equals(max)) {
-                E returnValue = minValue;
                 min = null;
                 max = null;
-                minValue = null;
-                maxValue = null;
-                return returnValue;
+                return;
             }
 
             if (universeSize == 2) {
-                E returnValue;
-
                 if (x == 0) {
                     min = 1;
-                    returnValue = minValue;
-                    minValue = maxValue;
                 } else {
                     max = 0;
-                    returnValue = maxValue;
-                    maxValue = minValue;
                 }
-
-                return returnValue;
+                
+                max = min;
+                return;
             }
 
-            E returnValue;
-
             if (min.equals(x)) {
-                returnValue = minValue;
                 Integer firstCluster = summary.getMinimumKey();
                 x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
-                
-                if (min.equals(max)) {
-                    minValue = maxValue;
-                } else {
-                    minValue = cluster[firstCluster].get(low(x));
-                }
-                    
-                cluster[high(x)].treeDelete(low(x));
-            } else {
-                returnValue = cluster[high(x)].treeDelete(low(x));
             }
+            
+            cluster[high(x)].treeDelete(low(x));
 
             if (cluster[high(x)].getMinimumKey() == null) {
                 summary.treeDelete(high(x));
@@ -306,29 +231,22 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
                     Integer summaryMaximum = summary.getMaximumKey();
 
                     if (summaryMaximum == null) {
-                        max = min; // Here is the shit!
-                        maxValue = minValue;
+                        max = min;
                     } else {
                         Integer maximumKey = 
                                 cluster[summaryMaximum].getMaximumKey();
                         max = index(summaryMaximum, maximumKey);
-                        maxValue = cluster[summaryMaximum].get(maximumKey);
                     }
                 }
             } else if (x.equals(max)) {
                 Integer maximumKey = cluster[high(x)].getMaximumKey();
                 max = index(high(x), maximumKey);
-                maxValue = cluster[high(x)].get(maximumKey);
             }
-
-            return returnValue;
         }
 
-        private void emptyTreeInsert(Integer x, E value) {
+        private void emptyTreeInsert(Integer x) {
             min = x;
             max = x;
-            minValue = value;
-            maxValue = value;
         }
 
         private int high(int x) {
@@ -350,9 +268,11 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
     private VEBTree<E> root;
 
     /**
-     * A hash table set for keeping track of the integer keys used so far.
+     * This map serves two purposes: first, it allows us to keep track of all 
+     * the integer keys in the van Emde Boas tree, second, it maps each present
+     * integer key to its satellite data.
      */
-    private final Set<Integer> set = new HashSet<>();
+    private final Map<Integer, E> map = new HashMap<>();
 
     public VanEmdeBoasTreeMap(int requestedUniverseSize) {
         checkRequestedUniverseSize(requestedUniverseSize);
@@ -362,41 +282,34 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
 
     @Override
     public E put(Integer key, E value) {
-        if (set.contains(key)) {
-            return root.treeUpdate(key, value);
+        if (map.containsKey(key)) {
+            return map.put(key, value);
+        } else {
+            map.put(key, value);
+            root.treeInsert(key);
+            return null;
         }
-
-        root.treeInsert(key, value);
-        set.add(key);
-        return null;
     }
 
     @Override
     public E get(Object key) {
-        return root.get((Integer) key);    
+        return map.get(key);    
     }
 
     @Override
     public E remove(Object key) {
-        if (set.contains((Integer) key)) {
-            set.remove((Integer) key);
-            return root.treeDelete((Integer) key);
+        if (map.containsKey((Integer) key)) {
+            E returnValue = map.remove(key);
+            root.treeDelete((Integer) key);
+            return returnValue;
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     @Override
     public boolean containsKey(Object key) {
-        if (key == null) {
-            return false;
-        }
-
-        if (!key.getClass().equals(Integer.class)) {
-            return false;
-        }
-
-        return set.contains((Integer) key);
+        return map.containsKey(key);
     }
 
     @Override
@@ -408,30 +321,30 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
 
     @Override
     public boolean isEmpty() {
-        return set.isEmpty();
+        return map.isEmpty();
     }
 
     @Override
     public int size() {
-        return set.size();
+        return map.size();
     }
 
     @Override
     public void clear() {
         root = new VEBTree<>(root.universeSize);
-        set.clear();
+        map.clear();
     }
 
     @Override
     public void putAll(Map<? extends Integer, ? extends E> m) {
         for (Map.Entry<? extends Integer, ? extends E> entry : m.entrySet()) {
-            root.treeInsert(entry.getKey(), entry.getValue());
+            put(entry.getKey(), entry.getValue());
         }
     }
 
     @Override
     public Set<Integer> keySet() {
-        return Collections.unmodifiableSet(set);
+        return Collections.unmodifiableSet(map.keySet());
     }
 
     @Override
@@ -449,7 +362,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
     }
 
     public Integer getMinimum() {
-        if (set.isEmpty()) {
+        if (map.isEmpty()) {
             throw new NoSuchElementException(
             "Asking for minimum integer key in empty VanEmdeBoasTreeMap.");
         }
@@ -458,7 +371,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
     }
     
     public Integer getPredessor(Integer x) {
-        if (set.isEmpty()) {
+        if (map.isEmpty()) {
             throw new NoSuchElementException(
             "Asking for predecessor integer key in empty VanEmdeBoasTreeMap.");
         }
@@ -468,7 +381,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
     }
 
     public Integer getSuccessor(Integer x) {
-        if (set.isEmpty()) {
+        if (map.isEmpty()) {
             throw new NoSuchElementException(
             "Asking for successor integer key in empty VanEmdeBoasTreeMap.");
         }
@@ -478,7 +391,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
     }
 
     public Integer getMaximum() {
-        if (set.isEmpty()) {
+        if (map.isEmpty()) {
             throw new NoSuchElementException(
             "Asking for maximum integer key in empty VanEmdeBoasTreeMap.");
         }

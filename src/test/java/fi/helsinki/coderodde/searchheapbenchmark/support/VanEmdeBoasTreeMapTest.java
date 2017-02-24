@@ -226,7 +226,7 @@ public class VanEmdeBoasTreeMapTest {
     @Test
     public void bruteForceTest() {
         final int UNIVERSE_SIZE = 32;
-        final int ITERATIONS = 10;
+        final int ITERATIONS = 100000;
         
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
