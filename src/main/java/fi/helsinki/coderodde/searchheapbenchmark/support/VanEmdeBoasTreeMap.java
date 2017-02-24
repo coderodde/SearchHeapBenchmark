@@ -24,6 +24,11 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
      * Holds the minimum universe size.
      */
     private static final int MINIMUM_UNIVERSE_SIZE = 2;
+    
+    /**
+     * Used to denote the absence of an element.
+     */
+    public static final int NIL = -1;
 
     /**
      * This static inner class implements recursively the entire van Emde Boas-
@@ -51,12 +56,12 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
         /**
          * The minimum integer key in this tree.
          */
-        private Integer min;
+        private int min;
 
         /**
          * The maximum integer key in this tree.
          */
-        private Integer max;
+        private int max;
 
         /**
          * The summary vEB-tree.
@@ -70,10 +75,16 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
 
         VEBTree(int universeSize) {
             this.universeSize = universeSize;
+            
             int universeSizeLowerSquare = lowerSquare(universeSize);
+            
             this.lowMask = universeSizeLowerSquare - 1;
-            this.highShift = 
-                    Integer.numberOfTrailingZeros(universeSizeLowerSquare);
+            this.highShift = Integer.numberOfTrailingZeros(
+                                     universeSizeLowerSquare);
+            
+            // Set to "null" min and max:
+            this.min = NIL;
+            this.max = NIL;
 
             if (universeSize != MINIMUM_UNIVERSE_SIZE) {
                 int upperUniverseSizeSquare = upperSquare(universeSize);
@@ -94,84 +105,84 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
             return universeSize;
         }
 
-        Integer getMinimumKey() {
+        int getMinimumKey() {
             return min;
         }
 
-        Integer getMaximumKey() {
+        int getMaximumKey() {
             return max;
         }
 
-        Integer getSuccessor(Integer x) {
+        int getSuccessor(int x) {
             if (universeSize == 2) {
                 if (x == 0 && max == 1) {
                     return 1;
                 }
 
-                return null;
+                return NIL;
             }
 
-            if (min != null && x < min) {
+            if (min != NIL && x < min) {
                 return min;
             }
 
-            Integer maximumLow = cluster[high(x)].getMaximumKey();
+            int maximumLow = cluster[high(x)].getMaximumKey();
 
-            if (maximumLow != null && low(x) < maximumLow) {
+            if (maximumLow != NIL && low(x) < maximumLow) {
                 int offset = cluster[high(x)].getSuccessor(low(x));
                 return index(high(x), offset);
             }
 
-            Integer successorCluster = summary.getSuccessor(high(x));
+            int successorCluster = summary.getSuccessor(high(x));
 
-            if (successorCluster == null) {
-                return null;
+            if (successorCluster == NIL) {
+                return NIL;
             }
 
             int offset = cluster[successorCluster].getMinimumKey();
             return index(successorCluster, offset);
         }
 
-        Integer getPredecessor(Integer x) {
+        int getPredecessor(int x) {
             if (universeSize == 2) {
-                if (min == null) {
-                    return null;
+                if (min == NIL) {
+                    return NIL;
                 }
 
                 if (x == 1 && min == 0) {
                     return 0;
                 }
 
-                return null;
+                return NIL;
             }
 
-            if (max != null && x > max) {
+            if (max != NIL && x > max) {
                 return max;
             }
 
-            Integer minimumLow = cluster[high(x)].getMinimumKey();
+            int minimumLow = cluster[high(x)].getMinimumKey();
 
-            if (minimumLow != null && low(x) > minimumLow) {
+            if (minimumLow != NIL && low(x) > minimumLow) {
                 int offset = cluster[high(x)].getPredecessor(low(x));
                 return index(high(x), offset);
             }
 
-            Integer predecessorCluster = summary.getPredecessor(high(x));
+            int predecessorCluster = summary.getPredecessor(high(x));
 
-            if (predecessorCluster == null) {
-                if (min != null && x > min) {
+            if (predecessorCluster == NIL) {
+                if (min != NIL && x > min) {
                     return min;
                 }
 
-                return null;
+                return NIL;
             }
 
             int offset = cluster[predecessorCluster].getMaximumKey();
             return index(predecessorCluster, offset);
         }
         
-        void treeInsert(Integer x) {
-            if (min == null) {
+        void treeInsert(int x) {
+            if (min == NIL) {
                 emptyTreeInsert(x);
                 return;
             }
@@ -183,9 +194,9 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
             }
 
             if (universeSize != 2) {
-                Integer minimum = cluster[high(x)].getMinimumKey();
+                int minimum = cluster[high(x)].getMinimumKey();
 
-                if (minimum == null) {
+                if (minimum == NIL) {
                     summary.treeInsert(high(x));
                     cluster[high(x)].emptyTreeInsert(low(x));
                 } else {
@@ -198,10 +209,10 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
             }
         }
 
-        void treeDelete(Integer x) {
-            if (min.equals(max)) {
-                min = null;
-                max = null;
+        void treeDelete(int x) {
+            if (min == max) {
+                min = NIL;
+                max = NIL;
                 return;
             }
 
@@ -216,35 +227,35 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
                 return;
             }
 
-            if (min.equals(x)) {
-                Integer firstCluster = summary.getMinimumKey();
+            if (min == x) {
+                int firstCluster = summary.getMinimumKey();
                 x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
             }
             
             cluster[high(x)].treeDelete(low(x));
 
-            if (cluster[high(x)].getMinimumKey() == null) {
+            if (cluster[high(x)].getMinimumKey() == NIL) {
                 summary.treeDelete(high(x));
 
-                if (x.equals(max)) {
-                    Integer summaryMaximum = summary.getMaximumKey();
+                if (x == max) {
+                    int summaryMaximum = summary.getMaximumKey();
 
-                    if (summaryMaximum == null) {
+                    if (summaryMaximum == NIL) {
                         max = min;
                     } else {
-                        Integer maximumKey = 
+                        int maximumKey = 
                                 cluster[summaryMaximum].getMaximumKey();
                         max = index(summaryMaximum, maximumKey);
                     }
                 }
-            } else if (x.equals(max)) {
-                Integer maximumKey = cluster[high(x)].getMaximumKey();
+            } else if (x == max) {
+                int maximumKey = cluster[high(x)].getMaximumKey();
                 max = index(high(x), maximumKey);
             }
         }
 
-        private void emptyTreeInsert(Integer x) {
+        private void emptyTreeInsert(int x) {
             min = x;
             max = x;
         }
@@ -361,7 +372,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
                 "'entrySet'.");
     }
 
-    public Integer getMinimum() {
+    public int getMinimumKey() {
         if (map.isEmpty()) {
             throw new NoSuchElementException(
             "Asking for minimum integer key in empty VanEmdeBoasTreeMap.");
@@ -370,7 +381,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
         return root.getMinimumKey();
     }
     
-    public Integer getPredessor(Integer x) {
+    public int getPredessorKey(int x) {
         if (map.isEmpty()) {
             throw new NoSuchElementException(
             "Asking for predecessor integer key in empty VanEmdeBoasTreeMap.");
@@ -380,7 +391,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
         return root.getPredecessor(x);
     }
 
-    public Integer getSuccessor(Integer x) {
+    public int getSuccessorKey(int x) {
         if (map.isEmpty()) {
             throw new NoSuchElementException(
             "Asking for successor integer key in empty VanEmdeBoasTreeMap.");
@@ -390,7 +401,7 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
         return root.getSuccessor(x);
     }
 
-    public Integer getMaximum() {
+    public int getMaximumKey() {
         if (map.isEmpty()) {
             throw new NoSuchElementException(
             "Asking for maximum integer key in empty VanEmdeBoasTreeMap.");

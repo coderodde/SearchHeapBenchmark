@@ -56,7 +56,7 @@ public class Main {
         
         benchmarkInt.run();
         System.out.println("***************************************");
-//        System.exit(0);
+        System.exit(0);
         System.out.println();
         System.out.println("*** Double weight search benchmark ****");
         

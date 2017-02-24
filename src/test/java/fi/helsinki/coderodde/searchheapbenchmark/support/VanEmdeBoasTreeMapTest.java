@@ -77,11 +77,11 @@ public class VanEmdeBoasTreeMapTest {
         for (int i = 0; i < 8; ++i) {
             map.put(i, 3 * i);
             assertEquals(Integer.valueOf(3 * i), map.get(i));
-            assertEquals(Integer.valueOf(i), map.getMaximum());
+            assertEquals(i, map.getMaximumKey());
         }
         
         for (int i = 7; i >= 0; --i) {
-            assertEquals(Integer.valueOf(i), map.getMaximum());
+            assertEquals(i, map.getMaximumKey());
             map.remove(i);
         }
     }
@@ -90,66 +90,66 @@ public class VanEmdeBoasTreeMapTest {
     public void testGetMinimum() {
         for (int i = 7; i >= 0; --i) {
             map.put(i, 3 * i);
-            assertEquals(Integer.valueOf(i), map.getMinimum());
+            assertEquals(i, map.getMinimumKey());
         }
         
         for (int i = 0; i < 8; ++i) {
-            assertEquals(Integer.valueOf(i), map.getMinimum());
+            assertEquals(i, map.getMinimumKey());
             map.remove(i);
         }
     }
 
     @Test(expected = NoSuchElementException.class)
     public void testGetMinimumThrowsOnEmptyMap() {
-        map.getMinimum();
+        map.getMinimumKey();
     }
 
     @Test(expected = NoSuchElementException.class)
     public void testGetMaximumThrowsOnEmptyMap() {
-        map.getMaximum();
+        map.getMaximumKey();
     }
     
     @Test
     public void testGetPredessor() {
         map.put(3, 9);
-        assertNull(map.getPredessor(3));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getPredessorKey(3));
         
         map.put(5, 15);
-        assertEquals(Integer.valueOf(3), map.getPredessor(4));
-        assertEquals(Integer.valueOf(3), map.getPredessor(5));
-        assertEquals(Integer.valueOf(5), map.getPredessor(6));
-        assertEquals(Integer.valueOf(5), map.getPredessor(7));
+        assertEquals(3, map.getPredessorKey(4));
+        assertEquals(3, map.getPredessorKey(5));
+        assertEquals(5, map.getPredessorKey(6));
+        assertEquals(5, map.getPredessorKey(7));
         
-        assertNull(map.getPredessor(3));
-        assertNull(map.getPredessor(2));
-        assertNull(map.getPredessor(1));
-        assertNull(map.getPredessor(0));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getPredessorKey(3));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getPredessorKey(2));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getPredessorKey(1));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getPredessorKey(0));
     }
     
     @Test
     public void testGetSuccessor() {
         map.put(5, 15);
-        assertNull(map.getSuccessor(5));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getSuccessorKey(5));
         
         map.put(3, 9);
-        assertEquals(Integer.valueOf(5), map.getSuccessor(4));
-        assertEquals(Integer.valueOf(5), map.getSuccessor(3));
-        assertEquals(Integer.valueOf(3), map.getSuccessor(2));
-        assertEquals(Integer.valueOf(3), map.getSuccessor(1));
+        assertEquals(5, map.getSuccessorKey(4));
+        assertEquals(5, map.getSuccessorKey(3));
+        assertEquals(3, map.getSuccessorKey(2));
+        assertEquals(3, map.getSuccessorKey(1));
         
-        assertNull(map.getSuccessor(5));
-        assertNull(map.getSuccessor(6));
-        assertNull(map.getSuccessor(7));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getSuccessorKey(5));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getSuccessorKey(6));
+        assertEquals(VanEmdeBoasTreeMap.NIL, map.getSuccessorKey(7));
     }
     
     @Test(expected = NoSuchElementException.class)
     public void testGetSuccessorThrowsOnEmptyMap() {
-        map.getSuccessor(1);
+        map.getSuccessorKey(1);
     }
     
     @Test(expected = NoSuchElementException.class)
     public void testGetPredecessorThrowsOnEmptyMap() {
-        map.getPredessor(1);
+        map.getPredessorKey(1);
     }
     
     @Test
@@ -167,8 +167,8 @@ public class VanEmdeBoasTreeMapTest {
         assertTrue(map.containsKey(3));
         assertTrue(map.containsKey(4));
         
-        assertEquals(Integer.valueOf(1), map.getMinimum());
-        assertEquals(Integer.valueOf(4), map.getMaximum());
+        assertEquals(1, map.getMinimumKey());
+        assertEquals(4, map.getMaximumKey());
         
         map.remove(2);
         
@@ -178,8 +178,8 @@ public class VanEmdeBoasTreeMapTest {
         assertTrue(map.containsKey(4));
         assertEquals(3, map.size());
         
-        assertEquals(Integer.valueOf(1), map.getMinimum());
-        assertEquals(Integer.valueOf(4), map.getMaximum());
+        assertEquals(1, map.getMinimumKey());
+        assertEquals(4, map.getMaximumKey());
         
         map.remove(4);
         
@@ -189,8 +189,8 @@ public class VanEmdeBoasTreeMapTest {
         assertFalse(map.containsKey(4));
         assertEquals(2, map.size());
         
-        assertEquals(Integer.valueOf(1), map.getMinimum());
-        assertEquals(Integer.valueOf(3), map.getMaximum());
+        assertEquals(1, map.getMinimumKey());
+        assertEquals(3, map.getMaximumKey());
         
         map.remove(2); // Cannot remove twice.
         
@@ -200,8 +200,8 @@ public class VanEmdeBoasTreeMapTest {
         assertFalse(map.containsKey(4));
         assertEquals(2, map.size());
         
-        assertEquals(Integer.valueOf(1), map.getMinimum());
-        assertEquals(Integer.valueOf(3), map.getMaximum());
+        assertEquals(1, map.getMinimumKey());
+        assertEquals(3, map.getMaximumKey());
         
         map.remove(1);
         
@@ -211,8 +211,8 @@ public class VanEmdeBoasTreeMapTest {
         assertFalse(map.containsKey(4));
         assertEquals(1, map.size());
         
-        assertEquals(Integer.valueOf(3), map.getMinimum());
-        assertEquals(Integer.valueOf(3), map.getMaximum());
+        assertEquals(3, map.getMinimumKey());
+        assertEquals(3, map.getMaximumKey());
         
         map.remove(3);
         
@@ -255,7 +255,7 @@ public class VanEmdeBoasTreeMapTest {
                 }
             }
         }
-        System.out.println("yeah");
+        
         assertEquals(treeMap.size(), vanMap.size());
     }
 }

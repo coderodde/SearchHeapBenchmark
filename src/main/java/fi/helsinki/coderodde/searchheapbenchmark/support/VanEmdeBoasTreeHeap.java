@@ -61,7 +61,7 @@ public final class VanEmdeBoasTreeHeap<E> implements PriorityQueue<E, Integer> {
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        Integer minimumKey = map.getMinimum();
+        Integer minimumKey = map.getMinimumKey();
         HeapNode<E> heapNodeChainHead = map.get(minimumKey);
         E returnValue;
         

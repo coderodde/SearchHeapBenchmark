@@ -147,7 +147,7 @@ public final class IndexedVanEmdeBoasTreeHeap<E>
     @Override
     public E extractMinimum() {
         checkHeapIsNotEmpty();
-        Integer minimumPriorityKey = nodeMap.getMinimum();
+        Integer minimumPriorityKey = nodeMap.getMinimumKey();
         HeapNode<E> heapNodeChainHead = nodeMap.get(minimumPriorityKey);
         E returnValue;
         
