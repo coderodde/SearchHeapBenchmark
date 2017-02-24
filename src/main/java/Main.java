@@ -46,7 +46,7 @@ public class Main {
         
         System.out.println("*** Integer weight search benchmark ***");
         System.out.println("Warming up integer weight search...");
-//        warmupInt.run();
+        warmupInt.run();
         System.out.println("Warming up integer weight search complete!");
         
         IntegerWeightBenchmark benchmarkInt = 
@@ -56,7 +56,7 @@ public class Main {
         
         benchmarkInt.run();
         System.out.println("***************************************");
-        System.exit(0);
+//        System.exit(0);
         System.out.println();
         System.out.println("*** Double weight search benchmark ****");
         
@@ -75,9 +75,10 @@ public class Main {
                 new DoubleWeightWarmup(searchTaskList1,
                                        graphData1.weightFunction);
         
-        System.out.println("Warming up...");
+        System.out.println("Real weight search Warming up...");
         warmup.run();
-        System.out.println("Warming up done!");
+        System.out.println("Real weight search warming up done!");
+        System.out.println("***************************************");
         
         GraphData<Double> graphData2 = createRandomGraph(GRAPH_NODES,
                                                          SPARSE_GRAPH_ARCS,
@@ -90,10 +91,13 @@ public class Main {
         
         List<SearchTask> searchTaskList2 = stc2.getSearchTaskList();
         
-        DoubleWeightBenchmark sparseBenchmarkSparse = 
+        System.out.println();
+        System.out.println("*** Sparse graph ***");
+        
+        DoubleWeightBenchmark sparseBenchmark = 
                 new DoubleWeightBenchmark(searchTaskList2, 
                                           graphData2.weightFunction);
-        sparseBenchmarkSparse.run();
+        sparseBenchmark.run();
         
         GraphData<Double> graphData3 = createRandomGraph(GRAPH_NODES,
                                                          MEDIUM_GRAPH_ARCS,
@@ -106,10 +110,13 @@ public class Main {
         
         List<SearchTask> searchTaskList3 = stc3.getSearchTaskList();
         
-        DoubleWeightBenchmark sparseBenchmarkMedium = 
+        System.out.println();
+        System.out.println("*** Medium graph ***");
+        
+        DoubleWeightBenchmark mediumBenchmark = 
                 new DoubleWeightBenchmark(searchTaskList3, 
                                           graphData3.weightFunction);
-        sparseBenchmarkMedium.run();
+        mediumBenchmark.run();
         
         GraphData<Double> graphData4 = createRandomGraph(GRAPH_NODES,
                                                          DENSE_GRAPH_ARCS,
@@ -122,10 +129,13 @@ public class Main {
         
         List<SearchTask> searchTaskList4 = stc4.getSearchTaskList();
         
-        DoubleWeightBenchmark sparseBenchmarkDense = 
+        System.out.println();
+        System.out.println("*** Dense graph ***");
+        
+        DoubleWeightBenchmark denseBenchmark = 
                 new DoubleWeightBenchmark(searchTaskList4, 
                                           graphData4.weightFunction);
-        sparseBenchmarkDense.run();
+        denseBenchmark.run();
         
         System.out.println("***************************************");
     }

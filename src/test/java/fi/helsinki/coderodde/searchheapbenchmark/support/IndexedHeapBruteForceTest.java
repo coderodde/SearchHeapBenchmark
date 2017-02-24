@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class IndexedHeapBruteForceTest {
     
-    private static final int OPERATIONS_PER_HEAP = 2_000_000;
+    private static final int OPERATIONS_PER_HEAP = 500_000;
     
     // This test can fail in principle:
     // Suppose we have input element/priority tuples (1, 10), (2, 10), (3, 10)
@@ -19,7 +19,7 @@ public class IndexedHeapBruteForceTest {
     public void test() {
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
-        System.out.println("IndexedHeapCorrectnessTest seed = " + seed);
+        System.out.println("IndexedHeapBruteForceTest, seed = " + seed);
         List<HeapTask> heapTaskList = getRandomHeapTaskList(OPERATIONS_PER_HEAP,
                                                             random);
         

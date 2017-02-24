@@ -5,10 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * This class implements a van Emde Boas tree -based map that maps integer keys
@@ -290,7 +287,13 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
                 Integer firstCluster = summary.getMinimumKey();
                 x = index(firstCluster, cluster[firstCluster].getMinimumKey());
                 min = x;
-                minValue = cluster[firstCluster].get(low(x));
+                
+                if (min.equals(max)) {
+                    minValue = maxValue;
+                } else {
+                    minValue = cluster[firstCluster].get(low(x));
+                }
+                    
                 cluster[high(x)].treeDelete(low(x));
             } else {
                 returnValue = cluster[high(x)].treeDelete(low(x));

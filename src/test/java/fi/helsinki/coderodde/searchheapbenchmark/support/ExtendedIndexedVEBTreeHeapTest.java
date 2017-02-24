@@ -68,8 +68,8 @@ public class ExtendedIndexedVEBTreeHeapTest {
         Weight<Integer> weight = new IntegerWeight();
         
         while (true) {
-//            long seed = 1487852368776L; //System.currentTimeMillis();
-            long seed = 1487856892778L; //System.currentTimeMillis();
+//            long seed = 1487856892778L; //System.currentTimeMillis();
+            long seed = 1487942488716L; // System.currentTimeMillis();
             Random random = new Random(seed);
             GraphData graphData = 
                     createRandomIntegerWeightGraph(SEARCH_GRAPH_NODES,
@@ -109,8 +109,33 @@ public class ExtendedIndexedVEBTreeHeapTest {
                 System.out.println(
                         targetPath + ": cost = " + targetPathLength);
                 return;
-            }
+            } 
         }
+    }
+    
+    @Test
+    public void testFindBadCase() {
+        IndexedVanEmdeBoasTreeHeap<Integer> heap = 
+                new IndexedVanEmdeBoasTreeHeap<>(32);
+        
+        heap.add(2, 0);
+        
+        heap.extractMinimum(); // 2
+        heap.add(1, 1);
+        heap.add(3, 1);
+        heap.add(4, 4);
+        
+        heap.extractMinimum(); // 3
+        heap.add(0, 4);
+        heap.decreasePriority(4, 1);
+        heap.add(5, 1);
+        
+        heap.extractMinimum(); // 5
+        
+        heap.extractMinimum(); // 4
+        
+        heap.extractMinimum(); // 1
+        System.out.println("Removed: " + heap.extractMinimum());
     }
     
     private static GraphData createRandomIntegerWeightGraph(int nodes,
