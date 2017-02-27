@@ -3,7 +3,10 @@ package fi.helsinki.coderodde.searchheapbenchmark.support;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 
 public final class BTreeMap<K extends Comparable<? super K>, V> 
         implements Map<K, V> {
@@ -330,123 +333,153 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         
         return index;
     }
-    
-//    private void bTreeDeleteKeyShit(BTreeNode<K> x, K key) {
-//        if (!x.isLeaf()) {
-//            BTreeNode<K> y = precedingChild(x);
-//            BTreeNode<K> z = successorChild(x);
-//            
-//            if (y.size > minimumDegree - 1) {
-//                K keyPrime = findPredecessorKey(key, x);
-//                moveKey(keyPrime, y, x);
-//                moveKey(key, x, z);
-//                bTreeDeleteKey(z, key);
-//            } else if (z.size > minimumDegree - 1) {
-//                K keyPrime = findSuccessorKey(key, x);
-//                moveKey(keyPrime, z, x);
-//                moveKey(key, x, y);
-//                bTreeDeleteKey(y, key);
-//            } else {
-//                moveKey(key, x, y);
-//                mergeNodes(y, z);
-//                bTreeDeleteKey(y, key);
-//            }
-//        } else {
-//            BTreeNode<K> y = precedingChild(x);
-//            BTreeNode<K> z = successorChild(x);
-//            BTreeNode<K> w = x.children[0];
-//            K v = x.keys[0];
-//            
-//            if (x.size > minimumDegree - 1) {
-//                removeKey(key, x);
-//            } else if (y.size > minimumDegree - 1) {
-//                K keyPrime = findPredecessorKey(v, w);
-//                moveKey(keyPrime, y, w);
-//                keyPrime = findSuccessorKey(v, w);
-//                moveKey(keyPrime, w, x);
-//                bTreeDeleteKey(x, key);
-//            } else if (w.size > minimumDegree - 1) {
-//                K keyPrime = findSuccessorKey(v, w);
-//                moveKey(keyPrime, z, w);
-//                keyPrime = findPredecessorKey(v, w);
-//                moveKey(keyPrime, w, x);
-//                bTreeDeleteKey(x, key);
-//            } else {
-//                BTreeNode<K> s = findSibling(w);
-//                BTreeNode<K> wPrime = w.children[0];
-//                
-//                if (wPrime.size == minimumDegree - 1) {
-//                    mergeNodes(wPrime, w);
-//                    mergeNodes(w, s);
-//                    bTreeDeleteKey(x, key);
-//                } else {
-//                    moveKey(v, w, x);
-//                    bTreeDeleteKey(x, key);
-//                }
-//            }
-//        }
-//    }
-    
-//    private BTreeNode<K> findSibling(BTreeNode<K> x) {
-//        return null;
-//    }
-//    
-//    private void removeKey(K key, BTreeNode<K> x) {
-//        int i = 0;
-//        
-//        while (i < x.size && x.keys[i].compareTo(key) != 0) {
-//            ++i;
-//        }
-//        
-//        ++i;
-//        
-//        while (i < x.size) {
-//            x.keys[i - 1] = x.keys[i];
-//            x.children[i] = x.children[i + 1];
-//        }
-//        
-//        x.children[x.size] = null;
-//        x.size--;
-//        x.keys[x.size] = null;
-//    }
-//    
-//    private void mergeNodes(BTreeNode<K> y, BTreeNode<K> z) {
-//        
-//    }
-//    
-//    private K findPredecessorKey(K key, BTreeNode<K> x) {
-//        int i = 0;
-//        
-//        while (i < x.size && x.keys[i].compareTo(key) != 0) {
-//            ++i;
-//        }
-//        
-//        return x.keys[i - 1];
-//    }
-//    
-//    private K findSuccessorKey(K key, BTreeNode<K> x) {
-//        int i = 0;
-//        
-//        while (i < x.size && x.keys[i].compareTo(key) != 0) {
-//            ++i;
-//        }
-//        
-//        return x.keys[i + 1];
-//    }
-//    
-//    private BTreeNode<K> precedingChild(BTreeNode<K> x) {
-//        int i = 0;
-//        
-////        while (i < x.size && x.keys[i].compareTo(key))
-//        
-//        return null;
-//    }
-//    
-//    private BTreeNode<K> successorChild(BTreeNode<K> x) {
-//        return null;
-//    }
-//    
-//    private void moveKey(K key, BTreeNode<K> y, BTreeNode<K> z) {
-//        
-//    }
+        
+    public static void main(String[] args) {
+        final int MINIMUM_DEGREE = 32;
+        final int UNIVERSE_SIZE = 30_000;
+        final int LOAD_SIZE = 2_000_000;
+        final int QUERY_SIZE = 1_000_000;
+        final int DELETE_SIZE = 1_000_000;
+
+        Map<Integer, Integer> tree1 = new BTreeMap<>(MINIMUM_DEGREE);
+        Map<Integer, Integer> tree2 = new TreeMap<>();
+
+        Random random = new Random();
+
+        // Warmup:
+        for (int i = 0; i < LOAD_SIZE; ++i) {
+            int key = random.nextInt(UNIVERSE_SIZE);
+            tree1.put(key, 3 * key);
+            tree2.put(key, 3 * key);
+        }
+
+        for (int i = 0; i < QUERY_SIZE; ++i) {
+            int key = random.nextInt(UNIVERSE_SIZE);
+
+            if (!Objects.equals(tree1.get(key), tree2.get(key))) {
+                throw new IllegalStateException(
+                        "Trees do not agree during warmup.");
+            }
+        }
+
+        for (int i = 0; i < DELETE_SIZE; ++i) {
+            int key = random.nextInt(UNIVERSE_SIZE);
+
+            if (!Objects.equals(tree1.remove(key), tree2.remove(key))) {
+                throw new IllegalStateException(
+                        "Trees do not agree during warmup.");
+            }
+        }
+
+        if (tree1.size() != tree2.size()) {
+            throw new IllegalStateException("Size mismatch after warmup.");
+        }
+
+        // Benchmark:
+        long seed = System.currentTimeMillis();
+        System.out.println("Seed = " + seed);
+
+        Random random1 = new Random(seed);
+        Random random2 = new Random(seed);
+
+        long totalTime1 = 0L;
+        long totalTime2 = 0L;
+
+        ///// VanEmdeBoasTreeMap /////
+        long startTime = System.currentTimeMillis();
+
+        tree1 = new VanEmdeBoasTreeMap<>(UNIVERSE_SIZE);
+
+        for (int i = 0; i < LOAD_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree1.put(key, 3 * key);
+        }
+
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("BTreeMap.put in " + 
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime1 += endTime - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < QUERY_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree1.get(key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("BTreeMap.get in " +
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime1 += endTime - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < DELETE_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree1.remove(key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("BTreeMap.remove in " +
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime1 += endTime - startTime;
+
+        System.out.println("BTreeMap total time: " + totalTime1 +
+                " milliseconds.");
+        System.out.println();
+
+        ///// TreeMap /////
+        startTime = System.currentTimeMillis();
+
+        tree2 = new TreeMap<>();
+
+        for (int i = 0; i < LOAD_SIZE; ++i) {
+            int key = random2.nextInt(UNIVERSE_SIZE);
+            tree2.put(key, 3 * key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("TreeMap.put in " + 
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime2 += endTime - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < QUERY_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree2.get(key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("TreeMap.get in " +
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime2 += endTime - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < DELETE_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree2.remove(key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("TreeMap.remove in " +
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime2 += endTime - startTime;
+
+        System.out.println("TreeMap total time: " + totalTime2 +
+                " milliseconds.");
+    }
 }
