@@ -5,7 +5,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * This class implements a van Emde Boas tree -based map that maps integer keys
@@ -455,5 +458,153 @@ public class VanEmdeBoasTreeMap<E> implements Map<Integer, E> {
     private static int lowerSquare(int number) {
         double exponent = Math.floor(Math.log(number) / Math.log(2.0) / 2.0);
         return (int) Math.pow(2.0, exponent);
+    }
+    
+    public static void main(String[] args) {
+        final int UNIVERSE_SIZE = 30_000;
+        final int LOAD_SIZE = 2_000_000;
+        final int QUERY_SIZE = 1_000_000;
+        final int DELETE_SIZE = 1_000_000;
+
+        Map<Integer, Integer> tree1 = new VanEmdeBoasTreeMap<>(UNIVERSE_SIZE);
+        Map<Integer, Integer> tree2 = new TreeMap<>();
+
+        Random random = new Random();
+
+        // Warmup:
+        for (int i = 0; i < LOAD_SIZE; ++i) {
+            int key = random.nextInt(UNIVERSE_SIZE);
+            tree1.put(key, 3 * key);
+            tree2.put(key, 3 * key);
+        }
+
+        for (int i = 0; i < QUERY_SIZE; ++i) {
+            int key = random.nextInt(UNIVERSE_SIZE);
+
+            if (!Objects.equals(tree1.get(key), tree2.get(key))) {
+                throw new IllegalStateException(
+                        "Trees do not agree during warmup.");
+            }
+        }
+
+        for (int i = 0; i < DELETE_SIZE; ++i) {
+            int key = random.nextInt(UNIVERSE_SIZE);
+
+            if (!Objects.equals(tree1.remove(key), tree2.remove(key))) {
+                throw new IllegalStateException(
+                        "Trees do not agree during warmup.");
+            }
+        }
+
+        if (tree1.size() != tree2.size()) {
+            throw new IllegalStateException("Size mismatch after warmup.");
+        }
+
+        // Benchmark:
+        long seed = System.currentTimeMillis();
+        System.out.println("Seed = " + seed);
+
+        Random random1 = new Random(seed);
+        Random random2 = new Random(seed);
+
+        long totalTime1 = 0L;
+        long totalTime2 = 0L;
+
+        ///// VanEmdeBoasTreeMap /////
+        long startTime = System.currentTimeMillis();
+
+        tree1 = new VanEmdeBoasTreeMap<>(UNIVERSE_SIZE);
+
+        for (int i = 0; i < LOAD_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree1.put(key, 3 * key);
+        }
+
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("VanEmdeBoasTreeMap.put in " + 
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime1 += endTime - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < QUERY_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree1.get(key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("VanEmdeBoasTreeMap.get in " +
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime1 += endTime - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < DELETE_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree1.remove(key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("VanEmdeBoasTreeMap.remove in " +
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime1 += endTime - startTime;
+
+        System.out.println("VanEmdeBoasTreeMap total time: " + totalTime1 +
+                " milliseconds.");
+        System.out.println();
+
+        ///// TreeMap /////
+        startTime = System.currentTimeMillis();
+
+        tree2 = new TreeMap<>();
+
+        for (int i = 0; i < LOAD_SIZE; ++i) {
+            int key = random2.nextInt(UNIVERSE_SIZE);
+            tree2.put(key, 3 * key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("TreeMap.put in " + 
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime2 += endTime - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < QUERY_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree2.get(key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("TreeMap.get in " +
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime2 += endTime - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < DELETE_SIZE; ++i) {
+            int key = random1.nextInt(UNIVERSE_SIZE);
+            tree2.remove(key);
+        }
+
+        endTime = System.currentTimeMillis();
+
+        System.out.println("TreeMap.remove in " +
+                (endTime - startTime) + " milliseconds.");
+
+        totalTime2 += endTime - startTime;
+
+        System.out.println("TreeMap total time: " + totalTime2 +
+                " milliseconds.");
     }
 }

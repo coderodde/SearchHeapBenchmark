@@ -58,7 +58,7 @@ public class ExtendedIndexedVEBTreeHeapTest {
     private static final int SEARCH_GRAPH_ARCS = 10;
     private static final int SEARCH_GRAPH_MAX_WEIGHT = 4;
     
-    @Test
+//    @Test
     public void findFailingCase() {
         PathFinder<Integer> finder;
         DirectedGraphWeightFunction<Integer> weightFunction;

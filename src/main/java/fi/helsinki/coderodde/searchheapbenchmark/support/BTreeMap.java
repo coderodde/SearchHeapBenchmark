@@ -13,7 +13,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
      */
     private static final int MINIMUM_DEGREE = 2;
     
-    private static final class BTreeNode<K> {
+    private static final class BTreeNode<K extends Comparable<? super K>> {
         
         /**
          * The number of key/value pairs in this B-tree node.
@@ -31,7 +31,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         BTreeNode<K>[] children;
         
         BTreeNode(int minimumDegree) {
-            this.keys = (K[]) new Object[2 * minimumDegree - 1];
+            this.keys = (K[]) new Comparable[2 * minimumDegree - 1];
         }
         
         void makeInternal() {
@@ -72,7 +72,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
     @Override
     public boolean containsKey(Object key) {
-        return map.containsKey(key);
+        return bTreeSearch(root, (K) key);
+//        return map.containsKey(key);
     }
 
     @Override
@@ -88,11 +89,22 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
     @Override
     public V put(K key, V value) {
+        if (map.containsKey(key)) {
+            return map.put(key, value);
+        }
+        
+        bTreeInsert(key);
+        map.put(key, value);
         return null;
     }
 
     @Override
     public V remove(Object key) {
+        if (map.containsKey((K) key)) {
+            // Remove from B-tree.
+            return map.remove(key);
+        }
+        
         return null;
     }
 
@@ -124,6 +136,22 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
     public Set<Entry<K, V>> entrySet() {
         throw new UnsupportedOperationException(
                 "This BTreeMap does not support entrySet.");
+    }
+    
+    private boolean bTreeSearch(BTreeNode<K> x, K key) {
+        int i = 0;
+        
+        while (i < x.size && key.compareTo(x.keys[i]) > 0) {
+            ++i;
+        }
+        
+        if (i < x.size && key.equals(x.keys[i])) {
+            return true;
+        } else if (x.isLeaf()) {
+            return false;
+        } else {
+            return bTreeSearch(x.children[i], key);
+        }
     }
     
     private void bTreeInsert(K key) {
@@ -186,7 +214,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                 i--;
             }
             
-            x.keys[i] = k;
+            x.keys[i + 1] = k;
             x.size++;
         } else {
             while (i >= 0 && k.compareTo(x.keys[i]) < 0) {
