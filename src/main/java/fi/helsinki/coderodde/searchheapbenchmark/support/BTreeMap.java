@@ -102,6 +102,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
     public V remove(Object key) {
         if (map.containsKey((K) key)) {
             // Remove from B-tree.
+            bTreeDeleteKey(root, (K) key);
             return map.remove(key);
         }
         
@@ -234,4 +235,218 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             bTreeInsertNonfull(x.children[i], k);
         }
     }
+    
+    private void bTreeDeleteKey(BTreeNode<K> node, K key) {
+        int keyIndex = findKeyIndex(node, key);
+        
+        if (node.isLeaf()) {
+            removeFromLeafNode(node, keyIndex);
+        } else {
+            removeFromInternalNode(node, keyIndex);
+        }
+    }
+        
+    private void removeFromInternalNode(BTreeNode<K> node, int keyIndex) {
+        K key = node.keys[keyIndex];
+        
+        if (node.children[keyIndex].size >= minimumDegree) {
+            K predecessorKey = getPredecessorKey(node, keyIndex);
+            node.keys[keyIndex] = predecessorKey;
+            bTreeDeleteKey(node.children[keyIndex], predecessorKey);
+        } else if (node.children[keyIndex + 1].size >= minimumDegree) {
+            K successorKey = getSuccessorKey(node, keyIndex);
+            node.keys[keyIndex] = successorKey;
+            bTreeDeleteKey(node.children[keyIndex + 1], successorKey);
+        } else {
+            merge(node, keyIndex);
+            bTreeDeleteKey(node.children[keyIndex], key);
+        }
+    }
+        
+    private void merge(BTreeNode<K> node, int keyIndex) {
+        BTreeNode<K> child = node.children[keyIndex];
+        BTreeNode<K> sibling = node.children[keyIndex + 1];
+        
+        child.keys[minimumDegree - 1] = node.keys[keyIndex];
+        
+        for (int i = 0; i != sibling.size; ++i) {
+            child.keys[i + minimumDegree] = sibling.keys[i];
+        }
+        
+        if (!child.isLeaf()) {
+            for (int i = 0; i <= sibling.size; ++i) {
+                child.children[i + minimumDegree] = sibling.children[i];
+            }
+        }
+        
+        for (int i = keyIndex + 1; i != node.size; ++i) {
+            node.keys[i - 1] = node.keys[i];
+        }
+        
+        for (int i = keyIndex + 2; i <= node.size; ++i) {
+            node.children[i - 1] = node.children[i];
+        }
+        
+        child.size += sibling.size + 1;
+        node.size--;
+    }
+        
+    private static <K extends Comparable<? super K>>
+        void removeFromLeafNode(BTreeNode<K> node, int keyIndex) {
+        for (int i = keyIndex + 1; i != node.size; ++i) {
+            node.keys[i - 1] = node.keys[i];
+        }
+        
+        node.size--;
+    }
+        
+    private K getPredecessorKey(BTreeNode<K> node, int keyIndex) {
+        BTreeNode<K> currentNode = node.children[keyIndex];
+        
+        while (!currentNode.isLeaf()) {
+            currentNode = currentNode.children[currentNode.size];
+        }
+        
+        return currentNode.keys[currentNode.size - 1];
+    }
+        
+    private K getSuccessorKey(BTreeNode<K> node, int keyIndex) {
+        BTreeNode<K> currentNode = node.children[keyIndex + 1];
+        
+        while (!currentNode.isLeaf()) {
+            currentNode = currentNode.children[0];
+        }
+        
+        return currentNode.keys[0];
+    }
+    
+    private static <K extends Comparable<? super K>> 
+        int findKeyIndex(BTreeNode<K> node, K key) {
+        int index = 0;
+        
+        while (index < node.size && node.keys[index].compareTo(key) != 0) {
+            ++index;
+        }
+        
+        return index;
+    }
+    
+//    private void bTreeDeleteKeyShit(BTreeNode<K> x, K key) {
+//        if (!x.isLeaf()) {
+//            BTreeNode<K> y = precedingChild(x);
+//            BTreeNode<K> z = successorChild(x);
+//            
+//            if (y.size > minimumDegree - 1) {
+//                K keyPrime = findPredecessorKey(key, x);
+//                moveKey(keyPrime, y, x);
+//                moveKey(key, x, z);
+//                bTreeDeleteKey(z, key);
+//            } else if (z.size > minimumDegree - 1) {
+//                K keyPrime = findSuccessorKey(key, x);
+//                moveKey(keyPrime, z, x);
+//                moveKey(key, x, y);
+//                bTreeDeleteKey(y, key);
+//            } else {
+//                moveKey(key, x, y);
+//                mergeNodes(y, z);
+//                bTreeDeleteKey(y, key);
+//            }
+//        } else {
+//            BTreeNode<K> y = precedingChild(x);
+//            BTreeNode<K> z = successorChild(x);
+//            BTreeNode<K> w = x.children[0];
+//            K v = x.keys[0];
+//            
+//            if (x.size > minimumDegree - 1) {
+//                removeKey(key, x);
+//            } else if (y.size > minimumDegree - 1) {
+//                K keyPrime = findPredecessorKey(v, w);
+//                moveKey(keyPrime, y, w);
+//                keyPrime = findSuccessorKey(v, w);
+//                moveKey(keyPrime, w, x);
+//                bTreeDeleteKey(x, key);
+//            } else if (w.size > minimumDegree - 1) {
+//                K keyPrime = findSuccessorKey(v, w);
+//                moveKey(keyPrime, z, w);
+//                keyPrime = findPredecessorKey(v, w);
+//                moveKey(keyPrime, w, x);
+//                bTreeDeleteKey(x, key);
+//            } else {
+//                BTreeNode<K> s = findSibling(w);
+//                BTreeNode<K> wPrime = w.children[0];
+//                
+//                if (wPrime.size == minimumDegree - 1) {
+//                    mergeNodes(wPrime, w);
+//                    mergeNodes(w, s);
+//                    bTreeDeleteKey(x, key);
+//                } else {
+//                    moveKey(v, w, x);
+//                    bTreeDeleteKey(x, key);
+//                }
+//            }
+//        }
+//    }
+    
+//    private BTreeNode<K> findSibling(BTreeNode<K> x) {
+//        return null;
+//    }
+//    
+//    private void removeKey(K key, BTreeNode<K> x) {
+//        int i = 0;
+//        
+//        while (i < x.size && x.keys[i].compareTo(key) != 0) {
+//            ++i;
+//        }
+//        
+//        ++i;
+//        
+//        while (i < x.size) {
+//            x.keys[i - 1] = x.keys[i];
+//            x.children[i] = x.children[i + 1];
+//        }
+//        
+//        x.children[x.size] = null;
+//        x.size--;
+//        x.keys[x.size] = null;
+//    }
+//    
+//    private void mergeNodes(BTreeNode<K> y, BTreeNode<K> z) {
+//        
+//    }
+//    
+//    private K findPredecessorKey(K key, BTreeNode<K> x) {
+//        int i = 0;
+//        
+//        while (i < x.size && x.keys[i].compareTo(key) != 0) {
+//            ++i;
+//        }
+//        
+//        return x.keys[i - 1];
+//    }
+//    
+//    private K findSuccessorKey(K key, BTreeNode<K> x) {
+//        int i = 0;
+//        
+//        while (i < x.size && x.keys[i].compareTo(key) != 0) {
+//            ++i;
+//        }
+//        
+//        return x.keys[i + 1];
+//    }
+//    
+//    private BTreeNode<K> precedingChild(BTreeNode<K> x) {
+//        int i = 0;
+//        
+////        while (i < x.size && x.keys[i].compareTo(key))
+//        
+//        return null;
+//    }
+//    
+//    private BTreeNode<K> successorChild(BTreeNode<K> x) {
+//        return null;
+//    }
+//    
+//    private void moveKey(K key, BTreeNode<K> y, BTreeNode<K> z) {
+//        
+//    }
 }

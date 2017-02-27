@@ -36,7 +36,7 @@ public class BTreeMapTest {
         }
     }
 
-//    @Test
+    @Test
     public void testContains() {
         assertFalse(map.containsKey(2));
         assertFalse(map.containsKey(6));
@@ -71,7 +71,7 @@ public class BTreeMapTest {
         assertFalse(map.containsKey(6));
     }
     
-//    @Test
+    @Test
     public void testDelete() {
         int sz = 0;
         
@@ -127,7 +127,7 @@ public class BTreeMapTest {
         assertEquals(0, map.size());
     }
     
-//    @Test
+    @Test
     public void testDeleteNodeWithTwoChildren() {
         map.put(2, 4);
         map.put(1, 2);
@@ -138,7 +138,7 @@ public class BTreeMapTest {
     
     @Test
     public void bruteForceTest() {
-        final int UNIVERSE_SIZE = 1000;
+        final int UNIVERSE_SIZE = 5_000;
         final int ITERATIONS = 20_000;
         
         long seed = System.currentTimeMillis();
@@ -160,10 +160,10 @@ public class BTreeMapTest {
                 assertEquals(treeMap.get(key), map.get(key));
             } else {
                 if (treeMap.isEmpty()) {
-//                    assertTrue(map.isEmpty());
+                    assertTrue(map.isEmpty());
                 } else {
-//                    int key = random.nextInt(UNIVERSE_SIZE);
-//                    assertEquals(treeMap.remove(key), map.remove(key));
+                    int key = random.nextInt(UNIVERSE_SIZE);
+                    assertEquals(treeMap.remove(key), map.remove(key));
                 }
             }
         }
