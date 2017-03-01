@@ -33,7 +33,10 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
          */
         BTreeNode<K>[] children;
         
+        final int minimumDegree;
+        
         BTreeNode(int minimumDegree) {
+            this.minimumDegree = minimumDegree;
             this.keys = (K[]) new Comparable[2 * minimumDegree - 1];
         }
         
@@ -43,6 +46,191 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         
         boolean isLeaf() {
             return children == null;
+        }
+        
+        void splitChild(BTreeNode<K> y, int i) {
+            BTreeNode<K> z = new BTreeNode<>(minimumDegree);
+            z.size = minimumDegree - 1;
+            
+            for (int j = 0; j < minimumDegree - 1; ++j) {
+                z.keys[j] = y.keys[j + minimumDegree];
+            }
+            
+            if (!y.isLeaf()) {
+                for (int j = 0; j < minimumDegree; ++j) {
+                    z.children[j] = y.children[j + minimumDegree];
+                }
+            }
+            
+            y.size = minimumDegree - 1;
+            
+            for (int j = size; j >= i + 1; --j) {
+                children[j + 1] = children[j];
+            }
+            
+            children[i + 1] = z;
+            
+            for (int j = size - 1; j >= i; --j) {
+                keys[j + 1] = keys[j];
+            }
+            
+            keys[i] = y.keys[minimumDegree - 1];
+            size++;
+        }
+        
+        int findKeyIndex(K k) {
+            int keyIndex = 0;
+            
+            while (keyIndex < size && keys[keyIndex].compareTo(k) < 0) {
+                ++keyIndex;
+            }
+            
+            return keyIndex;
+        }
+        
+        void deleteKey(K k) {
+            int keyIndex = findKeyIndex(k);
+            
+            if (isLeaf()) {
+                removeFromLeaf(keyIndex);
+            } else {
+                removeFromNonLeaf(keyIndex);
+            }
+        }
+        
+        void removeFromNonLeaf(int keyIndex) {
+            K k = keys[keyIndex];
+            
+            if (children[keyIndex].size >= minimumDegree) {
+                K predecessorKey = getPredecessorKey(keyIndex);
+                keys[keyIndex] = predecessorKey;
+                children[keyIndex].deleteKey(predecessorKey);
+            } else if (children[keyIndex + 1].size >= minimumDegree) {
+                K successorKey = getSuccessorKey(keyIndex);
+                keys[keyIndex] = successorKey;
+                children[keyIndex + 1].deleteKey(successorKey);
+            } else {
+                merge(keyIndex);
+                children[keyIndex].deleteKey(k);
+            }
+        }
+        
+        void merge(int keyIndex) {
+            BTreeNode<K> child = children[keyIndex];
+            BTreeNode<K> sibling = children[keyIndex + 1];
+            
+            child.keys[minimumDegree - 1] = keys[keyIndex];
+            
+            for (int i = 0; i < sibling.size; ++i) {
+                child.keys[i + minimumDegree] = sibling.keys[i];
+            }
+             
+            if (!child.isLeaf()) {
+                for (int i = 0; i <= sibling.size; ++i) {
+                    child.children[i + minimumDegree] = sibling.children[i];
+                }
+            }
+            
+            for (int i = keyIndex + 1; i < size; ++i) {
+                keys[i - 1] = keys[i];
+            }
+            
+            for (int i = keyIndex + 2; i <= size; ++i) {
+                children[i - 1] = children[i];
+            }
+            
+            size--;
+        }
+        
+        K getPredecessorKey(int keyIndex) {
+            BTreeNode<K> current = children[keyIndex];
+            
+            while (!current.isLeaf()) {
+                current = current.children[current.size];
+            }
+            
+            return current.keys[current.size - 1];
+        }
+        
+        K getSuccessorKey(int keyIndex) {
+            BTreeNode<K> current = children[keyIndex + 1];
+            
+            while (!current.isLeaf()) {
+                current = current.children[0];
+            }
+            
+            return current.keys[0];
+        }
+        
+        void removeFromLeaf(int keyIndex) {
+            for (int i = keyIndex + 1; i < size; ++i) {
+                keys[i - 1] = keys[i];
+            }
+            
+            size--;
+        }
+        
+        void insertNonFull(K k) {
+            int i = size - 1;
+            
+            if (isLeaf()) {
+                while (i >= 0 && keys[i].compareTo(k) > 0) {
+                    keys[i + 1] = keys[i];
+                    --i;
+                }
+                
+                keys[i + 1] = k;
+                size++;
+            } else {
+                while (i >= 0 && keys[i].compareTo(k) > 0) {
+                    --i;
+                }
+                
+                if (children[i + 1].size == 2 * minimumDegree - 1) {
+                    splitChild(i + 1, children[i + 1]);
+                    
+                    if (keys[i + 1].compareTo(k) < 0) {
+                        ++i;
+                    }
+                }
+                
+                children[i + 1].insertNonFull(k);
+            }
+        } 
+        
+        void splitChild(int i, BTreeNode<K> y) {
+            BTreeNode<K> z = new BTreeNode<>(minimumDegree);
+            
+            if (!y.isLeaf()) {
+                z.makeInternal();
+            }
+            
+            z.size = minimumDegree - 1;
+            
+            for (int j = 0; j < minimumDegree - 1; ++j) {
+                z.keys[j] = y.keys[j + minimumDegree];
+            }
+            
+            if (!y.isLeaf()) {
+                for (int j = 0; j < minimumDegree; ++j) {
+                    z.children[j] = y.children[j + minimumDegree];
+                }
+            }
+            
+            y.size = minimumDegree - 1;
+            
+            for (int j = size; j >= i + 1; --j) {
+                children[j + 1] = children[j];
+            }
+            
+            children[i + 1] = z;
+            
+            for (int j = size - 1; j >= i; --j) {
+                keys[j + 1] = keys[j];
+            }
+            
+            keys[i] = y.keys[minimumDegree - 1];
+            size++;
         }
     }
     
@@ -105,7 +293,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
     public V remove(Object key) {
         if (map.containsKey((K) key)) {
             // Remove from B-tree.
-            bTreeDeleteKey(root, (K) key);
+            root.deleteKey((K) key);
+//            bTreeDeleteKey(root, (K) key);
             return map.remove(key);
         }
         
@@ -159,54 +348,96 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
     }
     
     private void bTreeInsert(K key) {
-        BTreeNode<K> r = root;
-        
-        if (r.size == 2 * minimumDegree - 1) {
+        if (root.size == 2 * minimumDegree - 1) {
             BTreeNode<K> s = new BTreeNode<>(minimumDegree);
-            root = s;
             s.makeInternal();
-            s.children[0] = r;
-            bTreeSplitChild(s, 0);
-            bTreeInsertNonfull(s, key);
+            
+            s.children[0] = root;
+            s.splitChild(0, root);
+            
+            int i = 0;
+            
+            if (s.keys[0].compareTo(key) < 0) {
+                s.children[i].insertNonFull(key);
+            }
+            
+            s.children[i].insertNonFull(key);
         } else {
-            bTreeInsertNonfull(r, key);
+            root.insertNonFull(key);
         }
+        
+//        BTreeNode<K> r = root;
+//        
+//        if (r.size == 2 * minimumDegree - 1) {
+//            BTreeNode<K> s = new BTreeNode<>(minimumDegree);
+//            root = s;
+//            s.makeInternal();
+//            s.children[0] = r;
+//            bTreeSplitChild(s, 0);
+//            bTreeInsertNonfull(s, key);
+//        } else {
+//            bTreeInsertNonfull(r, key);
+//        }
     }
     
-    private void bTreeSplitChild(BTreeNode<K> x, int i) {
-        BTreeNode<K> z = new BTreeNode<>(minimumDegree);
-        BTreeNode<K> y = x.children[i];
+    private void bTreeSplitChild(BTreeNode<K> y, int i) {
+//        BTreeNode<K> z = new BTreeNode<>(minimumDegree);
+//        
+//        if (!y.isLeaf()) {
+//            z.makeInternal();
+//        }
+//        
+//        z.size = minimumDegree - 1;
+//        
+//        for (int j = 0; j < minimumDegree - 1; ++j) {
+//            z.keys[j] = y.keys[j + minimumDegree];
+//        }
+//        
+//        if (!y.isLeaf()) {
+//            for (int j = 0; j < minimumDegree; ++j) {
+//                z.children[j] = y.children[j + minimumDegree];
+//            }
+//        }
+//        
+//        y.size = minimumDegree - 1;
+//        
+//        for (int j = y.size; j >= i + 1; --j) {
+//            
+//        }
         
-        if (!y.isLeaf()) {
-            z.makeInternal();
-        }
-        
-        z.size = minimumDegree - 1;
-        
-        for (int j = 0; j < minimumDegree - 1; ++j) {
-            z.keys[j] = y.keys[j + minimumDegree];
-        }
-        
-        if (!y.isLeaf()) {
-            for (int j = 0; j < minimumDegree; ++j) {
-                z.children[j] = y.children[j + minimumDegree];
-            }
-        }
-        
-        y.size = minimumDegree - 1;
-        
-        for (int j = x.size;  j >= i; --j) {
-            x.children[j + 1] = x.children[j];
-        }
-        
-        x.children[i] = z;
-        
-        for (int j = x.size - 1; j >= i - 1; --j) {
-            x.keys[j + 1] = x.keys[j];
-        }
-        
-        x.keys[i - 1] = y.keys[minimumDegree - 1];
-        x.size++;
+//        BTreeNode<K> z = new BTreeNode<>(minimumDegree);
+//        BTreeNode<K> y = x.children[i];
+//        
+//        if (!y.isLeaf()) {
+//            z.makeInternal();
+//        }
+//        
+//        z.size = minimumDegree - 1;
+//        
+//        for (int j = 0; j < minimumDegree - 1; ++j) {
+//            z.keys[j] = y.keys[j + minimumDegree];
+//        }
+//        
+//        if (!y.isLeaf()) {
+//            for (int j = 0; j < minimumDegree; ++j) {
+//                z.children[j] = y.children[j + minimumDegree];
+//            }
+//        }
+//        
+//        y.size = minimumDegree - 1;
+//        
+//        for (int j = x.size;  j >= i; --j) {
+//            x.children[j + 1] = x.children[j];
+//        }
+//        
+//        x.children[i] = z; // i + 1 ?
+//        
+//        for (int j = x.size - 1; j >= i; --j) {
+//            x.keys[j + 1] = x.keys[j];
+//        }
+//        
+//        x.keys[i] = y.keys[minimumDegree];
+//        x.size++;
     }
     
     private void bTreeInsertNonfull(BTreeNode<K> x, K k) {
@@ -282,7 +513,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             }
         }
         
-        for (int i = keyIndex + 1; i != node.size; ++i) {
+        for (int i = keyIndex + 1; i < node.size; ++i) {
             node.keys[i - 1] = node.keys[i];
         }
         
