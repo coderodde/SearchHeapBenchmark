@@ -18,6 +18,11 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
      */
     private static final int MINIMUM_DEGREE = 2;
     
+    /**
+     * The minimum number of children of any non-root internal node.
+     */
+    private static final int DEFAULT_DEGREE = 32;
+    
     private static final class BTreeNode<K extends Comparable<? super K>> {
         
         /**
@@ -248,9 +253,13 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
     
     private final int minimumDegree;
     
-    public BTreeMap(int minimumDegree) {
-        this.minimumDegree = Math.max(minimumDegree, MINIMUM_DEGREE);
+    public BTreeMap(int degree) {
+        this.minimumDegree = Math.max(degree, MINIMUM_DEGREE);
         this.root = new BTreeNode(this.minimumDegree);
+    }
+    
+    public BTreeMap() {
+        this(DEFAULT_DEGREE);
     }
     
     @Override
