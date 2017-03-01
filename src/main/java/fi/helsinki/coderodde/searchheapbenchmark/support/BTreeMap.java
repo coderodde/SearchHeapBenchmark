@@ -1,8 +1,10 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
@@ -263,8 +265,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
     @Override
     public boolean containsKey(Object key) {
-        return bTreeSearch(root, (K) key);
-//        return map.containsKey(key);
+        return map.containsKey(key);
     }
 
     @Override
@@ -292,9 +293,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
     @Override
     public V remove(Object key) {
         if (map.containsKey((K) key)) {
-            // Remove from B-tree.
             root.deleteKey((K) key);
-//            bTreeDeleteKey(root, (K) key);
             return map.remove(key);
         }
         
@@ -331,19 +330,31 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                 "This BTreeMap does not support entrySet.");
     }
     
-    private boolean bTreeSearch(BTreeNode<K> x, K key) {
-        int i = 0;
+    public K getMaximumKey() {
+        checkBTreeMapNotEmpty();
+        BTreeNode<K> current = root;
         
-        while (i < x.size && key.compareTo(x.keys[i]) > 0) {
-            ++i;
+        while (!current.isLeaf()) {
+            current = current.children[current.size];
         }
         
-        if (i < x.size && key.equals(x.keys[i])) {
-            return true;
-        } else if (x.isLeaf()) {
-            return false;
-        } else {
-            return bTreeSearch(x.children[i], key);
+        return current.keys[current.size - 1];
+    }
+    
+    public K getMinimumKey() {
+        checkBTreeMapNotEmpty();
+        BTreeNode<K> current = root;
+        
+        while (!current.isLeaf()) {
+            current = current.children[0];
+        }
+        
+        return current.keys[0];
+    }
+    
+    private void checkBTreeMapNotEmpty() {
+        if (map.isEmpty()) {
+            throw new NoSuchElementException("This BTreeMap is empty.");
         }
     }
     
@@ -358,215 +369,23 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             int i = 0;
             
             if (s.keys[0].compareTo(key) < 0) {
-                s.children[i].insertNonFull(key);
+                ++i;
             }
             
             s.children[i].insertNonFull(key);
+            root = s;
         } else {
             root.insertNonFull(key);
         }
-        
-//        BTreeNode<K> r = root;
-//        
-//        if (r.size == 2 * minimumDegree - 1) {
-//            BTreeNode<K> s = new BTreeNode<>(minimumDegree);
-//            root = s;
-//            s.makeInternal();
-//            s.children[0] = r;
-//            bTreeSplitChild(s, 0);
-//            bTreeInsertNonfull(s, key);
-//        } else {
-//            bTreeInsertNonfull(r, key);
-//        }
-    }
-    
-    private void bTreeSplitChild(BTreeNode<K> y, int i) {
-//        BTreeNode<K> z = new BTreeNode<>(minimumDegree);
-//        
-//        if (!y.isLeaf()) {
-//            z.makeInternal();
-//        }
-//        
-//        z.size = minimumDegree - 1;
-//        
-//        for (int j = 0; j < minimumDegree - 1; ++j) {
-//            z.keys[j] = y.keys[j + minimumDegree];
-//        }
-//        
-//        if (!y.isLeaf()) {
-//            for (int j = 0; j < minimumDegree; ++j) {
-//                z.children[j] = y.children[j + minimumDegree];
-//            }
-//        }
-//        
-//        y.size = minimumDegree - 1;
-//        
-//        for (int j = y.size; j >= i + 1; --j) {
-//            
-//        }
-        
-//        BTreeNode<K> z = new BTreeNode<>(minimumDegree);
-//        BTreeNode<K> y = x.children[i];
-//        
-//        if (!y.isLeaf()) {
-//            z.makeInternal();
-//        }
-//        
-//        z.size = minimumDegree - 1;
-//        
-//        for (int j = 0; j < minimumDegree - 1; ++j) {
-//            z.keys[j] = y.keys[j + minimumDegree];
-//        }
-//        
-//        if (!y.isLeaf()) {
-//            for (int j = 0; j < minimumDegree; ++j) {
-//                z.children[j] = y.children[j + minimumDegree];
-//            }
-//        }
-//        
-//        y.size = minimumDegree - 1;
-//        
-//        for (int j = x.size;  j >= i; --j) {
-//            x.children[j + 1] = x.children[j];
-//        }
-//        
-//        x.children[i] = z; // i + 1 ?
-//        
-//        for (int j = x.size - 1; j >= i; --j) {
-//            x.keys[j + 1] = x.keys[j];
-//        }
-//        
-//        x.keys[i] = y.keys[minimumDegree];
-//        x.size++;
-    }
-    
-    private void bTreeInsertNonfull(BTreeNode<K> x, K k) {
-        int i = x.size - 1;
-        
-        if (x.isLeaf()) {
-            while (i >= 0 && k.compareTo(x.keys[i]) < 0) {
-                x.keys[i + 1] = x.keys[i];
-                i--;
-            }
-            
-            x.keys[i + 1] = k;
-            x.size++;
-        } else {
-            while (i >= 0 && k.compareTo(x.keys[i]) < 0) {
-                --i;
-            }
-            
-            ++i;
-            
-            if (x.children[i].size == 2 * minimumDegree - 1) {
-                bTreeSplitChild(x, i);
-                
-                if (k.compareTo(x.keys[i]) > 0) {
-                    ++i;
-                }
-            }
-            
-            bTreeInsertNonfull(x.children[i], k);
-        }
-    }
-    
-    private void bTreeDeleteKey(BTreeNode<K> node, K key) {
-        int keyIndex = findKeyIndex(node, key);
-        
-        if (node.isLeaf()) {
-            removeFromLeafNode(node, keyIndex);
-        } else {
-            removeFromInternalNode(node, keyIndex);
-        }
-    }
-        
-    private void removeFromInternalNode(BTreeNode<K> node, int keyIndex) {
-        K key = node.keys[keyIndex];
-        
-        if (node.children[keyIndex].size >= minimumDegree) {
-            K predecessorKey = getPredecessorKey(node, keyIndex);
-            node.keys[keyIndex] = predecessorKey;
-            bTreeDeleteKey(node.children[keyIndex], predecessorKey);
-        } else if (node.children[keyIndex + 1].size >= minimumDegree) {
-            K successorKey = getSuccessorKey(node, keyIndex);
-            node.keys[keyIndex] = successorKey;
-            bTreeDeleteKey(node.children[keyIndex + 1], successorKey);
-        } else {
-            merge(node, keyIndex);
-            bTreeDeleteKey(node.children[keyIndex], key);
-        }
-    }
-        
-    private void merge(BTreeNode<K> node, int keyIndex) {
-        BTreeNode<K> child = node.children[keyIndex];
-        BTreeNode<K> sibling = node.children[keyIndex + 1];
-        
-        child.keys[minimumDegree - 1] = node.keys[keyIndex];
-        
-        for (int i = 0; i != sibling.size; ++i) {
-            child.keys[i + minimumDegree] = sibling.keys[i];
-        }
-        
-        if (!child.isLeaf()) {
-            for (int i = 0; i <= sibling.size; ++i) {
-                child.children[i + minimumDegree] = sibling.children[i];
-            }
-        }
-        
-        for (int i = keyIndex + 1; i < node.size; ++i) {
-            node.keys[i - 1] = node.keys[i];
-        }
-        
-        for (int i = keyIndex + 2; i <= node.size; ++i) {
-            node.children[i - 1] = node.children[i];
-        }
-        
-        child.size += sibling.size + 1;
-        node.size--;
-    }
-        
-    private static <K extends Comparable<? super K>>
-        void removeFromLeafNode(BTreeNode<K> node, int keyIndex) {
-        for (int i = keyIndex + 1; i != node.size; ++i) {
-            node.keys[i - 1] = node.keys[i];
-        }
-        
-        node.size--;
-    }
-        
-    private K getPredecessorKey(BTreeNode<K> node, int keyIndex) {
-        BTreeNode<K> currentNode = node.children[keyIndex];
-        
-        while (!currentNode.isLeaf()) {
-            currentNode = currentNode.children[currentNode.size];
-        }
-        
-        return currentNode.keys[currentNode.size - 1];
-    }
-        
-    private K getSuccessorKey(BTreeNode<K> node, int keyIndex) {
-        BTreeNode<K> currentNode = node.children[keyIndex + 1];
-        
-        while (!currentNode.isLeaf()) {
-            currentNode = currentNode.children[0];
-        }
-        
-        return currentNode.keys[0];
     }
     
     private static <K extends Comparable<? super K>> 
         int findKeyIndex(BTreeNode<K> node, K key) {
-        int index = 0;
-        
-        while (index < node.size && node.keys[index].compareTo(key) != 0) {
-            ++index;
-        }
-        
-        return index;
+        return Arrays.binarySearch(node.keys, 0, node.size, key);
     }
         
     public static void main(String[] args) {
-        final int MINIMUM_DEGREE = 32;
+        final int MINIMUM_DEGREE = 128;
         final int UNIVERSE_SIZE = 30_000;
         final int LOAD_SIZE = 2_000_000;
         final int QUERY_SIZE = 1_000_000;
