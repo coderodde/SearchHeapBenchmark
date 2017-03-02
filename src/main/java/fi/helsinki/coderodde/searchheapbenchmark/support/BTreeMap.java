@@ -104,8 +104,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
     @Override
     public V get(Object key) {
-        return (V) bTreeSearch(root, (K) key);
-//        return map.get(key);    
+        return map.get(key);    
     }
 
     @Override
@@ -232,9 +231,9 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             x.children[j + 1] = x.children[j];
         }
         
-        x.children[i + 1] = z; // ?
+        x.children[i + 1] = z;
         
-        for (int j = x.size - 1; j >= i; --j) { // ?
+        for (int j = x.size - 1; j >= i; --j) {
             x.keys[j + 1] = x.keys[j];
         }
         
@@ -439,27 +438,30 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                             firstRightSiblingChild;
                 } else {
                     // Case 3b: Merge right sibling with the target child:
-                    BTreeNode<K> rightSibling = x.children[childIndex + 1];
-                    targetChild.keys[targetChild.size++] = x.keys[childIndex];
+                    BTreeNode<K> leftSibling = x.children[childIndex - 1];
+                    K keyToPushDown = x.keys[childIndex - 1];
+                    leftSibling.keys[leftSibling.size++] = keyToPushDown;
                     
-                    for (int i = 0, j = targetChild.size; 
-                            i != rightSibling.size; 
-                            ++i, ++j) {
-                        targetChild.keys[j] = rightSibling.keys[i];
-                        targetChild.children[j] = rightSibling.children[i];
+                    // Merge the contents of 'targetChild' to 'leftSibling':
+                    for (int i = 0, j = leftSibling.size; 
+                            i < targetChild.size; 
+                            ++i) {
+                        leftSibling.keys[j] = targetChild.keys[i];
+                        leftSibling.children[j] = targetChild.children[i];
                     }
                     
-                    targetChild.size += rightSibling.size;
+                    leftSibling.size = 2 * minimumDegree - 1;
+                    leftSibling.children[leftSibling.size] = 
+                            targetChild.children[targetChild.size];
                     
-                    targetChild.children[targetChild.size] = 
-                            rightSibling.children[rightSibling.size];
-                    
-                    // Shift in x:
-                    for (int i = childIndex + 1; i < x.size; ++i) {
+                    // Shift the contents of 'x' after the pushed down key one
+                    // position to the left:
+                    for (int i = childIndex; i < x.size; ++i) {
                         x.keys[i - 1] = x.keys[i];
                         x.children[i - 1] = x.children[i];
                     }
                     
+                    x.children[x.size - 1] = x.children[x.size];
                     x.children[x.size--] = null;
                 }
             }

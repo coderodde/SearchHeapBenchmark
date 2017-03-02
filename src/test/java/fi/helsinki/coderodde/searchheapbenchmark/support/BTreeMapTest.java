@@ -49,7 +49,7 @@ public class BTreeMapTest {
         }
     }
 
-//    @Test
+    @Test
     public void testContains() {
         assertFalse(map.containsKey(2));
         assertFalse(map.containsKey(6));
@@ -84,7 +84,7 @@ public class BTreeMapTest {
         assertFalse(map.containsKey(6));
     }
     
-//    @Test
+    @Test
     public void testDelete() {
         int sz = 0;
         
@@ -140,7 +140,7 @@ public class BTreeMapTest {
         assertEquals(0, map.size());
     }
     
-//    @Test
+    @Test
     public void testDeleteNodeWithTwoChildren() {
         map.put(2, 4);
         map.put(1, 2);
@@ -149,7 +149,7 @@ public class BTreeMapTest {
         assertEquals(Integer.valueOf(6), map.remove(3));
     }
     
-//    @Test
+    @Test
     public void debugTest() {
         BTreeMap<Integer, Integer> map = new BTreeMap<>(2);
         map.put(1, 1);
@@ -179,18 +179,18 @@ public class BTreeMapTest {
             
             if (coin < 0.45f) {
                 int newElement = random.nextInt(UNIVERSE_SIZE);
-                treeMap.put(newElement, newElement);
-                map.put(newElement, newElement);
-            } else if (coin < 0.65f) {
+                treeMap.put(newElement, 3 * newElement);
+                map.put(newElement, 3 * newElement);
+            } else if (coin < 0.55f) {
                 int key = random.nextInt(UNIVERSE_SIZE);
                 assertEquals(treeMap.get(key), map.get(key));
             } else {
-//                if (treeMap.isEmpty()) {
-//                    assertTrue(map.isEmpty());
-//                } else {
-//                    int key = random.nextInt(UNIVERSE_SIZE);
-//                    assertEquals(treeMap.remove(key), map.remove(key));
-//                }
+                if (treeMap.isEmpty()) {
+                    assertTrue(map.isEmpty());
+                } else {
+                    int key = random.nextInt(UNIVERSE_SIZE);
+                    assertEquals(treeMap.remove(key), map.remove(key));
+                }
             }
         }
         
