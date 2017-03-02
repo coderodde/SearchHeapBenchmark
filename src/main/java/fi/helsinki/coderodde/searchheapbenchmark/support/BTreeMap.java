@@ -366,7 +366,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             x.children[x.size] = null;
             x.size--;
             bTreeDeleteKey(y, key);
-        } else {
+        } else { // keyIndex == -1.
             int childIndex = -1;
             
             for (int i = 0; i <= x.size; ++i) {
@@ -385,16 +385,33 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             if (targetChild.size == minimumDegree - 1) {
                 if (childIndex > 0 
                         && x.children[childIndex - 1].size >= minimumDegree) {
-                // Case 3a: Move from left sibling:
-                        BTreeNode<K> leftSibling = x.children[childIndex - 1];
-                        K lastLeftSiblingKey = 
-                                leftSibling.keys[leftSibling.size - 1];
-                        x.keys[childIndex] = lastLeftSiblingKey;
+                    // Case 3a: Move from left sibling:
+                    BTreeNode<K> leftSibling = x.children[childIndex - 1];
+                    
+                    K lastLeftSiblingKey = 
+                            leftSibling.keys[leftSibling.size - 1];
+                    
+                    BTreeNode<K> lastLeftSiblingChild = 
+                            leftSibling.children[leftSibling.size];
+                    
+                    K keyToPushDown = x.keys[childIndex - 1];
+                    x.keys[childIndex - 1] = lastLeftSiblingKey;
+                    
+                    // Shift all the stuff in targetChild one step to the right:
+                    targetChild.children[targetChild.size + 1] = 
+                            targetChild.children[targetChild.size];
+                    
+                    for (int i = targetChild.size - 1; i >= 0; --i) {
+                        targetChild.keys[i + 1] = targetChild.keys[i];
+                        targetChild.children[i + 1] = targetChild.children[i];
+                    }
                         
-                        
-                        
-                        
-                } else if (childIndex < x.size + 1
+                    targetChild.size++;
+                    targetChild.keys[0] = keyToPushDown;
+                    targetChild.children[0] = lastLeftSiblingChild;
+                    leftSibling.children[leftSibling.size] = null;
+                    leftSibling.keys[--leftSibling.size] = null;
+                } else if (childIndex < x.size
                         && x.children[childIndex + 1].size >= minimumDegree) {
                 // Case 3a once again, but with right sibling:
                         BTreeNode<K> rightSibling = x.children[childIndex + 1];
