@@ -364,7 +364,37 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             x.children[x.size - 1] = x.children[x.size--];
             bTreeDeleteKey(y, key);
         } else {
+            int childIndex = -1;
             
+            for (int i = 0; i <= x.size; ++i) {
+                BTreeNode<K> currentChild = x.children[i];
+                
+                if (currentChild.keys[0].compareTo(key) <= 0
+                        && key.compareTo(
+                                currentChild.keys[currentChild.size - 1]) <= 0) {
+                    childIndex = i;
+                    break;
+                }
+            }
+            
+            BTreeNode<K> targetChild = x.children[childIndex];
+            
+            if (targetChild.size == minimumDegree - 1) {
+                if (childIndex > 0 
+                        && x.children[childIndex - 1].size >= minimumDegree) {
+                // Case 3a:
+                        
+                } else if (childIndex < x.size + 1
+                        && x.children[childIndex + 1].size >= minimumDegree) {
+                // Case 3a once again, but with different sibling:
+                
+                } else {
+                    // Case 3b:
+                    
+                }
+            }
+            
+            bTreeDeleteKey(targetChild, key);
         }
     }
     
