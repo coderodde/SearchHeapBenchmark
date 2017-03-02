@@ -413,12 +413,30 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                     leftSibling.keys[--leftSibling.size] = null;
                 } else if (childIndex < x.size
                         && x.children[childIndex + 1].size >= minimumDegree) {
-                // Case 3a once again, but with right sibling:
-                        BTreeNode<K> rightSibling = x.children[childIndex + 1];
-                
-                        
-                        
-                        
+                    // Case 3a once again, but with right sibling:
+                    BTreeNode<K> rightSibling = x.children[childIndex + 1];
+                    
+                    K firstRightSiblingKey = rightSibling.keys[0];
+                    BTreeNode<K> firstRightSiblingChild = 
+                            rightSibling.children[0];
+                    
+                    K keyToPushDown = x.keys[childIndex];
+                    x.keys[childIndex] = firstRightSiblingKey;
+                    
+                    // Shift all the stuff in the right sibling one step to the
+                    // left:
+                    for (int i = 1; i < rightSibling.size; ++i) {
+                        rightSibling.keys[i - 1] = rightSibling.keys[i];
+                        rightSibling.children[i - 1] = rightSibling.children[i];
+                    }
+                    
+                    rightSibling.children[rightSibling.size] = null;
+                    rightSibling.keys[--rightSibling.size] = null;
+                    
+                    // Append 'keyToPushDown' to 'targetChild':
+                    targetChild.keys[targetChild.size] = keyToPushDown;
+                    targetChild.children[++targetChild.size] = 
+                            firstRightSiblingChild;
                 } else {
                     // Case 3b: Merge right sibling with the target child:
                     BTreeNode<K> rightSibling = x.children[childIndex + 1];
