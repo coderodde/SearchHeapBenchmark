@@ -341,6 +341,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                     tmp.keys[i - 1] = tmp.keys[i];
                 }
                 
+                tmp.keys[--tmp.size] = null;
                 return;
             }
             
@@ -353,15 +354,17 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                 y.children[j] = z.children[i];
             }
             
-            y.children[2 * minimumDegree - 1] = z.children[z.size];
             y.size = 2 * minimumDegree - 1;
+            y.children[y.size] = z.children[z.size];
             
-            for (int i = keyIndex + 1; i != x.size; ++i) {
+            for (int i = keyIndex + 1; i < x.size; ++i) {
                 x.keys[i - 1] = x.keys[i];
                 x.children[i - 1] = x.children[i];
             }
             
-            x.children[x.size - 1] = x.children[x.size--];
+            x.children[x.size - 1] = x.children[x.size];
+            x.children[x.size] = null;
+            x.size--;
             bTreeDeleteKey(y, key);
         } else {
             int childIndex = -1;
@@ -382,15 +385,47 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             if (targetChild.size == minimumDegree - 1) {
                 if (childIndex > 0 
                         && x.children[childIndex - 1].size >= minimumDegree) {
-                // Case 3a:
+                // Case 3a: Move from left sibling:
+                        BTreeNode<K> leftSibling = x.children[childIndex - 1];
+                        K lastLeftSiblingKey = 
+                                leftSibling.keys[leftSibling.size - 1];
+                        x.keys[childIndex] = lastLeftSiblingKey;
+                        
+                        
+                        
                         
                 } else if (childIndex < x.size + 1
                         && x.children[childIndex + 1].size >= minimumDegree) {
-                // Case 3a once again, but with different sibling:
+                // Case 3a once again, but with right sibling:
+                        BTreeNode<K> rightSibling = x.children[childIndex + 1];
                 
+                        
+                        
+                        
                 } else {
-                    // Case 3b:
+                    // Case 3b: Merge right sibling with the target child:
+                    BTreeNode<K> rightSibling = x.children[childIndex + 1];
+                    targetChild.keys[targetChild.size++] = x.keys[childIndex];
                     
+                    for (int i = 0, j = targetChild.size; 
+                            i != rightSibling.size; 
+                            ++i, ++j) {
+                        targetChild.keys[j] = rightSibling.keys[i];
+                        targetChild.children[j] = rightSibling.children[i];
+                    }
+                    
+                    targetChild.size += rightSibling.size;
+                    
+                    targetChild.children[targetChild.size] = 
+                            rightSibling.children[rightSibling.size];
+                    
+                    // Shift in x:
+                    for (int i = childIndex + 1; i < x.size; ++i) {
+                        x.keys[i - 1] = x.keys[i];
+                        x.children[i - 1] = x.children[i];
+                    }
+                    
+                    x.children[x.size--] = null;
                 }
             }
             
