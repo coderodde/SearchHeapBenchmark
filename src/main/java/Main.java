@@ -47,7 +47,7 @@ public class Main {
         
         System.out.println("*** Integer weight search benchmark ***");
         System.out.println("Warming up integer weight search...");
-        warmupInt.run();
+//        warmupInt.run();
         System.out.println("Warming up integer weight search complete!");
         
         IntegerWeightBenchmark benchmarkInt = 

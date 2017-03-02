@@ -4,6 +4,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.support.AVLTreeHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.BTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
@@ -53,13 +54,17 @@ public final class IntegerWeightBenchmark {
 //            benchmarkUnindexed(new DaryHeap<>(degree));
 //        }
         
-        benchmarkUnindexed(new BinomialHeap<>());
-        benchmarkUnindexed(new FibonacciHeap<>());
-        benchmarkUnindexed(new PairingHeap<>());
-        benchmarkUnindexed(new IntegerDialsHeap<>());
-        benchmarkUnindexed(new AVLTreeHeap<>());
-        benchmarkUnindexed(new VanEmdeBoasTreeHeap<>(keyUniverse));
+//        benchmarkUnindexed(new BinomialHeap<>());
+//        benchmarkUnindexed(new FibonacciHeap<>());
+//        benchmarkUnindexed(new PairingHeap<>());
+//        benchmarkUnindexed(new IntegerDialsHeap<>());
+//        benchmarkUnindexed(new AVLTreeHeap<>());
+//        benchmarkUnindexed(new VanEmdeBoasTreeHeap<>(keyUniverse));
         
+        for (int minimumDegree : new int[]{ 32, 64, 128 }) {
+            benchmarkUnindexed(new BTreeHeap<>(minimumDegree));
+        }
+            
         //// Indexed heaps ////
 //        benchmarkIndexed(new IndexedBinaryHeap<>());
 //        

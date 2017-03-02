@@ -5,8 +5,6 @@ import java.util.NoSuchElementException;
 
 public final class BTreeHeap<E, P extends Comparable<? super P>> 
         implements PriorityQueue<E, P> {
-
-    private static final int DEFAULT_DEGREE = 32;
     
     private static final class HeapNode<E> {
         
@@ -29,12 +27,20 @@ public final class BTreeHeap<E, P extends Comparable<? super P>>
      * Maps each used integer priority to the collision chain of 
      * {@code HeapNode} objects.
      */
-    private final BTreeMap<P, HeapNode<E>> map = new BTreeMap<>();
+    private final BTreeMap<P, HeapNode<E>> map;
     
     /**
      * Holds the number of elements currently in this heap.
      */
     private int size;
+    
+    public BTreeHeap() {
+        map = new BTreeMap<>();
+    }
+    
+    public BTreeHeap(int minimumDegree) {
+        map = new BTreeMap<>(minimumDegree);
+    }
     
     @Override
     public void add(E element, P priority) {
@@ -62,6 +68,8 @@ public final class BTreeHeap<E, P extends Comparable<? super P>>
         checkHeapIsNotEmpty();
         P minimumKey = map.getMinimumKey();
         HeapNode<E> heapNodeChainHead = map.get(minimumKey);
+        
+        System.out.println("Contains: " + map.containsKey(minimumKey) + ", " + minimumKey);
         E returnValue;
         
         if (heapNodeChainHead.next != null) {
@@ -89,7 +97,7 @@ public final class BTreeHeap<E, P extends Comparable<? super P>>
     
     @Override
     public String toString() {
-        return "BTreeHeap";
+        return "BTreeHeap, t = " + map.getMinimumDegree();
     }
     
     /**
