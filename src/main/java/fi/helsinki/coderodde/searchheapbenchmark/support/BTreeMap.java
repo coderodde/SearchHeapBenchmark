@@ -323,8 +323,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                 // Case 2a:
                 BTreeNode<K> tmp = getMaximumNode(y);
                 K keyPrime = tmp.keys[tmp.size - 1];
+                bTreeDeleteKey(tmp, keyPrime);
                 x.keys[keyIndex] = keyPrime;
-                tmp.keys[--tmp.size] = null;
                 return;
             }
             
@@ -334,13 +334,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                 // Case 2b:
                 BTreeNode<K> tmp = getMinimumNode(z);
                 K keyPrime = tmp.keys[0];
+                bTreeDeleteKey(tmp, keyPrime);
                 x.keys[keyIndex] = keyPrime;
-                
-                for (int i = 1; i != tmp.size; ++i) {
-                    tmp.keys[i - 1] = tmp.keys[i];
-                }
-                
-                tmp.keys[--tmp.size] = null;
                 return;
             }
             
@@ -390,26 +385,43 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                     K lastLeftSiblingKey = 
                             leftSibling.keys[leftSibling.size - 1];
                     
-                    BTreeNode<K> lastLeftSiblingChild = 
-                            leftSibling.children[leftSibling.size];
-                    
-                    K keyToPushDown = x.keys[childIndex - 1];
-                    x.keys[childIndex - 1] = lastLeftSiblingKey;
-                    
-                    // Shift all the stuff in targetChild one step to the right:
-                    targetChild.children[targetChild.size + 1] = 
-                            targetChild.children[targetChild.size];
-                    
-                    for (int i = targetChild.size - 1; i >= 0; --i) {
-                        targetChild.keys[i + 1] = targetChild.keys[i];
-                        targetChild.children[i + 1] = targetChild.children[i];
+                    if (targetChild.isLeaf()) {
+                        K keyToPushDown = x.keys[childIndex - 1];
+                        x.keys[childIndex - 1] = lastLeftSiblingKey;
+
+                        // Shift all the stuff in targetChild one step to the 
+                        // right:
+                        for (int i = targetChild.size - 1; i >= 0; --i) {
+                            targetChild.keys[i + 1] = targetChild.keys[i];
+                        }
+
+                        targetChild.size++;
+                        targetChild.keys[0] = keyToPushDown;
+                        leftSibling.keys[--leftSibling.size] = null;
+                    } else {
+                        BTreeNode<K> lastLeftSiblingChild = 
+                                leftSibling.children[leftSibling.size];
+
+                        K keyToPushDown = x.keys[childIndex - 1];
+                        x.keys[childIndex - 1] = lastLeftSiblingKey;
+
+                        // Shift all the stuff in targetChild one step to the 
+                        // right:
+                        targetChild.children[targetChild.size + 1] = 
+                                targetChild.children[targetChild.size];
+
+                        for (int i = targetChild.size - 1; i >= 0; --i) {
+                            targetChild.keys[i + 1] = targetChild.keys[i];
+                            targetChild.children[i + 1] = 
+                                    targetChild.children[i];
+                        }
+
+                        targetChild.size++;
+                        targetChild.keys[0] = keyToPushDown;
+                        targetChild.children[0] = lastLeftSiblingChild;
+                        leftSibling.children[leftSibling.size] = null;
+                        leftSibling.keys[--leftSibling.size] = null;
                     }
-                        
-                    targetChild.size++;
-                    targetChild.keys[0] = keyToPushDown;
-                    targetChild.children[0] = lastLeftSiblingChild;
-                    leftSibling.children[leftSibling.size] = null;
-                    leftSibling.keys[--leftSibling.size] = null;
                 } else if (childIndex < x.size
                         && x.children[childIndex + 1].size >= minimumDegree) {
                     // Case 3a once again, but with right sibling:
@@ -438,31 +450,54 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                             firstRightSiblingChild;
                 } else {
                     // Case 3b: Merge right sibling with the target child:
-                    BTreeNode<K> leftSibling = x.children[childIndex - 1];
-                    K keyToPushDown = x.keys[childIndex - 1];
-                    leftSibling.keys[leftSibling.size++] = keyToPushDown;
-                    
-                    // Merge the contents of 'targetChild' to 'leftSibling':
-                    for (int i = 0, j = leftSibling.size; 
-                            i < targetChild.size; 
-                            ++i) {
-                        leftSibling.keys[j] = targetChild.keys[i];
-                        leftSibling.children[j] = targetChild.children[i];
+                    if (targetChild.isLeaf()) {
+                        BTreeNode<K> leftSibling = x.children[childIndex - 1];
+                        K keyToPushDown = x.keys[childIndex - 1];
+                        leftSibling.keys[leftSibling.size++] = keyToPushDown;
+
+                        // Merge the contents of 'targetChild' to 'leftSibling':
+                        for (int i = 0, j = leftSibling.size; 
+                                i < targetChild.size; 
+                                ++i) {
+                            leftSibling.keys[j] = targetChild.keys[i];
+                        }
+
+                        leftSibling.size = 2 * minimumDegree - 1;
+
+                        // Shift the contents of 'x' after the pushed down key 
+                        // one position to the left:
+                        for (int i = childIndex; i < x.size; ++i) {
+                            x.keys[i - 1] = x.keys[i];
+                        }
+                        
+                        x.size--;
+                    } else {
+                        BTreeNode<K> leftSibling = x.children[childIndex - 1];
+                        K keyToPushDown = x.keys[childIndex - 1];
+                        leftSibling.keys[leftSibling.size++] = keyToPushDown;
+
+                        // Merge the contents of 'targetChild' to 'leftSibling':
+                        for (int i = 0, j = leftSibling.size; 
+                                i < targetChild.size; 
+                                ++i) {
+                            leftSibling.keys[j] = targetChild.keys[i];
+                            leftSibling.children[j] = targetChild.children[i];
+                        }
+
+                        leftSibling.size = 2 * minimumDegree - 1;
+                        leftSibling.children[leftSibling.size] = 
+                                targetChild.children[targetChild.size];
+
+                        // Shift the contents of 'x' after the pushed down key 
+                        // one position to the left:
+                        for (int i = childIndex; i < x.size; ++i) {
+                            x.keys[i - 1] = x.keys[i];
+                            x.children[i - 1] = x.children[i];
+                        }
+
+                        x.children[x.size - 1] = x.children[x.size];
+                        x.children[x.size--] = null;       
                     }
-                    
-                    leftSibling.size = 2 * minimumDegree - 1;
-                    leftSibling.children[leftSibling.size] = 
-                            targetChild.children[targetChild.size];
-                    
-                    // Shift the contents of 'x' after the pushed down key one
-                    // position to the left:
-                    for (int i = childIndex; i < x.size; ++i) {
-                        x.keys[i - 1] = x.keys[i];
-                        x.children[i - 1] = x.children[i];
-                    }
-                    
-                    x.children[x.size - 1] = x.children[x.size];
-                    x.children[x.size--] = null;
                 }
             }
             
