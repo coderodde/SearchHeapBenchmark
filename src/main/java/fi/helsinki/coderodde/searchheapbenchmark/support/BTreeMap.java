@@ -137,6 +137,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
     @Override
     public void clear() {
+        root = new BTreeNode<>(minimumDegree);
         map.clear();
     }
 
@@ -564,7 +565,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         int i = 0;
         
         while (i < x.size && k.compareTo(x.keys[i]) > 0) {
-//            System.out.println(i);
             ++i;
         }
         
@@ -573,7 +573,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         } else if (x.isLeaf()) {
             return null;
         } else {
-//            System.out.println("yeah: " + k);
             return bTreeSearch(x.children[i], k);
         }
     }
@@ -586,7 +585,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         final int DELETE_SIZE = 5_000;
 
         Map<Integer, Integer> tree1 = new BTreeMap<>(MINIMUM_DEGREE);
-        Map<Integer, Integer> tree2 = new TreeMap<>();
+        Map<Integer, Integer> tree2 = new TreeMap<>(); 
         
         Random random = new Random();
 
@@ -626,7 +625,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         Random random1 = new Random(seed);
         Random random2 = new Random(seed);
 
-        long totalTime1 = 0L;
+        long totalTime1 = 0L; 
         long totalTime2 = 0L;
 
         long startTime = System.currentTimeMillis();

@@ -163,6 +163,33 @@ public class BTreeMapTest {
     }
     
     @Test
+    public void smallDebugTest() {
+        System.out.println("Find bad remove!");
+        BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
+        
+        while (true) {
+            long seed = 1488562950095L; //System.currentTimeMillis();
+            Random random = new Random(seed);
+            m.clear();
+            
+            for (int i = 0; i < 10; ++i) {
+                int key = random.nextInt(30);
+                m.put(key, key);
+            }
+            
+            int removeKey = random.nextInt(30);
+            
+            try {
+                m.remove(removeKey);
+            } catch (Exception ex) {
+                ex.printStackTrace(System.err);
+                System.err.println("Seed = " + seed);
+                return;
+            }
+        }
+    }
+    
+    @Test
     public void bruteForceTest() {
         final int UNIVERSE_SIZE = 50_000;
         final int ITERATIONS = 100_000;
