@@ -15,8 +15,19 @@ public class BTreeMapTest {
     public void setUp() {
         map.clear();
     }
-
+    
     @Test
+    public void rootTest() {
+        map = map.buildDebugTree();
+        map.remove(9);
+        System.out.println("removed 9");
+        map.remove(10);
+        System.out.println("removed 10");
+        map.remove(11);
+        System.out.println("removed 11");
+    }
+
+//    @Test
     public void debug() {
         map = new BTreeMap<>(2);
         map.put(2, 2);
@@ -29,7 +40,7 @@ public class BTreeMapTest {
         
     }
     
-    @Test
+//    @Test
     public void testInsert() {
         // Insert 0, 2, 4, 6.
         for (int i = 0; i < 8; i += 2) {
@@ -49,7 +60,7 @@ public class BTreeMapTest {
         }
     }
 
-    @Test
+//    @Test
     public void testContains() {
         assertFalse(map.containsKey(2));
         assertFalse(map.containsKey(6));
@@ -84,7 +95,7 @@ public class BTreeMapTest {
         assertFalse(map.containsKey(6));
     }
     
-    @Test
+//    @Test
     public void testDelete() {
         int sz = 0;
         
@@ -140,7 +151,7 @@ public class BTreeMapTest {
         assertEquals(0, map.size());
     }
     
-    @Test
+//    @Test
     public void testDeleteNodeWithTwoChildren() {
         map.put(2, 4);
         map.put(1, 2);
@@ -149,7 +160,7 @@ public class BTreeMapTest {
         assertEquals(Integer.valueOf(6), map.remove(3));
     }
     
-    @Test
+//    @Test
     public void debugTest() {
         BTreeMap<Integer, Integer> map = new BTreeMap<>(2);
         map.put(1, 1);
@@ -162,13 +173,13 @@ public class BTreeMapTest {
         assertEquals(Integer.valueOf(0), map.getMinimumKey());
     }
     
-    @Test
+//    @Test
     public void smallDebugTest() {
         System.out.println("Find bad remove!");
         BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
         
         while (true) {
-            long seed = 1488642200678L; System.currentTimeMillis();
+            long seed = System.currentTimeMillis();
             Random random = new Random(seed);
             m.clear();
             
@@ -191,10 +202,10 @@ public class BTreeMapTest {
     
 //    @Test
     public void bruteForceTest() {
-        final int UNIVERSE_SIZE = 50_000;
-        final int ITERATIONS = 100_000;
-//        final int UNIVERSE_SIZE = 50;
-//        final int ITERATIONS = 100;
+//        final int UNIVERSE_SIZE = 50_000;
+//        final int ITERATIONS = 100_000;
+        final int UNIVERSE_SIZE = 50;
+        final int ITERATIONS = 100;
         
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
