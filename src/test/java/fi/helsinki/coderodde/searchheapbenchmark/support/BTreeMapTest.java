@@ -168,7 +168,7 @@ public class BTreeMapTest {
         BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
         
         while (true) {
-            long seed = 1488562950095L; //System.currentTimeMillis();
+            long seed = 1488642200678L; System.currentTimeMillis();
             Random random = new Random(seed);
             m.clear();
             
@@ -189,10 +189,12 @@ public class BTreeMapTest {
         }
     }
     
-    @Test
+//    @Test
     public void bruteForceTest() {
         final int UNIVERSE_SIZE = 50_000;
         final int ITERATIONS = 100_000;
+//        final int UNIVERSE_SIZE = 50;
+//        final int ITERATIONS = 100;
         
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
