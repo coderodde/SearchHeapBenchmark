@@ -16,14 +16,14 @@ public class BTreeMapTest {
         map.clear();
     }
     
-    @Test
+    
     public void rootTest() {
-        map = map.buildDebugTree();
-        map.remove(9);
+        BTreeMap<Integer, Integer> map2 = map.buildDebugTree();
+        map2.remove(9);
         System.out.println("removed 9");
-        map.remove(10);
+        map2.remove(10);
         System.out.println("removed 10");
-        map.remove(11);
+        map2.remove(11);
         System.out.println("removed 11");
     }
 
@@ -179,7 +179,7 @@ public class BTreeMapTest {
         BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
         
         while (true) {
-            long seed = System.currentTimeMillis();
+            long seed = 1488645727592L; //System.currentTimeMillis();
             Random random = new Random(seed);
             m.clear();
             
@@ -188,24 +188,26 @@ public class BTreeMapTest {
                 m.put(key, key);
             }
             
-            int removeKey = random.nextInt(30);
-            
-            try {
-                m.remove(removeKey);
-            } catch (Exception ex) {
-                ex.printStackTrace(System.err);
-                System.err.println("Seed = " + seed);
-                return;
+            while (true) {
+                int removeKey = random.nextInt(30);
+
+                try {
+                    m.remove(removeKey);
+                } catch (Exception ex) {
+                    ex.printStackTrace(System.err);
+                    System.err.println("Seed = " + seed + ", remove key: " + removeKey);
+                    return;
+                }
             }
         }
     }
     
-//    @Test
+    @Test
     public void bruteForceTest() {
 //        final int UNIVERSE_SIZE = 50_000;
 //        final int ITERATIONS = 100_000;
-        final int UNIVERSE_SIZE = 50;
-        final int ITERATIONS = 100;
+        final int UNIVERSE_SIZE = 5_000;
+        final int ITERATIONS = 10_000;
         
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
@@ -235,5 +237,6 @@ public class BTreeMapTest {
         }
         
         assertEquals(treeMap.size(), map.size());
+        System.out.println(ITERATIONS + " yeah");
     }
 }

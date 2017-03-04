@@ -116,7 +116,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         }
         
         if (i < x.size && key.compareTo(x.keys[i]) == 0) {
-            return (V) key;
+            return map.get(key);
         } else if (x.isLeaf()) {
             return null;
         } else {
@@ -124,7 +124,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         }
     }
 
-    public static BTreeMap<Integer, Integer> buildDebugTree() {
+    public BTreeMap<Integer, Integer> buildDebugTree() {
         BTreeMap<Integer, Integer> ret = new BTreeMap<>(2);
         ret.root.size = 1;
         ret.root.keys[0] = 10;
@@ -139,8 +139,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         leftChild.size = 1;
         rightChild.size = 1;
         
-        leftChild.keys[0] = Integer.valueOf(9);
-        rightChild.keys[0] = Integer.valueOf(11);
+        leftChild.keys[0] = 9;
+        rightChild.keys[0] = 11;
         
         ret.map.put(9, 9);
         ret.map.put(10, 10);
@@ -166,11 +166,16 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             bTreeDeleteKey(root, (K) key);
             
             if (root.size == 0) {
-                System.out.println("root.size == 0!");
-                System.out.println(root.children[0]);
-                System.out.println("---");
                 root = root.children[0];
+                System.out.println("root.size: " + root.size);
             }
+            
+//            if (root.size == 0) {
+//                System.out.println("root.size == 0!");
+//                System.out.println(root.children[0]);
+//                System.out.println("---");
+//                root = root.children[0];
+//            }
             
             return map.remove(key);
         }
@@ -435,17 +440,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                 childIndex = x.size;
             }
             
-//            for (int i = 0; i <= x.size; ++i) {
-//                BTreeNode<K> currentChild = x.children[i];
-//                
-//                if (currentChild.keys[0].compareTo(key) <= 0
-//                        && key.compareTo(currentChild
-//                                .keys[currentChild.size - 1]) <= 0) {
-//                    childIndex = i;
-//                    break;
-//                }
-//            }
-            
             BTreeNode<K> targetChild = x.children[childIndex];
             
             if (targetChild.size == minimumDegree - 1) {
@@ -631,22 +625,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         
         return -1;
     }
-    
-//    private K bTreeSearch(BTreeNode<K> x, K k) {
-//        int i = 0;
-//        
-//        while (i < x.size && k.compareTo(x.keys[i]) > 0) {
-//            ++i;
-//        }
-//        
-//        if (i < x.size && k.compareTo(x.keys[i]) == 0) {
-//            return k;
-//        } else if (x.isLeaf()) {
-//            return null;
-//        } else {
-//            return bTreeSearch(x.children[i], k);
-//        }
-//    }
         
     public static void main(String[] args) {
         final int MINIMUM_DEGREE = 16;
