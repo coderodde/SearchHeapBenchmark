@@ -16,7 +16,6 @@ public class BTreeMapTest {
         map.clear();
     }
     
-    
     public void rootTest() {
         BTreeMap<Integer, Integer> map2 = map.buildDebugTree();
         map2.remove(9);
@@ -27,7 +26,7 @@ public class BTreeMapTest {
         System.out.println("removed 11");
     }
 
-//    @Test
+    @Test
     public void debug() {
         map = new BTreeMap<>(2);
         map.put(2, 2);
@@ -36,11 +35,9 @@ public class BTreeMapTest {
         map.remove(2);
         map.remove(3);
         map.remove(1);
-        
-        
     }
     
-//    @Test
+    @Test
     public void testInsert() {
         // Insert 0, 2, 4, 6.
         for (int i = 0; i < 8; i += 2) {
@@ -48,7 +45,7 @@ public class BTreeMapTest {
         }
         
         assertEquals(4, map.size());
-        map.put(2, -2); // vEB tree does not allow duplicates.
+        map.put(2, -2); // B tree does not allow duplicates.
         assertEquals(4, map.size());
 
         for (int i = 0; i < 8; i += 2) {
@@ -60,7 +57,7 @@ public class BTreeMapTest {
         }
     }
 
-//    @Test
+    @Test
     public void testContains() {
         assertFalse(map.containsKey(2));
         assertFalse(map.containsKey(6));
@@ -95,7 +92,7 @@ public class BTreeMapTest {
         assertFalse(map.containsKey(6));
     }
     
-//    @Test
+    @Test
     public void testDelete() {
         int sz = 0;
         
@@ -151,7 +148,7 @@ public class BTreeMapTest {
         assertEquals(0, map.size());
     }
     
-//    @Test
+    @Test
     public void testDeleteNodeWithTwoChildren() {
         map.put(2, 4);
         map.put(1, 2);
@@ -160,7 +157,7 @@ public class BTreeMapTest {
         assertEquals(Integer.valueOf(6), map.remove(3));
     }
     
-//    @Test
+    @Test
     public void debugTest() {
         BTreeMap<Integer, Integer> map = new BTreeMap<>(2);
         map.put(1, 1);
@@ -169,17 +166,17 @@ public class BTreeMapTest {
         map.put(-1, -1);
         
         map.remove(-1);
-        
+        map.remove(1);
         assertEquals(Integer.valueOf(0), map.getMinimumKey());
     }
     
-//    @Test
+    @Test
     public void smallDebugTest() {
         System.out.println("Find bad remove!");
         BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
         
         while (true) {
-            long seed = 1488645727592L; //System.currentTimeMillis();
+            long seed = 1488720691998L; //System.currentTimeMillis();
             Random random = new Random(seed);
             m.clear();
             
@@ -188,11 +185,19 @@ public class BTreeMapTest {
                 m.put(key, key);
             }
             
+            int i = 0;
+            
             while (true) {
                 int removeKey = random.nextInt(30);
-
+                
                 try {
+                    boolean healthy = m.isHealty();
+                    System.out.println(++i + ": " + healthy);
                     m.remove(removeKey);
+                    
+                    if (!healthy) {
+                        return;
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace(System.err);
                     System.err.println("Seed = " + seed + ", remove key: " + removeKey);
@@ -200,6 +205,11 @@ public class BTreeMapTest {
                 }
             }
         }
+    }
+    
+    @Test
+    public void bookTest() {
+        BTreeMap<Character, Character> m = new BTreeMap<>(3);
     }
     
     @Test
@@ -212,7 +222,7 @@ public class BTreeMapTest {
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         Map<Integer, Integer> treeMap = new TreeMap<>();
-        BTreeMap<Integer, Integer> map = new BTreeMap<>();
+        BTreeMap<Integer, Integer> map = new BTreeMap<>(5);
         
         System.out.println("Seed = " + seed);
         
@@ -237,6 +247,5 @@ public class BTreeMapTest {
         }
         
         assertEquals(treeMap.size(), map.size());
-        System.out.println(ITERATIONS + " yeah");
     }
 }
