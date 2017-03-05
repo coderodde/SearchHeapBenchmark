@@ -555,8 +555,11 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         x.size--;
                         
                         if (x.size == 0) {
+                            root = x.children[0];
                             System.out.println("Push me up! leftSibling");
                         }
+                        
+                        targetChild = leftSibling;
                     } else {
                         K keyToPushDown = x.keys[childIndex - 1];
                         leftSibling.keys[leftSibling.size] = keyToPushDown;
@@ -586,8 +589,11 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         x.children[x.size--] = null;
                         
                         if (x.size == 0) {
+                            root = x.children[0];
                             System.out.println("After left sibling move up!");
                         }
+                        
+                        targetChild = leftSibling;
                     }  
                 } else {
                     // When we get here, we know that 'targetChild' has right
@@ -623,6 +629,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         
                         if (x.size == 0) {
                             System.out.println("After right sibling move up! Leaf");
+                            root = x.children[0];
                         }
                     } else {
                         // Append the key from 'x' to the end of 'targetChild':
@@ -654,6 +661,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         
                         if (x.size == 0) {
                             System.out.println("After right sibling move up! Internal node");
+                            root = x.children[0];
                         }
                     }
                 }
