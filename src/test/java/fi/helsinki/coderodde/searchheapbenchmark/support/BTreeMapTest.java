@@ -176,7 +176,7 @@ public class BTreeMapTest {
         BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
         
         while (true) {
-            long seed = 1488720691998L; //System.currentTimeMillis();
+            long seed = 1488724853658L; // System.currentTimeMillis();
             Random random = new Random(seed);
             m.clear();
             
@@ -196,6 +196,7 @@ public class BTreeMapTest {
                     m.remove(removeKey);
                     
                     if (!healthy) {
+                        System.out.println("unhealthy");
                         return;
                     }
                 } catch (Exception ex) {
@@ -207,12 +208,7 @@ public class BTreeMapTest {
         }
     }
     
-    @Test
-    public void bookTest() {
-        BTreeMap<Character, Character> m = new BTreeMap<>(3);
-    }
-    
-    @Test
+//    @Test
     public void bruteForceTest() {
 //        final int UNIVERSE_SIZE = 50_000;
 //        final int ITERATIONS = 100_000;

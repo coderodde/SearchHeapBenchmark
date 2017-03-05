@@ -410,6 +410,10 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             x.children[x.size] = null;
             x.size--;
             bTreeDeleteKey(y, key);
+            
+            if (x.size == 0) {
+                root = y;
+            }
         } else { // keyIndex == -1.
             int childIndex = -1;
             
