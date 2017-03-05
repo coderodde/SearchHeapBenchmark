@@ -176,7 +176,7 @@ public class BTreeMapTest {
         BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
         
         while (true) {
-            long seed = 1488724853658L; // System.currentTimeMillis();
+            long seed = 1488729202839L; //System.currentTimeMillis();
             Random random = new Random(seed);
             m.clear();
             
@@ -192,11 +192,17 @@ public class BTreeMapTest {
                 
                 try {
                     boolean healthy = m.isHealty();
-                    System.out.println(++i + ": " + healthy);
-                    m.remove(removeKey);
+                    if (m.remove(removeKey) != null) {
+                        System.out.println(++i + ": " + healthy);
+                    }
                     
                     if (!healthy) {
                         System.out.println("unhealthy");
+                        return;
+                    }
+                    
+                    if (m.isEmpty()) {
+                        System.out.println("PASS!");
                         return;
                     }
                 } catch (Exception ex) {

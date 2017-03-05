@@ -549,13 +549,16 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
                         leftSibling.size = 2 * minimumDegree - 1;
 
+                        // Shit is here
                         // Shift the contents of 'x' after the pushed down 
                         // key one position to the left:
                         for (int i = childIndex; i < x.size; ++i) {
                             x.keys[i - 1] = x.keys[i];
+                            x.children[i] = x.children[i + 1];
                         }
                         
                         x.keys[x.size - 1] = null;
+                        x.children[x.size] = null;
                         x.size--;
                         
                         if (x.size == 0) {
@@ -625,6 +628,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         // one position to the left:
                         for (int i = childIndex + 1; i < x.size; ++i) {
                             x.keys[i - 1] = x.keys[i];
+                            // Children as well?
                         }
                         
                         x.keys[x.size - 1] = null;
