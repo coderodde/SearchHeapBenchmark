@@ -562,8 +562,9 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         x.size--;
                         
                         if (x.size == 0) {
-                            root = x.children[0];
-                            System.out.println("Push me up! leftSibling");
+//                            root = x.children[0];
+                            root = leftSibling;
+//                            System.out.println("Push me up! leftSibling");
                         }
                         
                         targetChild = leftSibling;
@@ -598,7 +599,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         if (x.size == 0) {
                             root = leftSibling;
 //                            root = x.children[0]; // Bug?
-                            System.out.println("After left sibling move up!");
+//                            System.out.println("After left sibling move up!");
                         }
                         
                         targetChild = leftSibling;
@@ -637,8 +638,9 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         
                         
                         if (x.size == 0) {
-                            System.out.println("After right sibling move up! Leaf");
-                            root = x.children[0];
+//                            System.out.println("After right sibling move up! Leaf");
+//                            root = x.children[0];
+                            root = targetChild;
                         }
                     } else {
                         // Append the key from 'x' to the end of 'targetChild':
@@ -669,8 +671,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         x.children[x.size--] = null;
                         
                         if (x.size == 0) {
-                            System.out.println("After right sibling move up! Internal node");
-                            root = x.children[0];
+//                            System.out.println("After right sibling move up! Internal node");
+                            root = targetChild;
                         }
                     }
                 }
