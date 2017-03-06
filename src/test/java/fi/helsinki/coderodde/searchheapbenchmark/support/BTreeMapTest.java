@@ -204,8 +204,8 @@ public class BTreeMapTest {
                     }
                     
                     if (m.isEmpty()) {
-//                        return;
-                        continue outer;
+                        return;
+//                        continue outer;
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace(System.err);
@@ -216,7 +216,7 @@ public class BTreeMapTest {
         }
     }
     
-//    @Test
+    @Test
     public void bruteForceTest() {
         final int UNIVERSE_SIZE = 50_000;
         final int ITERATIONS = 100_000;
