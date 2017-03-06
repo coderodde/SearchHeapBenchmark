@@ -176,7 +176,7 @@ public class BTreeMapTest {
         BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
         
         while (true) {
-            long seed = 1488729202839L; //System.currentTimeMillis();
+            long seed = 1488799272037L; //System.currentTimeMillis();
             Random random = new Random(seed);
             m.clear();
             

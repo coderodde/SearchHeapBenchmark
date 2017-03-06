@@ -596,7 +596,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         x.children[x.size--] = null;
                         
                         if (x.size == 0) {
-                            root = x.children[0];
+                            root = leftSibling;
+//                            root = x.children[0]; // Bug?
                             System.out.println("After left sibling move up!");
                         }
                         
@@ -628,7 +629,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         // one position to the left:
                         for (int i = childIndex + 1; i < x.size; ++i) {
                             x.keys[i - 1] = x.keys[i];
-                            // Children as well?
+                            x.children[i] = x.children[i + 1];
                         }
                         
                         x.keys[x.size - 1] = null;
