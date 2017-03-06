@@ -521,6 +521,9 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                                     rightSibling.children[i];
                         }
 
+                        // Shit is here! 6.3.2017 klo 14:58
+                        rightSibling.children[rightSibling.size - 1] = 
+                                rightSibling.children[rightSibling.size];
                         rightSibling.children[rightSibling.size] = null;
                         rightSibling.keys[--rightSibling.size] = null;
 
@@ -528,7 +531,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         targetChild.keys[targetChild.size] = keyToPushDown;
                         targetChild.children[++targetChild.size] = 
                                 firstRightSiblingChild;
-                        targetChild.size++;
                     }
                 } else if (childIndex > 0) {
                     // When we get here, we know that 'targetChild' has left
@@ -583,18 +585,20 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
                         leftSibling.size = 2 * minimumDegree - 1;
                         leftSibling.children[leftSibling.size] = 
-                                targetChild.children[targetChild.size];
+                                targetChild.children[targetChild.size]; // Don't remove! (16:57 6.3.2017)
 
+                        // Shit is somewhere here.
                         // Shift the contents of 'x' after the pushed down 
                         // key one position to the left:
                         for (int i = childIndex; i < x.size; ++i) {
                             x.keys[i - 1] = x.keys[i];
-                            x.children[i - 1] = x.children[i];
+                            x.children[i] = x.children[i + 1];
                         }
 
                         x.keys[x.size - 1] = null;
-                        x.children[x.size - 1] = x.children[x.size];
                         x.children[x.size--] = null;
+//                        x.children[x.size - 1] = x.children[x.size]; // Removed 18:15 (6.3.2017)
+//                        x.children[x.size--] = null; // Same as above.
                         
                         if (x.size == 0) {
                             root = leftSibling;

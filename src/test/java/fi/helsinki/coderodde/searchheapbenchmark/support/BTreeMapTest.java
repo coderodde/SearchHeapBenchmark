@@ -172,15 +172,17 @@ public class BTreeMapTest {
     
     @Test
     public void smallDebugTest() {
+        // Seed = 1488805842895, remove key: 4
         System.out.println("Find bad remove!");
         BTreeMap<Integer, Integer> m = new BTreeMap<>(2);
         
+        outer:
         while (true) {
-            long seed = System.currentTimeMillis();
+            long seed = 1488815783504L; //System.currentTimeMillis();
             Random random = new Random(seed);
             m.clear();
             
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 14; ++i) {
                 int key = random.nextInt(30);
                 m.put(key, key);
             }
@@ -202,8 +204,8 @@ public class BTreeMapTest {
                     }
                     
                     if (m.isEmpty()) {
-                        System.out.println("PASS!");
-                        return;
+//                        return;
+                        continue outer;
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace(System.err);
@@ -214,12 +216,12 @@ public class BTreeMapTest {
         }
     }
     
-    @Test
+//    @Test
     public void bruteForceTest() {
-//        final int UNIVERSE_SIZE = 50_000;
-//        final int ITERATIONS = 100_000;
-        final int UNIVERSE_SIZE = 5_000;
-        final int ITERATIONS = 10_000;
+        final int UNIVERSE_SIZE = 50_000;
+        final int ITERATIONS = 100_000;
+//        final int UNIVERSE_SIZE = 5_000;
+//        final int ITERATIONS = 10_000;
         
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
