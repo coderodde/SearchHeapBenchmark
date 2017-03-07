@@ -104,8 +104,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
     @Override
     public V get(Object key) {
-        return bTreeSearch(root, (K) key);
-//        return map.get(key);    
+//        return bTreeSearch(root, (K) key);
+        return map.get(key);    
     }
     
     private V bTreeSearch(BTreeNode<K> x, K key) {
@@ -122,31 +122,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         } else {
             return bTreeSearch(x.children[i], key);
         }
-    }
-
-    public BTreeMap<Integer, Integer> buildDebugTree() {
-        BTreeMap<Integer, Integer> ret = new BTreeMap<>(2);
-        ret.root.size = 1;
-        ret.root.keys[0] = 10;
-        ret.root.makeInternal();
-        
-        BTreeNode<Integer> leftChild = new BTreeNode<>(2);
-        BTreeNode<Integer> rightChild = new BTreeNode<>(2);
-        
-        ret.root.children[0] = leftChild;
-        ret.root.children[1] = rightChild;
-        
-        leftChild.size = 1;
-        rightChild.size = 1;
-        
-        leftChild.keys[0] = 9;
-        rightChild.keys[0] = 11;
-        
-        ret.map.put(9, 9);
-        ret.map.put(10, 10);
-        ret.map.put(11, 11);
-        
-        return ret;
     }
     
     @Override

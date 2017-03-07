@@ -97,7 +97,7 @@ public final class BTreeHeap<E, P extends Comparable<? super P>>
     
     @Override
     public String toString() {
-        return "BTreeHeap, t = " + map.getMinimumDegree();
+        return "BTreeHeap, minimumDegree = " + map.getMinimumDegree();
     }
     
     /**
