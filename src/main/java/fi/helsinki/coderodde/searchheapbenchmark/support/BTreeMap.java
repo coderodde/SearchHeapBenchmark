@@ -1,5 +1,6 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -267,7 +268,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                 x.keys[i + 1] = x.keys[i];
                 --i;
             }
-            
+
             x.keys[i + 1] = k; // ?
             x.size++;
         } else {
@@ -287,24 +288,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             
             bTreeInsertNonFull(x.children[i], k);
         }
-    }
-    
-    private static <K extends Comparable<? super K>> 
-        K findMinimumKey(BTreeNode<K> x) {
-        while (!x.isLeaf()) {
-            x = x.children[0];
-        }
-        
-        return x.keys[0];
-    }
-        
-    private static <K extends Comparable<? super K>>
-        K findMaximumKey(BTreeNode<K> x) {
-        while (!x.isLeaf()) {
-            x = x.children[x.size];
-        }       
-        
-        return x.keys[x.size - 1];
     }
         
     private static <K extends Comparable<? super K>> 
@@ -670,7 +653,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             }
         }
         
-        return -1;
+        return -1;  
     }
         
     public static void main(String[] args) {

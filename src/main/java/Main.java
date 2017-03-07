@@ -22,7 +22,6 @@ public class Main {
              (WARMUP_GRAPH_NODES + 1);
     
     public static void main(String[] args) {
-//        long seed = 1487849447577L; System.currentTimeMillis();
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         System.out.println("Seed = " + seed);
@@ -57,7 +56,7 @@ public class Main {
         
         benchmarkInt.run();
         System.out.println("***************************************");
-        System.exit(0);
+        
         System.out.println();
         System.out.println("*** Double weight search benchmark ****");
         

@@ -4,6 +4,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.DirectedGraphWeightFunction;
 import fi.helsinki.coderodde.searchheapbenchmark.PathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.PriorityQueue;
 import fi.helsinki.coderodde.searchheapbenchmark.support.AVLTreeHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.BTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.BinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
@@ -12,6 +13,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.DoubleDialsHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DoubleWeight;
 import fi.helsinki.coderodde.searchheapbenchmark.support.FibonacciHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedAVLTreeHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDaryHeap;
@@ -22,7 +24,6 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedPairingHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.PairingHeap;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public final class DoubleWeightBenchmark {
 
@@ -58,6 +59,10 @@ public final class DoubleWeightBenchmark {
         
         benchmarkUnindexed(new AVLTreeHeap<>());
         
+        for (int minimumDegree : new int[]{ 32, 64, 128 }) {
+            benchmarkUnindexed(new BTreeHeap<>(minimumDegree));
+        }
+        
         //// Indexed heaps ////
         benchmarkIndexed(new IndexedBinaryHeap<>());
         
@@ -74,6 +79,10 @@ public final class DoubleWeightBenchmark {
         }
         
         benchmarkIndexed(new IndexedAVLTreeHeap<>());
+        
+        for (int minimumDegree : new int[]{ 32, 64, 128 }) {
+            benchmarkIndexed(new IndexedBTreeHeap<>(minimumDegree));
+        }
         
         System.out.println("Algorithms/heaps agree: " + samePaths());
     }
