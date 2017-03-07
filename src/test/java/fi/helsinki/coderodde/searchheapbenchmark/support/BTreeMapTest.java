@@ -15,16 +15,6 @@ public class BTreeMapTest {
     public void setUp() {
         map.clear();
     }
-    
-    public void rootTest() {
-        BTreeMap<Integer, Integer> map2 = map.buildDebugTree();
-        map2.remove(9);
-        System.out.println("removed 9");
-        map2.remove(10);
-        System.out.println("removed 10");
-        map2.remove(11);
-        System.out.println("removed 11");
-    }
 
     @Test
     public void debug() {
@@ -170,7 +160,7 @@ public class BTreeMapTest {
         assertEquals(Integer.valueOf(0), map.getMinimumKey());
     }
     
-    @Test
+//    @Test
     public void smallDebugTest() {
         // Seed = 1488805842895, remove key: 4
         System.out.println("Find bad remove!");
@@ -217,11 +207,29 @@ public class BTreeMapTest {
     }
     
     @Test
+    public void bruteForceTestHealth() {
+        map = new BTreeMap<>(2);
+        long seed = System.currentTimeMillis();
+        Random random = new Random(seed);
+        System.out.println("bruteForceTestHealth(), seed = " + seed);
+        
+        for (int i = 0; i < 20; ++i) {
+            int key = random.nextInt(30);
+            map.put(key, key);
+            System.out.println("i = " + i + ", healthy: " + map.isHealty());
+        }
+        
+        for (int i = 0; i < 7; ++i) {
+            int key = random.nextInt(30);
+            map.remove(key);
+            System.out.println("j = " + i + ", healthy: " + map.isHealty());
+        }
+    }
+    
+    @Test
     public void bruteForceTest() {
-        final int UNIVERSE_SIZE = 50_000;
-        final int ITERATIONS = 100_000;
-//        final int UNIVERSE_SIZE = 5_000;
-//        final int ITERATIONS = 10_000;
+        final int UNIVERSE_SIZE = 500_000;
+        final int ITERATIONS = 1_000_000;
         
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
@@ -237,7 +245,7 @@ public class BTreeMapTest {
                 int newElement = random.nextInt(UNIVERSE_SIZE);
                 treeMap.put(newElement, 3 * newElement);
                 map.put(newElement, 3 * newElement);
-            } else if (coin < 0.55f) {
+            } else if (coin < 0.53f) {
                 int key = random.nextInt(UNIVERSE_SIZE);
                 assertEquals(treeMap.get(key), map.get(key));
             } else {

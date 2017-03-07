@@ -564,9 +564,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         x.size--;
                         
                         if (x.size == 0) {
-//                            root = x.children[0];
                             root = leftSibling;
-//                            System.out.println("Push me up! leftSibling");
                         }
                         
                         targetChild = leftSibling;
@@ -602,8 +600,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         
                         if (x.size == 0) {
                             root = leftSibling;
-//                            root = x.children[0]; // Bug?
-//                            System.out.println("After left sibling move up!");
                         }
                         
                         targetChild = leftSibling;
@@ -642,8 +638,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         
                         
                         if (x.size == 0) {
-//                            System.out.println("After right sibling move up! Leaf");
-//                            root = x.children[0];
                             root = targetChild;
                         }
                     } else {
@@ -675,7 +669,6 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         x.children[x.size--] = null;
                         
                         if (x.size == 0) {
-//                            System.out.println("After right sibling move up! Internal node");
                             root = targetChild;
                         }
                     }
@@ -707,10 +700,10 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         
     public static void main(String[] args) {
         final int MINIMUM_DEGREE = 16;
-        final int UNIVERSE_SIZE = 30_000;
-        final int LOAD_SIZE = 20_000;
-        final int QUERY_SIZE = 10_000;
-        final int DELETE_SIZE = 5_000;
+        final int UNIVERSE_SIZE = 100_000;
+        final int LOAD_SIZE = 1_000_000;
+        final int QUERY_SIZE = 1_000_000;
+        final int DELETE_SIZE = 500_000;
 
         Map<Integer, Integer> tree1 = new BTreeMap<>(MINIMUM_DEGREE);
         Map<Integer, Integer> tree2 = new TreeMap<>(); 
@@ -762,7 +755,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
         for (int i = 0; i < LOAD_SIZE; ++i) {
             int key = random1.nextInt(UNIVERSE_SIZE);
-            tree1.put(key, key);
+            tree1.put(key, 3 * key);
         }
 
         long endTime = System.currentTimeMillis();
@@ -824,7 +817,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         startTime = System.currentTimeMillis();
 
         for (int i = 0; i < QUERY_SIZE; ++i) {
-            int key = random1.nextInt(UNIVERSE_SIZE);
+            int key = random2.nextInt(UNIVERSE_SIZE);
             tree2.get(key);
         }
 
@@ -838,7 +831,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         startTime = System.currentTimeMillis();
 
         for (int i = 0; i < DELETE_SIZE; ++i) {
-            int key = random1.nextInt(LOAD_SIZE);
+            int key = random2.nextInt(LOAD_SIZE);
             tree2.remove(key);
         }
 
@@ -872,11 +865,25 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             }
         }
         
-        if (node.size > count) {
+        if (node.size != count) {
             return false;
         }
         
         if (!node.isLeaf()) {
+            count = 0;
+            
+            for (int i = 0; i <= node.size; ++i) {
+                if (node.children[i] == null) {
+                    break;
+                } else {
+                    count++;
+                }
+            }
+            
+            if (count != node.size + 1) {
+                return false;
+            }
+            
             for (int i = 0; i <= node.size; ++i) {
                 if (!isHealthy(node.children[i])) {
                     return false;
