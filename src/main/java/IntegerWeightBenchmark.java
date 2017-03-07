@@ -11,6 +11,7 @@ import fi.helsinki.coderodde.searchheapbenchmark.support.DaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.DijkstraPathFinder;
 import fi.helsinki.coderodde.searchheapbenchmark.support.FibonacciHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedAVLTreeHeap;
+import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBTreeHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinaryHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedBinomialHeap;
 import fi.helsinki.coderodde.searchheapbenchmark.support.IndexedDaryHeap;
@@ -48,29 +49,29 @@ public final class IntegerWeightBenchmark {
     
     public void run() {
         //// Unindexed heaps ////
-//        benchmarkUnindexed(new BinaryHeap<>());
-//        
-//        for (int degree = 2; degree <= 10; ++degree) {
-//            benchmarkUnindexed(new DaryHeap<>(degree));
-//        }
+        benchmarkUnindexed(new BinaryHeap<>());
         
-//        benchmarkUnindexed(new BinomialHeap<>());
-//        benchmarkUnindexed(new FibonacciHeap<>());
-//        benchmarkUnindexed(new PairingHeap<>());
-//        benchmarkUnindexed(new IntegerDialsHeap<>());
-//        benchmarkUnindexed(new AVLTreeHeap<>());
-//        benchmarkUnindexed(new VanEmdeBoasTreeHeap<>(keyUniverse));
+        for (int degree = 2; degree <= 10; ++degree) {
+            benchmarkUnindexed(new DaryHeap<>(degree));
+        }
+        
+        benchmarkUnindexed(new BinomialHeap<>());
+        benchmarkUnindexed(new FibonacciHeap<>());
+        benchmarkUnindexed(new PairingHeap<>());
+        benchmarkUnindexed(new IntegerDialsHeap<>());
+        benchmarkUnindexed(new AVLTreeHeap<>());
+        benchmarkUnindexed(new VanEmdeBoasTreeHeap<>(keyUniverse));
         
         for (int minimumDegree : new int[]{ 32, 64, 128 }) {
             benchmarkUnindexed(new BTreeHeap<>(minimumDegree));
         }
             
         //// Indexed heaps ////
-//        benchmarkIndexed(new IndexedBinaryHeap<>());
-//        
-//        for (int degree = 2; degree <= 10; ++degree) {
-//            benchmarkIndexed(new IndexedDaryHeap<>(degree));
-//        }
+        benchmarkIndexed(new IndexedBinaryHeap<>());
+        
+        for (int degree = 2; degree <= 10; ++degree) {
+            benchmarkIndexed(new IndexedDaryHeap<>(degree));
+        }
         
         benchmarkIndexed(new IndexedBinomialHeap<>());
         benchmarkIndexed(new IndexedFibonacciHeap<>());
@@ -78,6 +79,10 @@ public final class IntegerWeightBenchmark {
         benchmarkIndexed(new IndexedIntegerDialsHeap<>());
         benchmarkIndexed(new IndexedAVLTreeHeap<>());
         benchmarkIndexed(new IndexedVanEmdeBoasTreeHeap<>(keyUniverse));
+        
+        for (int minimumDegree : new int[]{ 32, 64, 128 }) {
+            benchmarkIndexed(new IndexedBTreeHeap<>(minimumDegree));
+        }
         
         System.out.println("Algorithms/heaps agree: " + samePaths());
     }

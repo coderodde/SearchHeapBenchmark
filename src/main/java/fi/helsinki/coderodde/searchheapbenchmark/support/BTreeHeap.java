@@ -68,8 +68,6 @@ public final class BTreeHeap<E, P extends Comparable<? super P>>
         checkHeapIsNotEmpty();
         P minimumKey = map.getMinimumKey();
         HeapNode<E> heapNodeChainHead = map.get(minimumKey);
-        
-        System.out.println("Contains: " + map.containsKey(minimumKey) + ", " + minimumKey);
         E returnValue;
         
         if (heapNodeChainHead.next != null) {
