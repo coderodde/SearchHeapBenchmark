@@ -209,20 +209,22 @@ public class BTreeMapTest {
     @Test
     public void bruteForceTestHealth() {
         map = new BTreeMap<>(2);
-        long seed = System.currentTimeMillis();
+        long seed = 1488972317767L; //System.currentTimeMillis();
         Random random = new Random(seed);
         System.out.println("bruteForceTestHealth(), seed = " + seed);
         
         for (int i = 0; i < 20; ++i) {
             int key = random.nextInt(30);
+//            System.out.println(key);
             map.put(key, key);
-            System.out.println("i = " + i + ", healthy: " + map.isHealty());
+            assertTrue(map.isHealty());
         }
         
-        for (int i = 0; i < 7; ++i) {
+        for (int i = 0; i < 10; ++i) {
             int key = random.nextInt(30);
+            System.out.println(key);
             map.remove(key);
-            System.out.println("j = " + i + ", healthy: " + map.isHealty());
+            assertTrue(map.isHealty());
         }
     }
     

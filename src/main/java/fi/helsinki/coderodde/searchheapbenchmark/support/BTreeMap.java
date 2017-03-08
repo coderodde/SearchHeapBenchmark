@@ -1,6 +1,5 @@
 package fi.helsinki.coderodde.searchheapbenchmark.support;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -105,8 +104,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
     @Override
     public V get(Object key) {
-//        return bTreeSearch(root, (K) key);
-        return map.get(key);    
+        return bTreeSearch(root, (K) key);
+//        return map.get(key);    
     }
     
     private V bTreeSearch(BTreeNode<K> x, K key) {
@@ -236,16 +235,24 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         
         for (int j = 0; j < minimumDegree - 1; ++j) {
             z.keys[j] = y.keys[j + minimumDegree];
+            y.keys[j + minimumDegree] = null;
         }
         
         if (!y.isLeaf()) {
             for (int j = 0; j < minimumDegree; ++j) {
                 z.children[j] = y.children[j + minimumDegree];
+                y.children[j + minimumDegree] = null;
             }
         }
         
+        int oldSizeOfY = y.size;
         y.size = minimumDegree - 1;
+        K pushUpKey = y.keys[minimumDegree - 1];
         
+        for (int j = y.size; j < oldSizeOfY; ++j) {
+            y.keys[j] = null;
+        }
+                
         for (int j = x.size; j >= i; --j) {
             x.children[j + 1] = x.children[j];
         }
@@ -256,7 +263,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             x.keys[j + 1] = x.keys[j];
         }
         
-        x.keys[i] = y.keys[minimumDegree - 1];
+        x.keys[i] = pushUpKey;
         x.size++;
     }
     
@@ -591,9 +598,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                             x.children[i] = x.children[i + 1];
                         }
                         
-                        x.keys[x.size - 1] = null;
-                        x.size--;
-                        
+                        x.children[x.size] = null;
+                        x.keys[--x.size] = null;
                         
                         if (x.size == 0) {
                             root = targetChild;
@@ -815,7 +821,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         
         int count = 0;
         
-        for (int i = 0; i < node.size; ++i) {
+        for (int i = 0; i < node.keys.length; ++i) {
             if (node.keys[i] == null) {
                 break;
             } else {
@@ -830,7 +836,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
         if (!node.isLeaf()) {
             count = 0;
             
-            for (int i = 0; i <= node.size; ++i) {
+            for (int i = 0; i < node.children.length; ++i) {
                 if (node.children[i] == null) {
                     break;
                 } else {
