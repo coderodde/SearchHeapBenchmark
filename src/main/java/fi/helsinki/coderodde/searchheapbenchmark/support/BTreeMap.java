@@ -104,8 +104,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
 
     @Override
     public V get(Object key) {
-        return bTreeSearch(root, (K) key);
-//        return map.get(key);    
+//        return bTreeSearch(root, (K) key);
+        return map.get(key);    
     }
     
     private V bTreeSearch(BTreeNode<K> x, K key) {
@@ -373,7 +373,7 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
             }
             
             x.children[x.size] = null;
-            x.size--;
+            x.keys[--x.size] = null;
             bTreeDeleteKey(y, key);
             
             if (x.size == 0) {
@@ -630,7 +630,8 @@ public final class BTreeMap<K extends Comparable<? super K>, V>
                         }
                         
                         x.children[x.size - 1] = x.children[x.size];
-                        x.children[x.size--] = null;
+                        x.children[x.size] = null;
+                        x.keys[--x.size] = null;
                         
                         if (x.size == 0) {
                             root = targetChild;

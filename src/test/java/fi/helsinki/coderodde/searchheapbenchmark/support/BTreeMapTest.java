@@ -206,10 +206,39 @@ public class BTreeMapTest {
         }
     }
     
+//    @Test
+    public void findBadNullifies() {
+        while (true) {
+            long seed = System.currentTimeMillis();
+            Random random = new Random(seed);
+            map = new BTreeMap<>(2);
+            
+            for (int i = 0; i < 40; ++i) {
+                int key = random.nextInt(60);
+                map.put(key, 3 * key);
+                assertTrue(map.isHealty());
+            }
+            
+            while (!map.isEmpty()) {
+                int key = random.nextInt(60);
+//                System.out.println("key: " + key);
+                map.remove(key);
+                
+                try {
+                    assertTrue(map.isHealty());
+                } catch (Throwable t) {
+                    System.out.println(
+                            "findBadNullifies() failed on seed = " + seed);
+                    return;
+                }
+            }
+        }
+    }
+    
     @Test
     public void bruteForceTestHealth() {
         map = new BTreeMap<>(2);
-        long seed = 1488972317767L; //System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         System.out.println("bruteForceTestHealth(), seed = " + seed);
         
@@ -222,7 +251,7 @@ public class BTreeMapTest {
         
         for (int i = 0; i < 10; ++i) {
             int key = random.nextInt(30);
-            System.out.println(key);
+//            System.out.println(key);
             map.remove(key);
             assertTrue(map.isHealty());
         }
